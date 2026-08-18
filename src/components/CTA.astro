@@ -1,0 +1,46 @@
+---
+import Button from './Button.astro';
+import Icon from './Icon.astro';
+import { contact } from '../data/company.ts';
+
+interface Props {
+  title?: string;
+  lead?: string;
+  class?: string;
+}
+
+const {
+  title = 'Talk to a telematics specialist in Lagos',
+  lead = 'Tell us what you move — vehicles, cargo, people — and we will walk you through the right PrimeTrack setup, backed by 24/7 PrimeCARE support and a 3-year warranty.',
+  class: className = '',
+} = Astro.props;
+
+const primaryPhone = contact.phones[0];
+---
+
+<section class={`bg-ink-950 on-dark ${className}`}>
+  <div class="container-prime py-16 md:py-24">
+    <div class="bg-prime-glow relative overflow-hidden rounded-panel border border-white/10 px-6 py-12 md:px-14 md:py-16">
+      <div class="bg-grid-prime pointer-events-none absolute inset-0 opacity-60"></div>
+
+      <div class="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+        <div class="flex max-w-2xl flex-col gap-4">
+          <span class="eyebrow">Get started</span>
+          <h2 class="text-h2 text-white">{title}</h2>
+          <p class="text-lead text-ink-300 text-pretty">{lead}</p>
+        </div>
+
+        <div class="flex shrink-0 flex-col gap-3 sm:flex-row lg:flex-col">
+          <Button href="/contact-prime/" size="lg">
+            Contact us
+            <Icon name="arrow-right" size={18} />
+          </Button>
+          <Button href={`tel:${primaryPhone.tel}`} variant="secondary" tone="dark" size="lg">
+            <Icon name="phone" size={16} />
+            {primaryPhone.display}
+          </Button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

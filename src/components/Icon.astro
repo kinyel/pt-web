@@ -1,0 +1,50 @@
+---
+/**
+ * Inlines an SVG icon at build time. No icon font, no runtime JS, and only the
+ * icons actually used ever reach the page.
+ *
+ * Resolution order: `src/icons/` first (project-owned glyphs — Lucide no
+ * longer ships brand marks), then the Lucide set. Paths resolve from the
+ * project root because component files are bundled before they execute.
+ */
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+interface Props {
+  name: string;
+  size?: number;
+  class?: string;
+  strokeWidth?: number;
+}
+
+const { name, size = 20, class: className = '', strokeWidth = 1.75 } = Astro.props;
+
+const root = process.cwd();
+const candidates = [
+  join(root, 'src', 'icons', `${name}.svg`),
+  join(root, 'node_modules', 'lucide-static', 'icons', `${name}.svg`),
+];
+
+let svg = '';
+for (const candidate of candidates) {
+  try {
+    svg = readFileSync(candidate, 'utf8');
+    break;
+  } catch {
+    /* try the next location */
+  }
+}
+
+if (!svg) {
+  throw new Error(`Icon "${name}" not found in src/icons or lucide-static.`);
+}
+
+// Lucide ships fixed 24×24 attributes; swap them for our sizing and colour.
+svg = svg
+  .replace(/width="24"/, `width="${size}"`)
+  .replace(/height="24"/, `height="${size}"`)
+  .replace(/stroke-width="2"/, `stroke-width="${strokeWidth}"`)
+  .replace(/<svg /, `<svg aria-hidden="true" focusable="false" class="${className}" `);
+---
+
+<Fragment set:html={svg} />

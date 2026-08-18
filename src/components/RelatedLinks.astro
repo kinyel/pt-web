@@ -1,0 +1,31 @@
+---
+import Section from './Section.astro';
+import SectionHeader from './SectionHeader.astro';
+import ProductCard from './ProductCard.astro';
+import type { NavItem } from '../data/navigation.ts';
+
+interface Props {
+  items: NavItem[];
+  title?: string;
+  eyebrow?: string;
+}
+
+const { items, title = 'Related solutions', eyebrow = 'Keep exploring' } = Astro.props;
+---
+
+<Section tone="tinted">
+  <SectionHeader eyebrow={eyebrow} title={title} />
+  <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    {
+      items.map((item) => (
+        <ProductCard
+          href={item.href}
+          label={item.label}
+          descriptor={item.descriptor}
+          icon={item.icon!}
+          external={item.external}
+        />
+      ))
+    }
+  </div>
+</Section>

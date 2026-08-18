@@ -1,0 +1,92 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import FeatureBlocks from '../components/FeatureBlocks.astro';
+import MediaPlaceholder from '../components/MediaPlaceholder.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import CTA from '../components/CTA.astro';
+import { products, services } from '../data/navigation.ts';
+import { productSchema, breadcrumbSchema } from '../data/schema.ts';
+
+const page = products.find((p) => p.href === '/reliable-container-tracking/')!;
+
+const features = [
+  {
+    icon: 'zap',
+    title: 'Months of self-sustaining operation',
+    body: 'A single full charge runs the device for months, and a few hours of charging extends battery life further.',
+  },
+  {
+    icon: 'shield',
+    title: 'Magnetized alloy body',
+    body: 'A weather-proof alloy housing with a magnetized base attaches to any metallic surface — no fixings, no installation crew.',
+  },
+  {
+    icon: 'satellite-dish',
+    title: 'Works off-grid',
+    body: 'Internal power means remote areas with no power source are still covered, with real-time location transmitted throughout.',
+  },
+  {
+    icon: 'thermometer',
+    title: 'Survives harsh conditions',
+    body: 'Built to withstand extreme temperature, moisture and the conditions cargo actually travels through.',
+  },
+  {
+    icon: 'chart-line',
+    title: 'Integrated reporting',
+    body: 'The tracker feeds the fleet management software directly, giving real-time updates alongside detailed reports.',
+  },
+];
+
+const related = [
+  products.find((p) => p.href === '/primesolar/')!,
+  products.find((p) => p.href === '/vehicle-fleet-telematics-solutions-in-nigeria/')!,
+  services.find((s) => s.href === '/fleet-analytics/')!,
+];
+---
+
+<BaseLayout
+  title={page.title!}
+  description={page.description!}
+  schemas={[
+    productSchema({ name: 'STAR Goods & Container Trackers', description: page.description!, url: page.href }),
+    breadcrumbSchema([{ label: 'Products', href: '/#products' }, { label: page.label, href: page.href }]),
+  ]}
+>
+  <PageHero
+    icon="container"
+    eyebrow="Goods Trackers"
+    title="STAR Trackers — stand-alone & rechargeable"
+    lead="Container and goods tracking for cargo that travels where there is no power source. STAR stands for Stand-Alone and Rechargeable, and that is exactly the problem it solves."
+    chips={['Months per charge', 'Magnetized base', 'Weather-proof alloy', 'Off-grid capable']}
+    crumbs={[{ label: 'Products', href: '/#products' }, { label: 'Goods Trackers' }]}
+  />
+
+  <Section tone="white">
+    <div class="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
+      <div class="flex flex-col gap-5">
+        <SectionHeader
+          eyebrow="Use case"
+          title="Cargo does not come with a power supply"
+          lead="Containers, trailers and palletised goods spend most of their journey detached from any vehicle — which is precisely where conventional wired trackers stop reporting."
+        />
+        <p class="text-body text-ink-600 text-pretty">
+          A STAR Tracker clamps to any metallic surface with its magnetized base, runs for months on
+          its own charge, and keeps transmitting real-time location the whole way.
+        </p>
+      </div>
+
+      <MediaPlaceholder slot="star-container-tracker" />
+    </div>
+  </Section>
+
+  <Section tone="tinted">
+    <SectionHeader eyebrow="Capabilities" title="Built to be left alone" />
+    <FeatureBlocks features={features} columns={3} class="mt-12" />
+  </Section>
+
+  <RelatedLinks items={related} />
+  <CTA />
+</BaseLayout>

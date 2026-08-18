@@ -1,0 +1,47 @@
+---
+import { Image } from 'astro:assets';
+import logoDark from '../assets/brand/primetrack-logo.png';
+import logoLight from '../assets/brand/primetrack-logo-light.png';
+
+/**
+ * The real PrimeTrack logo, downloaded from the live site.
+ *
+ * `tone="light"` swaps in the white-wordmark variant derived by
+ * scripts/make-logo-variant.mjs — the supplied artwork has a black wordmark
+ * that vanishes on dark surfaces. The orange ring is untouched in both.
+ *
+ * SIZE CEILING: the source file is 111×99px, the largest the client publishes.
+ * At 44px tall a 2× screen needs 98px — just inside the source. Do not render
+ * this larger than about 48px tall until a vector is supplied.
+ */
+interface Props {
+  class?: string;
+  tone?: 'light' | 'dark';
+  /** Rendered height in px. Keep at or below 48 — see note above. */
+  height?: number;
+}
+
+const { class: className = '', tone = 'dark', height = 44 } = Astro.props;
+
+const asset = tone === 'light' ? logoLight : logoDark;
+
+/* Both dimensions are set explicitly. `width:auto` is not enough: as a flex
+   child the image inherits align-self:stretch and blows out to the full column
+   width, which is what made the footer logo render 426px wide. */
+const renderWidth = ((asset.width / asset.height) * height).toFixed(2);
+---
+
+<!-- width/height carry the file's INTRINSIC size so the aspect ratio the
+     browser reserves matches the file exactly; display size is CSS only.
+     Rounding a derived width here is what makes browsers report a squashed
+     image. -->
+<Image
+  src={asset}
+  alt="PrimeTrack Telematics (Nig.) Ltd"
+  width={asset.width}
+  height={asset.height}
+  densities={[1, 2]}
+  loading="eager"
+  class={`shrink-0 ${className}`}
+  style={`height:${height}px;width:${renderWidth}px`}
+/>

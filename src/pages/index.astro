@@ -1,0 +1,342 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/Section.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import ProductCard from '../components/ProductCard.astro';
+import StatBand from '../components/StatBand.astro';
+import Button from '../components/Button.astro';
+import Icon from '../components/Icon.astro';
+import CTA from '../components/CTA.astro';
+import HeroMap from '../components/HeroMap.astro';
+import { Image } from 'astro:assets';
+import { media } from '../data/media.ts';
+import { products, services } from '../data/navigation.ts';
+import { company, descriptors, credentials, certificatesPdf } from '../data/company.ts';
+
+/**
+ * Homepage capability blurbs — the feature set the live homepage advertises
+ * (inventory §5). Nothing added, nothing embellished.
+ */
+const capabilities = [
+  {
+    icon: 'smartphone',
+    title: 'Track vehicles on the go',
+    body: 'Native iOS and Android apps put live vehicle positions in your pocket.',
+  },
+  {
+    icon: 'wrench',
+    title: 'Fleet preventive maintenance',
+    body: 'Automated service and renewal scheduling, so nothing lapses unnoticed.',
+  },
+  {
+    icon: 'gauge',
+    title: 'Driver behaviour monitoring',
+    body: 'Identify risky habits before they become incidents or fuel losses.',
+    href: '/driver-behaviour-monitoring-systems-for-vehicle-fleet-management/',
+  },
+  {
+    icon: 'siren',
+    title: 'Arrive Alive speed limiters',
+    body: 'PrimeTrack is an FRSC-licensed Speed Limiter vendor.',
+  },
+  {
+    icon: 'video',
+    title: 'Ai-PRIME video telematics',
+    body: 'AI-analysed video that coaches drivers in real time and evidences incidents.',
+    href: '/vehicle-video-tracking-systems/',
+  },
+  {
+    icon: 'fuel',
+    title: 'Fuel consumption monitoring',
+    body: 'See where fuel actually goes and what it costs you.',
+    href: '/fleet-fuel-consumption-management-system/',
+  },
+  {
+    icon: 'plug',
+    title: 'Prime API integration',
+    body: 'Push telematics data straight into the systems you already run.',
+    href: '/gps-telematics-api-integrations/',
+  },
+];
+
+/** Three of the seven advantages (inventory §6.1); the page carries all seven. */
+const advantages = [
+  {
+    icon: 'shield-check',
+    title: 'Regulator-approved',
+    body: 'NCC-licensed to provide GPS tracking and telematics in Nigeria — many competitors are not.',
+  },
+  {
+    icon: 'headset',
+    title: 'PrimeCARE, 24/7',
+    body: 'Round-the-clock human support, with proactive monitoring that catches anomalies before you do.',
+  },
+  {
+    icon: 'layers',
+    title: 'Built for African conditions',
+    body: 'Rugged hardware engineered for heat, dust, humidity and variable network coverage.',
+  },
+];
+
+const title = "PrimeTrack Telematics — Nigeria's #1 GPS Tracking & Fleet Management";
+const description =
+  'GPS vehicle tracking, Ai-enabled video telematics, solar trackers and fleet management in Nigeria. NCC-licensed, 24/7 PrimeCARE support, 3-year warranty.';
+---
+
+<BaseLayout title={title} description={description}>
+  <!-- ================= HERO ================= -->
+  <section class="on-dark relative isolate overflow-hidden bg-ink-950">
+    <HeroMap />
+
+    <!-- Readability wash. The map is decoration; the words have to win.
+         Mobile fades top-to-bottom, so the copy sits on near-solid dark and the
+         routes surface lower down around the stats. Desktop fades left-to-right
+         instead, clearing the right half beside the copy. A single horizontal
+         wash on mobile buried the map almost completely. -->
+    <div
+      class="absolute inset-0 bg-gradient-to-b from-ink-950/96 via-ink-950/82 to-ink-950/55 lg:bg-gradient-to-r lg:from-ink-950 lg:via-ink-950/80 lg:to-transparent"
+    >
+    </div>
+    <div class="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-ink-950 to-transparent"></div>
+
+    <div class="container-prime relative py-16 md:py-24 lg:py-28">
+      <div class="flex max-w-2xl flex-col gap-7">
+        <span class="eyebrow">{company.positioning}</span>
+
+        <h1 class="text-display-xl text-white">
+          Efficient telematics<br class="hidden sm:block" /> is here
+        </h1>
+
+        <p class="max-w-xl text-lead text-ink-300 text-pretty">
+          Precision vehicle tracking, Ai-enabled video telematics and IoT-driven fleet management
+          for Nigerian businesses — backed by 24/7 PrimeCARE support and a 3-year warranty.
+        </p>
+
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <Button href="/contact-prime/" size="lg">
+            Talk to our team
+            <Icon name="arrow-right" size={18} />
+          </Button>
+          <Button href="/fleet-analytics/" variant="secondary" tone="dark" size="lg">
+            See what we track
+          </Button>
+        </div>
+
+        <ul class="flex flex-wrap gap-x-6 gap-y-3 pt-2">
+          {
+            ['NCC-licensed', 'FRSC-licensed Speed Limiter vendor', '3-year warranty'].map((item) => (
+              <li class="flex items-center gap-2 text-small text-ink-300">
+                <Icon name="circle-check" size={16} class="text-prime-500" />
+                {item}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <!-- The only four numeric claims on this site (inventory §5). -->
+    <div class="relative">
+      <div class="rule-prime"></div>
+      <div class="container-prime py-10 md:py-12">
+        <StatBand tone="dark" />
+      </div>
+    </div>
+
+    <!-- Capability descriptors, verbatim from the live homepage. -->
+    <div class="relative border-t border-white/10">
+      <ul class="container-prime flex flex-wrap items-center gap-x-8 gap-y-3 py-5">
+        {
+          descriptors.map((descriptor) => (
+            <li class="flex items-center gap-2 text-small text-ink-400">
+              <span class="h-1.5 w-1.5 rounded-full bg-azure-400" />
+              {descriptor}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= PRODUCTS ================= -->
+  <Section tone="white" id="products">
+    <SectionHeader
+      eyebrow="Products"
+      title="Hardware for every asset you move"
+      lead="Six tracker families covering vehicles, cargo and people — all reporting into one fleet management platform."
+    />
+
+    <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        products.map((product, i) => (
+          <ProductCard
+            href={product.href}
+            label={product.label}
+            descriptor={product.descriptor}
+            icon={product.icon!}
+            featured={i < 2}
+            blurb={
+              i === 0
+                ? 'Ai-PRIME pairs a high-storage DVR with four weatherproof cameras and ADAS sensors, streaming live video and flagging risky driving as it happens.'
+                : 'PrimeSOLAR keeps reporting even when a truck sits in the workshop — it never touches the vehicle battery, and the cell recharges daily in sunlight.'
+            }
+            class="reveal"
+          />
+        ))
+      }
+    </div>
+  </Section>
+
+  <!-- ================= SERVICES ================= -->
+  <Section tone="tinted" id="services">
+    <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+      <SectionHeader
+        eyebrow="Services"
+        accent="tech"
+        title="The intelligence layer on top of the hardware"
+        lead="Trackers collect the data. These services turn it into decisions your operation can act on."
+      />
+      <Button href="/fleet-analytics/" variant="tech" class="shrink-0">
+        Explore fleet analytics
+        <Icon name="arrow-right" size={16} />
+      </Button>
+    </div>
+
+    <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        services.map((service) => (
+          <ProductCard
+            href={service.href}
+            label={service.label}
+            descriptor={service.descriptor}
+            icon={service.icon!}
+            external={service.external}
+            accent="tech"
+            class="reveal"
+          />
+        ))
+      }
+    </div>
+  </Section>
+
+  <!-- ================= WHY PRIMETRACK ================= -->
+  <Section tone="dark">
+    <div class="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+      <SectionHeader
+        eyebrow="Why PrimeTrack"
+        tone="dark"
+        title="Why fleets trust us with their vehicles"
+        lead="Seven advantages separate PrimeTrack from the field. Three of them matter before you even switch a device on."
+      />
+
+      <div class="flex flex-col gap-8">
+        <ul class="flex flex-col divide-y divide-white/10">
+          {
+            advantages.map((advantage) => (
+              <li class="flex gap-5 py-6 first:pt-0">
+                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/10 text-prime-400">
+                  <Icon name={advantage.icon} size={20} />
+                </span>
+                <div>
+                  <h3 class="text-h4 text-white">{advantage.title}</h3>
+                  <p class="mt-1.5 text-small text-ink-400 text-pretty">{advantage.body}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+
+        <Button href="/why-choose-primetrack/" variant="secondary" tone="dark" class="self-start">
+          See all seven advantages
+          <Icon name="arrow-right" size={16} />
+        </Button>
+      </div>
+    </div>
+  </Section>
+
+  <!-- ================= CAPABILITIES ================= -->
+  <Section tone="white">
+    <SectionHeader
+      eyebrow="Capabilities"
+      accent="tech"
+      title="What you get, day to day"
+      lead="The everyday features PrimeTrack customers rely on across Nigeria."
+    />
+
+    <ul class="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        capabilities.map((capability) => (
+          <li class="reveal flex flex-col gap-3">
+            <span class="flex h-10 w-10 items-center justify-center rounded-card bg-azure-50 text-azure-700">
+              <Icon name={capability.icon} size={18} />
+            </span>
+            <h3 class="text-h4 text-ink-950">{capability.title}</h3>
+            <p class="text-small text-ink-600 text-pretty">{capability.body}</p>
+            {capability.href && (
+              <a
+                href={capability.href}
+                class="inline-flex items-center gap-1.5 text-small font-semibold text-azure-700 hover:text-azure-600"
+              >
+                Learn more<span class="sr-only"> about {capability.title.toLowerCase()}</span>
+                <Icon name="arrow-right" size={15} />
+              </a>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <!-- ================= CREDENTIALS ================= -->
+  <Section tone="tinted">
+    <div class="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+      <SectionHeader
+        eyebrow="Credentials"
+        title="Licensed, accountable, and here when you call"
+        lead="Every claim on this page is one we can evidence — including the paperwork."
+      />
+
+      <div class="flex flex-col gap-5">
+        <ul class="grid gap-4 sm:grid-cols-2">
+          {
+            credentials.map((credential) => (
+              <li class="rounded-panel border border-ink-200 bg-white p-6">
+                <span class="flex h-10 w-10 items-center justify-center rounded-full bg-prime-50 text-prime-600">
+                  <Icon name="badge-check" size={19} />
+                </span>
+                <h3 class="mt-4 text-h4 text-ink-950">{credential.title}</h3>
+                <p class="mt-1.5 text-small text-ink-600 text-pretty">{credential.body}</p>
+              </li>
+            ))
+          }
+        </ul>
+
+        <div class="flex flex-col gap-4 rounded-panel border border-ink-200 bg-white p-6">
+          <p class="text-label uppercase text-ink-500">Regulatory bodies</p>
+          {/* The client's own accreditation artwork, reproduced as published.
+              No accreditation is asserted in copy beyond what §6.2 of the
+              content inventory verifies — see the note in data/media.ts. */}
+          <Image
+            src={media.accreditations.image}
+            alt={media.accreditations.alt}
+            width={180}
+            height={58}
+            loading="lazy"
+            class="h-auto w-[180px] max-w-full"
+          />
+          {/* Rendered at its native 180px. The source is the only version the
+              client publishes, so a 2× render would just be upscaling. */}
+          <a
+            href={certificatesPdf.href}
+            class="inline-flex items-center gap-2 self-start text-small font-semibold text-azure-700 hover:text-azure-600"
+          >
+            <Icon name="file-text" size={16} />
+            {certificatesPdf.label}
+          </a>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <CTA />
+</BaseLayout>

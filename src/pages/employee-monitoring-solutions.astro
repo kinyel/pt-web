@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import FeatureBlocks from '../components/FeatureBlocks.astro';
+import MediaPlaceholder from '../components/MediaPlaceholder.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import CTA from '../components/CTA.astro';
+import Icon from '../components/Icon.astro';
+import { products, services } from '../data/navigation.ts';
+import { productSchema, breadcrumbSchema } from '../data/schema.ts';
+
+const page = products.find((p) => p.href === '/employee-monitoring-solutions/')!;
+
+/** Device formats offered (inventory §3.5). */
+const formats = [
+  { icon: 'watch', label: 'Watches' },
+  { icon: 'container', label: 'Keyrings' },
+  { icon: 'radio', label: 'Modems' },
+  { icon: 'cpu', label: 'GPS chips' },
+];
+
+const features = [
+  {
+    icon: 'map-pinned',
+    title: 'Real-time tracking',
+    body: 'Live personnel locations, with server ping intervals you can set to match the situation.',
+  },
+  {
+    icon: 'siren',
+    title: 'Emergency panic button',
+    body: 'A discreet SOS that reaches designated people immediately, without drawing attention.',
+  },
+  {
+    icon: 'target',
+    title: 'Geofencing and POI zones',
+    body: 'Define zones and points of interest, and get notified on every entry and exit.',
+  },
+  {
+    icon: 'zap',
+    title: 'Solid power management',
+    body: 'Efficient power use, with reserve power that can be activated remotely when it is needed.',
+  },
+  {
+    icon: 'users',
+    title: 'Wearable, ergonomic designs',
+    body: 'Sleek and lightweight enough to be worn all day — and discreet where discretion matters.',
+  },
+];
+
+const related = [
+  products.find((p) => p.href === '/vehicle-fleet-telematics-solutions-in-nigeria/')!,
+  products.find((p) => p.href === '/reliable-container-tracking/')!,
+  services.find((s) => s.href === '/fleet-analytics/')!,
+];
+---
+
+<BaseLayout
+  title={page.title!}
+  description={page.description!}
+  schemas={[
+    productSchema({ name: 'Human Trackers — Personnel Tracking', description: page.description!, url: page.href }),
+    breadcrumbSchema([{ label: 'Products', href: '/#products' }, { label: page.label, href: page.href }]),
+  ]}
+>
+  <PageHero
+    icon="watch"
+    eyebrow="Human Trackers"
+    title="Personnel tracking that people will actually wear"
+    lead="Self-powered wearable GPS trackers for staff working alone, travelling, or operating in places where getting help quickly matters."
+    chips={['Panic-button SOS', 'Geofencing', 'Remote reserve power', 'Discreet formats']}
+    crumbs={[{ label: 'Products', href: '/#products' }, { label: 'Human Trackers' }]}
+  />
+
+  <Section tone="white">
+    <div class="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
+      <div class="flex flex-col gap-6">
+        <SectionHeader
+          eyebrow="Formats"
+          title="Four ways to carry the same protection"
+          lead="Every format is self-powered, and several are discreet enough that nobody needs to know they are there."
+        />
+        <ul class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {
+            formats.map((format) => (
+              <li class="flex flex-col items-center gap-2.5 rounded-panel border border-ink-200 bg-white px-3 py-6 text-center">
+                <span class="flex h-11 w-11 items-center justify-center rounded-full bg-prime-50 text-prime-600">
+                  <Icon name={format.icon} size={20} />
+                </span>
+                <span class="text-small font-semibold text-ink-900">{format.label}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <MediaPlaceholder slot="wearable-personnel-tracker" />
+    </div>
+  </Section>
+
+  <Section tone="tinted">
+    <SectionHeader eyebrow="Capabilities" title="What the devices do" />
+    <FeatureBlocks features={features} columns={3} class="mt-12" />
+  </Section>
+
+  <RelatedLinks items={related} />
+  <CTA />
+</BaseLayout>

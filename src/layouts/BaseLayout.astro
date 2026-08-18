@@ -1,0 +1,101 @@
+---
+import '../styles/global.css';
+import { getImage } from 'astro:assets';
+import Navbar from '../components/Navbar.tsx';
+import Footer from '../components/Footer.astro';
+import { organizationSchema } from '../data/schema.ts';
+import logoDark from '../assets/brand/primetrack-logo.png';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Extra JSON-LD blocks for this page (Product, Service, Breadcrumb…). */
+  schemas?: Record<string, unknown>[];
+  /** Set false on the 404 page and other routes search engines should skip. */
+  indexable?: boolean;
+}
+
+const { title, description, schemas = [], indexable = true } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+
+/* Social card. Regenerate with `node scripts/make-og-image.mjs`. Absolute URL
+   is required — relative paths are ignored by most scrapers. */
+const ogImage = new URL('/og-primetrack.png', Astro.site).href;
+const ogImageAlt =
+  'PrimeTrack Telematics — efficient telematics is here. 5,000 active trackers, 15+ years experience, 5 countries, 24/7 support.';
+const currentPath = Astro.url.pathname;
+const allSchemas = [organizationSchema, ...schemas];
+
+/* The header is a React island, so it cannot import an Astro image directly.
+   Optimise here and hand it plain URLs. 44px tall, 2× capped at the source's
+   own 111×99 — see the size note in Logo.astro. */
+const LOGO_H = 44;
+const LOGO_RATIO = logoDark.width / logoDark.height;
+const LOGO_W = LOGO_H * LOGO_RATIO;
+/* Width only — passing height as well makes Astro resize to an exact box and
+   rounds the aspect ratio off, which browsers then report as a squashed image. */
+const [logo1x, logo2x] = await Promise.all([
+  getImage({ src: logoDark, width: Math.round(LOGO_W), format: 'webp' }),
+  getImage({ src: logoDark, width: Math.round(LOGO_W * 2), format: 'webp' }),
+]);
+const logo = {
+  src: logo1x.src,
+  srcSet: `${logo1x.src} 1x, ${logo2x.src} 2x`,
+  width: logo1x.attributes.width ?? Math.round(LOGO_W),
+  height: logo1x.attributes.height ?? LOGO_H,
+};
+---
+
+<!doctype html>
+<html lang="en-NG">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {!indexable && <meta name="robots" content="noindex, follow" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="PrimeTrack Telematics" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="en_NG" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <meta name="theme-color" content="#08090b" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    {
+      allSchemas.map((schema) => (
+        <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+      ))
+    }
+  </head>
+
+  <body class="flex min-h-screen flex-col">
+    <a
+      href="#main"
+      class="sr-only rounded-full bg-ink-950 px-5 py-3 font-semibold text-white focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60]"
+    >
+      Skip to content
+    </a>
+
+    <Navbar client:load currentPath={currentPath} logo={logo} />
+
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+
+    <Footer />
+  </body>
+</html>

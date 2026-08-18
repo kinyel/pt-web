@@ -1,0 +1,118 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import FeatureBlocks from '../components/FeatureBlocks.astro';
+import ContentImage from '../components/ContentImage.astro';
+import { media } from '../data/media.ts';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import CTA from '../components/CTA.astro';
+import Icon from '../components/Icon.astro';
+import { products, services } from '../data/navigation.ts';
+import { productSchema, breadcrumbSchema } from '../data/schema.ts';
+
+const page = products.find((p) => p.href === '/primesolar/')!;
+
+/** The device's own claim block (inventory §3.2). */
+const claims = [
+  '3-year continuous operation before battery replacement',
+  'SIM-tampering proof',
+  'Waterproof',
+  'Dustproof',
+  'High-temperature proof',
+  'Device-removal proof',
+];
+
+const features = [
+  {
+    icon: 'wrench',
+    title: 'Works while the truck is off the road',
+    body: 'PrimeSOLAR never connects to the truck battery, so it keeps reporting even while the vehicle sits in the workshop.',
+  },
+  {
+    icon: 'shield',
+    title: 'Tamper-proof by design',
+    body: 'The SIM cannot be swapped out, and any physical interference triggers an instant alert. The device can also pick up surrounding audio and carries a built-in vibration sensor.',
+  },
+  {
+    icon: 'sun',
+    title: 'Recharges daily in sunlight',
+    body: 'The embedded battery lasts a minimum of three years before replacement, topping itself up from daylight every day it is in service.',
+  },
+  {
+    icon: 'thermometer',
+    title: 'Built for the tropics',
+    body: 'Waterproof, weatherproof and temperature-proof — a rugged housing engineered for Nigerian heat, dust and rain.',
+  },
+  {
+    icon: 'bell',
+    title: 'Precision reports and breach alerts',
+    body: 'Full reporting and breach notifications arrive through the fleet platform and the Prime mobile apps.',
+  },
+];
+
+const related = [
+  products.find((p) => p.href === '/reliable-container-tracking/')!,
+  products.find((p) => p.href === '/vehicle-fleet-telematics-solutions-in-nigeria/')!,
+  services.find((s) => s.href === '/fleet-analytics/')!,
+];
+---
+
+<BaseLayout
+  title={page.title!}
+  description={page.description!}
+  schemas={[
+    productSchema({ name: 'PrimeSOLAR Solar Trackers', description: page.description!, url: page.href }),
+    breadcrumbSchema([{ label: 'Products', href: '/#products' }, { label: page.label, href: page.href }]),
+  ]}
+>
+  <PageHero
+    icon="sun"
+    eyebrow="Solar Trackers"
+    title="PrimeSOLAR — the maintenance-free truck tracker"
+    lead="Nigeria's premier solar tracking device, backed by full warranty cover. It draws nothing from the vehicle, so it keeps working when everything else is switched off."
+    chips={['Solar-recharging', 'Tamper-proof SIM', 'Vibration sensor', '3-year battery life']}
+    crumbs={[{ label: 'Products', href: '/#products' }, { label: 'Solar Trackers' }]}
+  />
+
+  <Section tone="white">
+    <div class="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
+      <div class="flex flex-col gap-5">
+        <SectionHeader
+          eyebrow="The problem it solves"
+          title="A tracker that outlives the trip"
+          lead="Wired trackers go quiet the moment a truck is parked up, disconnected or in for repair — exactly the moments when knowing where an asset sits matters most."
+        />
+        <p class="text-body text-ink-600 text-pretty">
+          PrimeSOLAR is independent of the vehicle's electrical system. Its embedded cell runs for a
+          minimum of three years before replacement and recharges daily from sunlight, so coverage
+          does not depend on the truck being alive.
+        </p>
+      </div>
+
+      <ContentImage asset={media.primesolarTracker} />
+    </div>
+  </Section>
+
+  <Section tone="dark" size="sm">
+    <ul class="grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        claims.map((claim) => (
+          <li class="flex items-start gap-3 text-small font-semibold uppercase tracking-wide text-ink-200">
+            <Icon name="circle-check" size={18} class="mt-0.5 shrink-0 text-prime-500" />
+            {claim}
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section tone="tinted">
+    <SectionHeader eyebrow="Capabilities" title="What makes it maintenance-free" />
+    <FeatureBlocks features={features} columns={3} class="mt-12" />
+  </Section>
+
+  <RelatedLinks items={related} />
+  <CTA />
+</BaseLayout>

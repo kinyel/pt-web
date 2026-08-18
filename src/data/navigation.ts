@@ -1,0 +1,135 @@
+/**
+ * Navigation + per-page SEO metadata.
+ * Menu structure comes straight from inventory §2 — no invented categories,
+ * no "Solutions" or "Industries" menu (neither exists in verified content).
+ * Every href is byte-identical to the live site (inventory §8).
+ */
+
+export interface NavItem {
+  label: string;
+  href: string;
+  /** One-line descriptor shown in the mega-menu and on cards. */
+  descriptor: string;
+  /** Lucide icon name used on cards and page heroes. */
+  icon?: string;
+  external?: boolean;
+  /** Page <title>. */
+  title?: string;
+  /** Page meta description. */
+  description?: string;
+}
+
+export const products: NavItem[] = [
+  {
+    label: 'Video Trackers',
+    href: '/vehicle-video-tracking-systems/',
+    icon: 'video',
+    descriptor: 'Ai-PRIME intelligent vehicle CCTV with ADAS',
+    title: 'Ai-PRIME Vehicle Video Tracking & CCTV Systems | PrimeTrack',
+    description:
+      '4K DVR cameras, ADAS sensors and AI video telematics for Nigerian fleets — live video feeds, incident evidence and real-time driver alerts.',
+  },
+  {
+    label: 'Solar Trackers',
+    href: '/primesolar/',
+    icon: 'sun',
+    descriptor: 'Maintenance-free solar tracking for trucks',
+    title: 'PrimeSOLAR Solar-Powered Vehicle & Truck Trackers | PrimeTrack',
+    description:
+      'Maintenance-free solar GPS tracker with a minimum 3-year battery, tamper-proof SIM, and a waterproof, dustproof, high-temperature build.',
+  },
+  {
+    label: 'Fleet Trackers',
+    href: '/vehicle-fleet-telematics-solutions-in-nigeria/',
+    icon: 'truck',
+    descriptor: 'GPS fleet management, 3 to 3,000 vehicles',
+    title: 'Vehicle Fleet Telematics & Fleet Management in Nigeria | PrimeTrack',
+    description:
+      'GPS-based fleet management to optimise routes, cut fuel consumption and eliminate downtime — real-time tracking, alerts, reporting and API integration.',
+  },
+  {
+    label: 'Goods Trackers',
+    href: '/reliable-container-tracking/',
+    icon: 'container',
+    descriptor: 'Stand-alone rechargeable container tracking',
+    title: 'STAR Container & Goods Trackers — Reliable Container Tracking | PrimeTrack',
+    description:
+      'Stand-alone rechargeable trackers running for months per charge, with a magnetized weather-proof body for containers and cargo in off-grid areas.',
+  },
+  {
+    label: 'Human Trackers',
+    href: '/employee-monitoring-solutions/',
+    icon: 'watch',
+    descriptor: 'Wearable personnel trackers with panic SOS',
+    title: 'Employee & Personnel GPS Monitoring Solutions | PrimeTrack',
+    description:
+      'Wearable GPS trackers — watches, keyrings, modems and chips — with panic-button SOS, geofencing and real-time personnel tracking.',
+  },
+  {
+    label: 'Fuel Monitoring',
+    href: '/fleet-fuel-consumption-management-system/',
+    icon: 'fuel',
+    descriptor: 'Fleet fuel usage tracking and reporting',
+    title: 'Fleet Fuel Consumption Management System | PrimeTrack',
+    description:
+      'Track fleet fuel usage accurately, identify idling, speeding and inefficient driving, and act on consumption trends with detailed reports.',
+  },
+];
+
+export const services: NavItem[] = [
+  {
+    label: 'Driver Monitoring',
+    href: '/driver-behaviour-monitoring-systems-for-vehicle-fleet-management/',
+    icon: 'gauge',
+    descriptor: 'Behaviour scoring for safety and fuel savings',
+    title: 'Driver Behaviour Monitoring Systems for Fleet Management | PrimeTrack',
+    description:
+      'Monitor driver behaviour to improve safety, reduce fuel consumption and increase fleet productivity with PrimeTrack telematics.',
+  },
+  {
+    label: 'API Integration',
+    href: '/gps-telematics-api-integrations/',
+    icon: 'plug',
+    descriptor: 'Connect telematics data to your ERM/ERP',
+    title: 'GPS & Telematics API Integrations | PrimeTrack',
+    description:
+      'Integrate location, speed, fuel and maintenance data directly into your ERM/ERP with a flexible API and dedicated integration support.',
+  },
+  {
+    label: 'Fleet Analytics',
+    href: '/fleet-analytics/',
+    icon: 'chart-line',
+    descriptor: '15 reporting and analytics capabilities',
+    title: 'Fleet Analytics & Telematics Reporting | PrimeTrack',
+    description:
+      'Fifteen fleet analytics capabilities — real-time tracking, history playback, geofencing, fuel, temperature, video telematics, TAT and utilisation reporting.',
+  },
+  {
+    // Rwanda property. Never rebuilt as a Nigeria page (inventory §4.4).
+    // Open item: client to confirm whether vRAS belongs in the Nigeria nav.
+    label: 'vRAS',
+    href: 'https://primetrack.rw/vras',
+    icon: 'globe',
+    descriptor: 'Rwanda — opens the PrimeTrack Rwanda site',
+    external: true,
+  },
+];
+
+/** Footer secondary navigation — the site's own "PrimeINFO" / "PrimeTOOLS" grouping. */
+export const primeInfo: NavItem[] = [
+  { label: 'Why Choose PrimeTrack?', href: '/why-choose-primetrack/', descriptor: 'Seven advantages' },
+  { label: 'Prime Warranties', href: '/warranty/', descriptor: '3-year product warranty' },
+  { label: 'Prime Careers', href: '/careers/', descriptor: 'Join the team' },
+  { label: 'I.C.C.P.', href: '/iccp/', descriptor: 'I.C.C.P.' },
+];
+
+export const primeTools: NavItem[] = [
+  { label: 'Support Manuals & Documents', href: '/tools/', descriptor: 'Guides and downloads' },
+  { label: 'Terms of Service', href: '/service-terms/', descriptor: 'Service terms' },
+];
+
+/** Top-level header items rendered to the right of the two mega-menus. */
+export const primaryLinks: NavItem[] = [
+  { label: 'Why PrimeTrack', href: '/why-choose-primetrack/', descriptor: 'Seven advantages' },
+  { label: 'Contact', href: '/contact-prime/', descriptor: 'Talk to our team in Lagos' },
+];

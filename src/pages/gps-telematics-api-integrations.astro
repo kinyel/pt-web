@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import CTA from '../components/CTA.astro';
+import Icon from '../components/Icon.astro';
+import { products, services } from '../data/navigation.ts';
+import { serviceSchema, breadcrumbSchema } from '../data/schema.ts';
+
+const page = services.find((s) => s.href === '/gps-telematics-api-integrations/')!;
+
+/** The five benefits listed on this service page (inventory §4.2). */
+const benefits = [
+  {
+    icon: 'zap',
+    title: 'Streamlined data exchange',
+    body: 'Location, speed, fuel and maintenance schedules move between systems automatically instead of being re-keyed.',
+  },
+  {
+    icon: 'chart-column',
+    title: 'Enhanced fleet management',
+    body: 'Vehicle status, real-time alerts and reports surface inside the tools your team already has open.',
+  },
+  {
+    icon: 'route',
+    title: 'Seamless workflow automation',
+    body: 'Reports, maintenance reminders and work-order dispatch trigger themselves off live telematics data.',
+  },
+  {
+    icon: 'code',
+    title: 'Customized solutions',
+    body: 'The API is flexible enough to fit the way your operation actually works, rather than the other way round.',
+  },
+  {
+    icon: 'headset',
+    title: 'Reliable support',
+    body: 'A dedicated team stays with you through integration — not just until the credentials are issued.',
+  },
+];
+
+const related = [
+  services.find((s) => s.href === '/fleet-analytics/')!,
+  products.find((p) => p.href === '/vehicle-fleet-telematics-solutions-in-nigeria/')!,
+  products.find((p) => p.href === '/fleet-fuel-consumption-management-system/')!,
+];
+---
+
+<BaseLayout
+  title={page.title!}
+  description={page.description!}
+  schemas={[
+    serviceSchema({ name: 'GPS & Telematics API Integrations', description: page.description!, url: page.href }),
+    breadcrumbSchema([{ label: 'Services', href: '/#services' }, { label: page.label, href: page.href }]),
+  ]}
+>
+  <PageHero
+    accent="tech"
+    icon="plug"
+    eyebrow="API Integration"
+    title="Telematics data, inside the systems you already run"
+    lead="PrimeTrack's API connects tracking data directly to your ERM, so fleet information stops living in a separate tab and starts driving your existing workflows."
+    chips={['ERM/ERP integration', 'Workflow automation', 'Dedicated support']}
+    crumbs={[{ label: 'Services', href: '/#services' }, { label: 'API Integration' }]}
+  />
+
+  <Section tone="white">
+    <SectionHeader
+      accent="tech"
+      eyebrow="Benefits"
+      title="Five reasons fleets integrate rather than export"
+    />
+
+    <ul class="mt-12 grid gap-x-10 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
+      {
+        benefits.map((benefit, i) => (
+          <li class="reveal flex flex-col gap-3 border-t border-ink-200 pt-6">
+            <div class="flex items-center justify-between gap-3">
+              <span class="flex h-10 w-10 items-center justify-center rounded-card bg-ink-950 text-prime-400">
+                <Icon name={benefit.icon} size={18} />
+              </span>
+              <span class="font-display text-h4 text-ink-300">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+            </div>
+            <h2 class="text-h4 text-ink-950">{benefit.title}</h2>
+            <p class="text-small text-ink-600 text-pretty">{benefit.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section tone="dark" size="sm">
+    <div class="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
+      <SectionHeader
+        accent="tech"
+        eyebrow="Getting started"
+        tone="dark"
+        title="Tell us what you run, and we will map the integration"
+        lead="Bring your ERM or ERP details to the conversation and our integration team will scope it with you."
+      />
+    </div>
+  </Section>
+
+  <RelatedLinks items={related} />
+  <CTA />
+</BaseLayout>

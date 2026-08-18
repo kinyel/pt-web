@@ -1,0 +1,82 @@
+---
+import Breadcrumbs from './Breadcrumbs.astro';
+import Icon from './Icon.astro';
+import Button from './Button.astro';
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  /** Short verified proof points shown as chips under the lead. */
+  chips?: string[];
+  icon?: string;
+  crumbs: { label: string; href?: string }[];
+  showCta?: boolean;
+  /**
+   * `tech` gives the page the blue voice — blue-led backdrop wash, blue icon
+   * and eyebrow. Used on the data/analytics/integration pages so the service
+   * layer reads differently from the hardware pages.
+   */
+  accent?: 'brand' | 'tech';
+}
+
+const {
+  eyebrow,
+  title,
+  lead,
+  chips = [],
+  icon,
+  crumbs,
+  showCta = true,
+  accent = 'brand',
+} = Astro.props;
+
+const isTech = accent === 'tech';
+const glow = isTech ? 'bg-azure-glow' : 'bg-prime-glow';
+const iconTone = isTech ? 'text-azure-300' : 'text-prime-400';
+---
+
+<section class="on-dark relative overflow-hidden bg-ink-950">
+  <div class={`${glow} absolute inset-0`}></div>
+  <div class="bg-grid-prime absolute inset-0"></div>
+
+  <div class="container-prime relative py-12 md:py-20">
+    <Breadcrumbs items={crumbs} tone="dark" />
+
+    <div class="mt-8 flex max-w-3xl flex-col gap-5">
+      {
+        icon && (
+          <span class={`flex h-12 w-12 items-center justify-center rounded-card border border-white/10 ${iconTone}`}>
+            <Icon name={icon} size={22} />
+          </span>
+        )
+      }
+      {eyebrow && <span class={`eyebrow ${isTech ? 'eyebrow-tech' : ''}`}>{eyebrow}</span>}
+      <h1 class="text-display text-white">{title}</h1>
+      {lead && <p class="text-lead text-ink-300 text-pretty">{lead}</p>}
+
+      {
+        chips.length > 0 && (
+          <ul class="flex flex-wrap gap-2 pt-1">
+            {chips.map((chip) => (
+              <li class="rounded-full border border-white/12 px-3.5 py-1.5 text-small text-ink-300">
+                {chip}
+              </li>
+            ))}
+          </ul>
+        )
+      }
+
+      {
+        showCta && (
+          <div class="flex flex-col gap-3 pt-2 sm:flex-row">
+            <Button href="/contact-prime/">
+              Request details
+              <Icon name="arrow-right" size={16} />
+            </Button>
+          </div>
+        )
+      }
+    </div>
+  </div>
+</section>

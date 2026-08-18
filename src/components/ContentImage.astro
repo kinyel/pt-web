@@ -1,0 +1,58 @@
+---
+import { Picture } from 'astro:assets';
+import type { MediaAsset } from '../data/media.ts';
+
+/**
+ * A real photograph or graphic from the asset registry.
+ *
+ * Emits AVIF + WebP + original via <picture>, with a width-based srcset capped
+ * at the source file's own width so nothing is upscaled. Everything is lazy by
+ * default; pass loading="eager" for anything above the fold.
+ *
+ * Real images keep their natural aspect ratio — cropping the client's own
+ * photography to fit a grid is how captions and product edges get cut off.
+ */
+interface Props {
+  asset: MediaAsset;
+  class?: string;
+  loading?: 'lazy' | 'eager';
+  sizes?: string;
+  /** Constrains height on very tall sources without cropping. */
+  maxHeight?: string;
+}
+
+const {
+  asset,
+  class: className = '',
+  loading = 'lazy',
+  sizes = '(min-width: 1024px) 36rem, (min-width: 640px) 90vw, 100vw',
+  maxHeight,
+} = Astro.props;
+
+const { image, alt } = asset;
+
+// Never request a width larger than the file actually has.
+const widths = [...new Set([400, 640, 900, 1200, image.width])]
+  .filter((w) => w <= image.width)
+  .sort((a, b) => a - b);
+---
+
+<figure class={`relative ${className}`}>
+  <!-- Blue hairline corner: the technology motif, applied to real media. -->
+  <span
+    aria-hidden="true"
+    class="pointer-events-none absolute -left-1.5 -top-1.5 h-10 w-10 rounded-tl-panel border-l-2 border-t-2 border-azure-400/60"
+  ></span>
+
+  <Picture
+    src={image}
+    formats={['avif', 'webp']}
+    widths={widths}
+    sizes={sizes}
+    alt={alt}
+    loading={loading}
+    decoding={loading === 'eager' ? 'sync' : 'async'}
+    class="w-full rounded-panel border border-ink-200/80 object-cover"
+    style={maxHeight ? `max-height:${maxHeight}` : undefined}
+  />
+</figure>

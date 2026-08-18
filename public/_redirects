@@ -1,0 +1,22 @@
+# Cloudflare Pages redirects.
+#
+# The rebuild preserves every live URL exactly, so there are no page-level
+# redirects to declare — this file exists for the two housekeeping cases below
+# and as the place to add any future path changes.
+#
+# 1. Legacy WordPress endpoints that no longer exist on a static site.
+/wp-admin           /            301
+/wp-admin/*         /            301
+/wp-login.php       /            301
+/feed               /            301
+/feed/*             /            301
+/comments/feed/*    /            301
+
+# 2. Old image paths, so image-search equity follows the optimized assets.
+#    Uncomment each line as the client supplies the corresponding file.
+# /wp-content/uploads/2024/03/2-website-image-solar-tracker-1024x724.jpg   /images/primesolar-tracker.jpg        301
+# /wp-content/uploads/2023/07/fuel-management-fuel-monitoring-device-fleet-fuel-management.jpg  /images/fuel-monitoring-device.jpg  301
+# /wp-content/uploads/2023/06/vehicle-video-tracking-nigeria.jpg           /images/vehicle-video-tracking.jpg    301
+# /wp-content/uploads/2023/06/vehicle-dvr-realtime-cctv.jpg                /images/vehicle-dvr-cctv.jpg          301
+# /wp-content/uploads/2023/06/logo-primetrack-telematics.png               /images/logo-primetrack.png           301
+# /wp-content/uploads/2023/07/accreditations.fw_.png                       /images/accreditations.png            301

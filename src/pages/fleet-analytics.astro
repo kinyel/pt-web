@@ -1,0 +1,153 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import CTA from '../components/CTA.astro';
+import Icon from '../components/Icon.astro';
+import { products, services } from '../data/navigation.ts';
+import { serviceSchema, breadcrumbSchema } from '../data/schema.ts';
+
+const page = services.find((s) => s.href === '/fleet-analytics/')!;
+
+/**
+ * The 15 verified capabilities (inventory §4.3), grouped so they can be
+ * scanned. Grouping is presentational only — no capability was added,
+ * removed or reworded into something it is not.
+ */
+const groups = [
+  {
+    name: 'Tracking & location',
+    icon: 'map-pinned',
+    items: [
+      { title: 'Real-time tracking', body: 'Live positions for every asset on the platform.' },
+      { title: 'History playback', body: 'Replay any journey to see exactly what happened and when.' },
+      { title: 'Geofencing', body: 'Define zones and get alerted on every entry and exit.' },
+      { title: 'Route optimisation analysis', body: 'Compare routes actually driven against better ones.' },
+    ],
+  },
+  {
+    name: 'Efficiency & utilisation',
+    icon: 'trending-up',
+    items: [
+      { title: 'Idling detection', body: 'Find engines burning fuel while earning nothing.' },
+      { title: 'Fuel monitoring', body: 'Track consumption across the fleet and spot the outliers.' },
+      { title: 'Asset utilisation reports', body: 'See which vehicles work and which sit.' },
+      { title: 'Turnaround time (TAT) reporting', body: 'Measure how long trips and stops really take.' },
+    ],
+  },
+  {
+    name: 'Safety & incidents',
+    icon: 'shield-check',
+    items: [
+      { title: 'Speed monitoring', body: 'Overspeed events surfaced as they happen.' },
+      { title: 'Driver behaviour monitoring', body: 'Scoring that makes risky habits visible.' },
+      { title: 'Video telematics', body: 'Footage tied to the events it explains.' },
+      { title: 'Emergency notification (SOS)', body: 'Immediate escalation when a driver needs help.' },
+      { title: 'Incident reporting and alerts', body: 'A record of what happened, raised automatically.' },
+    ],
+  },
+  {
+    name: 'Condition & upkeep',
+    icon: 'wrench',
+    items: [
+      { title: 'Maintenance alerts', body: 'Servicing prompts before a vehicle becomes downtime.' },
+      {
+        title: 'Temperature monitoring',
+        body: 'Cold-chain and refrigerated cargo watched end to end.',
+      },
+    ],
+  },
+];
+
+const totalCapabilities = groups.reduce((sum, group) => sum + group.items.length, 0);
+
+const related = [
+  products.find((p) => p.href === '/vehicle-fleet-telematics-solutions-in-nigeria/')!,
+  services.find((s) => s.href === '/gps-telematics-api-integrations/')!,
+  products.find((p) => p.href === '/vehicle-video-tracking-systems/')!,
+];
+---
+
+<BaseLayout
+  title={page.title!}
+  description={page.description!}
+  schemas={[
+    serviceSchema({ name: 'Fleet Analytics', description: page.description!, url: page.href }),
+    breadcrumbSchema([{ label: 'Services', href: '/#services' }, { label: page.label, href: page.href }]),
+  ]}
+>
+  <PageHero
+    accent="tech"
+    icon="chart-line"
+    eyebrow="Fleet Analytics"
+    title="Fifteen ways to understand your fleet"
+    lead="Tracking hardware produces data. Fleet Analytics turns it into the specific answers an operations team needs — about location, cost, safety and condition."
+    chips={[`${totalCapabilities} capabilities`, 'Real-time and historical', 'Cold-chain ready']}
+    crumbs={[{ label: 'Services', href: '/#services' }, { label: 'Fleet Analytics' }]}
+  />
+
+  <Section tone="white">
+    <SectionHeader
+      accent="tech"
+      eyebrow="Capabilities"
+      title="Grouped by the question you are asking"
+      lead="Every capability below is part of the standard analytics suite."
+    />
+
+    <div class="mt-12 flex flex-col gap-12">
+      {
+        groups.map((group) => (
+          <div class="reveal grid gap-6 border-t border-ink-200 pt-8 lg:grid-cols-[16rem_1fr] lg:gap-12">
+            <div class="flex items-start gap-3">
+              <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-card bg-ink-950 text-prime-400">
+                <Icon name={group.icon} size={18} />
+              </span>
+              <div>
+                <h2 class="text-h3 text-ink-950">{group.name}</h2>
+                <p class="mt-1 text-small text-ink-500">
+                  {group.items.length} capabilities
+                </p>
+              </div>
+            </div>
+
+            <ul class="grid gap-x-8 gap-y-5 sm:grid-cols-2">
+              {group.items.map((item) => (
+                <li class="flex gap-3">
+                  <Icon name="check" size={17} class="mt-1 shrink-0 text-prime-600" />
+                  <div>
+                    <h3 class="text-h4 text-ink-900">{item.title}</h3>
+                    <p class="mt-1 text-small text-ink-600 text-pretty">{item.body}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section tone="dark" size="sm">
+    <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+      <SectionHeader
+        accent="tech"
+        eyebrow="Integration"
+        tone="dark"
+        title="Every one of these can feed your own systems"
+        lead="The Prime API pushes analytics data straight into your ERM or ERP, so these reports do not have to live in a separate tool."
+      />
+      <a
+        href="/gps-telematics-api-integrations/"
+        class="inline-flex shrink-0 items-center gap-2 text-small font-semibold text-prime-400 hover:text-prime-300"
+      >
+        Explore API integration
+        <Icon name="arrow-right" size={16} />
+      </a>
+    </div>
+  </Section>
+
+  <RelatedLinks items={related} />
+  <CTA />
+</BaseLayout>

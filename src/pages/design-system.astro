@@ -1,0 +1,265 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from '../components/Section.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Button from '../components/Button.astro';
+import ProductCard from '../components/ProductCard.astro';
+import MediaPlaceholder from '../components/MediaPlaceholder.astro';
+import Icon from '../components/Icon.astro';
+
+/**
+ * Internal design-system reference. Excluded from the sitemap (astro.config.mjs)
+ * and marked noindex — it exists so the team can review and extend the system
+ * without reverse-engineering it from pages.
+ */
+
+// Full class names, written out: Tailwind scans source text, so an
+// interpolated `bg-ink-${step}` would never be generated.
+const inkScale = [
+  { step: '950', class: 'bg-ink-950' }, { step: '900', class: 'bg-ink-900' },
+  { step: '850', class: 'bg-ink-850' }, { step: '800', class: 'bg-ink-800' },
+  { step: '700', class: 'bg-ink-700' }, { step: '600', class: 'bg-ink-600' },
+  { step: '500', class: 'bg-ink-500' }, { step: '400', class: 'bg-ink-400' },
+  { step: '300', class: 'bg-ink-300' }, { step: '200', class: 'bg-ink-200' },
+  { step: '100', class: 'bg-ink-100' }, { step: '50', class: 'bg-ink-50' },
+];
+const primeScale = [
+  { step: '900', class: 'bg-prime-900' }, { step: '800', class: 'bg-prime-800' },
+  { step: '700', class: 'bg-prime-700' }, { step: '600', class: 'bg-prime-600' },
+  { step: '500', class: 'bg-prime-500' }, { step: '400', class: 'bg-prime-400' },
+  { step: '300', class: 'bg-prime-300' }, { step: '200', class: 'bg-prime-200' },
+  { step: '100', class: 'bg-prime-100' }, { step: '50', class: 'bg-prime-50' },
+];
+const signalScale = [
+  { step: '700', class: 'bg-signal-700' }, { step: '600', class: 'bg-signal-600' },
+  { step: '500', class: 'bg-signal-500' }, { step: '100', class: 'bg-signal-100' },
+];
+
+const typeScale = [
+  { token: 'text-display-xl', use: 'Homepage hero only', sample: 'Efficient telematics' },
+  { token: 'text-display', use: 'Inner page H1', sample: 'Fifteen ways to understand your fleet' },
+  { token: 'text-h2', use: 'Section headings', sample: 'Why fleets trust us' },
+  { token: 'text-h3', use: 'Sub-sections, card groups', sample: 'Tracking & location' },
+  { token: 'text-h4', use: 'Card titles', sample: 'Real-time tracking' },
+  { token: 'text-lead', use: 'Section lead paragraph', sample: 'Tracking hardware produces data.' },
+  { token: 'text-body', use: 'Body copy', sample: 'Precision vehicle tracking for Nigerian businesses.' },
+  { token: 'text-small', use: 'Card copy, captions, nav', sample: 'NCC-licensed telematics provider.' },
+  { token: 'text-label', use: 'Eyebrows and labels', sample: 'WHY PRIMETRACK' },
+  { token: 'text-stat', use: 'Statistics only', sample: '5,000' },
+];
+
+const shadows = [
+  { token: 'shadow-card', use: 'Resting cards' },
+  { token: 'shadow-lift', use: 'Card hover' },
+  { token: 'shadow-menu', use: 'Mega-menu and dropdowns' },
+];
+
+const breakpoints = [
+  { name: 'base', width: '0–639px', note: 'Mobile. Single column, drawer nav, 44px touch targets.' },
+  { name: 'sm', width: '640px', note: 'Large phone. Two-column card grids begin.' },
+  { name: 'md', width: '768px', note: 'Tablet. Wider gutters, two-column feature blocks.' },
+  { name: 'lg', width: '1024px', note: 'Laptop. Desktop nav and mega-menus appear; split layouts.' },
+  { name: 'xl', width: '1280px', note: 'Desktop. Header phone number appears.' },
+];
+---
+
+<BaseLayout
+  title="Design system — PrimeTrack (internal)"
+  description="Internal reference for the PrimeTrack design system: colour, type, spacing, components and motion."
+  indexable={false}
+>
+  <Section tone="dark" size="sm">
+    <span class="eyebrow">Internal reference</span>
+    <h1 class="mt-4 text-display text-white">PrimeTrack design system</h1>
+    <p class="mt-4 max-w-2xl text-lead text-ink-300">
+      Every token below is defined once in <code class="text-prime-400">src/styles/global.css</code>.
+      This page is noindex and excluded from the sitemap.
+    </p>
+  </Section>
+
+  <!-- COLOUR -->
+  <Section tone="white">
+    <SectionHeader
+      eyebrow="Colour"
+      title="One dominant, one accent, per section"
+      lead="Black and white do the structural work. Orange is the single brand accent. Red is reserved for live indicators and genuine alerts — never decoration."
+    />
+
+    <div class="mt-10 flex flex-col gap-8">
+      <div>
+        <h3 class="text-h4 text-ink-950">Ink — structure</h3>
+        <div class="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-12">
+          {
+            inkScale.map((swatch) => (
+              <div class="flex flex-col gap-1.5">
+                <div class={`h-14 rounded-card border border-ink-200 ${swatch.class}`} />
+                <span class="text-[0.7rem] text-ink-500">{swatch.step}</span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-h4 text-ink-950">Prime — brand accent</h3>
+        <div class="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-10">
+          {
+            primeScale.map((swatch) => (
+              <div class="flex flex-col gap-1.5">
+                <div class={`h-14 rounded-card border border-ink-200 ${swatch.class}`} />
+                <span class="text-[0.7rem] text-ink-500">{swatch.step}</span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-h4 text-ink-950">Signal — alerts only</h3>
+        <div class="mt-3 grid grid-cols-4 gap-2 sm:w-1/3">
+          {
+            signalScale.map((swatch) => (
+              <div class="flex flex-col gap-1.5">
+                <div class={`h-14 rounded-card border border-ink-200 ${swatch.class}`} />
+                <span class="text-[0.7rem] text-ink-500">{swatch.step}</span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <!-- TYPE -->
+  <Section tone="tinted">
+    <SectionHeader
+      eyebrow="Typography"
+      title="Space Grotesk for headings, Inter for reading"
+      lead="Both are self-hosted variable fonts — no external requests, no layout shift. Every size is fluid via clamp(), so there are no per-breakpoint overrides."
+    />
+
+    <div class="mt-10 flex flex-col divide-y divide-ink-200">
+      {
+        typeScale.map((entry) => (
+          <div class="grid gap-3 py-6 lg:grid-cols-[14rem_1fr] lg:gap-8">
+            <div>
+              <code class="text-small font-semibold text-prime-700">{entry.token}</code>
+              <p class="text-small text-ink-500">{entry.use}</p>
+            </div>
+            <p class={`${entry.token} text-ink-950`}>{entry.sample}</p>
+          </div>
+        ))
+      }
+    </div>
+  </Section>
+
+  <!-- BUTTONS -->
+  <Section tone="white">
+    <SectionHeader eyebrow="Buttons" title="Three variants, two sizes, two tones" />
+    <div class="mt-10 flex flex-col gap-8">
+      <div class="flex flex-wrap items-center gap-4">
+        <Button href="#buttons">Primary</Button>
+        <Button href="#buttons" variant="secondary">Secondary</Button>
+        <Button href="#buttons" variant="ghost">Ghost</Button>
+        <Button href="#buttons" size="lg">Primary large</Button>
+      </div>
+      <div class="flex flex-wrap items-center gap-4 rounded-panel bg-ink-950 p-8">
+        <Button href="#buttons">Primary</Button>
+        <Button href="#buttons" variant="secondary" tone="dark">Secondary</Button>
+        <Button href="#buttons" variant="ghost" tone="dark">Ghost</Button>
+      </div>
+      <p class="text-small text-ink-500">
+        Every button clears a 44px minimum touch target. Focus rings come from the global
+        <code>:focus-visible</code> rule — do not override them per component.
+      </p>
+    </div>
+  </Section>
+
+  <!-- SURFACES -->
+  <Section tone="tinted">
+    <SectionHeader eyebrow="Surfaces" title="Cards, radius and shadow" />
+
+    <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <ProductCard
+        href="#cards"
+        label="Standard card"
+        descriptor="Hover lifts by 2px and warms the border."
+        icon="truck"
+      />
+      <div class="rounded-panel border border-ink-200 bg-white p-6">
+        <h3 class="text-h4 text-ink-950">Panel</h3>
+        <p class="mt-2 text-small text-ink-600">
+          <code>rounded-panel</code> (1.5rem) for large containers; <code>rounded-card</code>
+          (0.875rem) for smaller ones. Pills use <code>rounded-full</code>.
+        </p>
+      </div>
+      <MediaPlaceholder demo />
+    </div>
+
+    <div class="mt-8 grid gap-5 sm:grid-cols-3">
+      {
+        shadows.map((shadow) => (
+          <div class={`rounded-panel bg-white p-6 ${shadow.token}`}>
+            <code class="text-small font-semibold text-prime-700">{shadow.token}</code>
+            <p class="mt-1.5 text-small text-ink-600">{shadow.use}</p>
+          </div>
+        ))
+      }
+    </div>
+  </Section>
+
+  <!-- MOTION + BREAKPOINTS -->
+  <Section tone="white">
+    <div class="grid gap-12 lg:grid-cols-2 lg:gap-16">
+      <div>
+        <SectionHeader eyebrow="Motion" title="Fast, small, and skippable" />
+        <ul class="mt-8 flex flex-col gap-4 text-small text-ink-600">
+          <li class="flex gap-3">
+            <Icon name="check" size={16} class="mt-0.5 shrink-0 text-prime-600" />
+            <span>
+              <code class="font-semibold text-ink-900">--duration-fast (140ms)</code> — colour and
+              hover changes.
+            </span>
+          </li>
+          <li class="flex gap-3">
+            <Icon name="check" size={16} class="mt-0.5 shrink-0 text-prime-600" />
+            <span>
+              <code class="font-semibold text-ink-900">--duration-base (220ms)</code> — dropdowns,
+              card lifts, chevron rotation.
+            </span>
+          </li>
+          <li class="flex gap-3">
+            <Icon name="check" size={16} class="mt-0.5 shrink-0 text-prime-600" />
+            <span>
+              <code class="font-semibold text-ink-900">.reveal</code> — scroll-reveal built on
+              CSS <code>animation-timeline: view()</code>. No JavaScript, no animation library, and
+              it degrades to plain visible content where unsupported.
+            </span>
+          </li>
+          <li class="flex gap-3">
+            <Icon name="check" size={16} class="mt-0.5 shrink-0 text-prime-600" />
+            <span>
+              <code class="font-semibold text-ink-900">prefers-reduced-motion</code> disables all of
+              it globally.
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <SectionHeader eyebrow="Breakpoints" title="Mobile-first, five stops" />
+        <dl class="mt-8 flex flex-col divide-y divide-ink-200">
+          {
+            breakpoints.map((bp) => (
+              <div class="grid grid-cols-[4rem_6rem_1fr] gap-3 py-3 text-small">
+                <dt class="font-semibold text-ink-900">{bp.name}</dt>
+                <dd class="text-ink-500">{bp.width}</dd>
+                <dd class="text-ink-600">{bp.note}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

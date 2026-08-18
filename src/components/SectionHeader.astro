@@ -1,0 +1,34 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  align?: 'left' | 'center';
+  tone?: 'light' | 'dark';
+  /** `tech` turns the eyebrow blue for data/technology sections. */
+  accent?: 'brand' | 'tech';
+  class?: string;
+  as?: 'h2' | 'h3';
+}
+
+const {
+  eyebrow,
+  title,
+  lead,
+  align = 'left',
+  tone = 'light',
+  accent = 'brand',
+  class: className = '',
+  as: Tag = 'h2',
+} = Astro.props;
+
+const alignment = align === 'center' ? 'text-center mx-auto items-center' : 'items-start';
+const titleTone = tone === 'dark' ? 'text-white' : 'text-ink-950';
+const leadTone = tone === 'dark' ? 'text-ink-300' : 'text-ink-600';
+---
+
+<div class={`flex max-w-3xl flex-col gap-4 ${alignment} ${className}`}>
+  {eyebrow && <span class={`eyebrow ${accent === 'tech' ? 'eyebrow-tech' : ''}`}>{eyebrow}</span>}
+  <Tag class={`text-h2 ${titleTone}`}>{title}</Tag>
+  {lead && <p class={`text-lead text-pretty ${leadTone}`}>{lead}</p>}
+</div>

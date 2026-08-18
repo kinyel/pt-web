@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import MediaPlaceholder from '../components/MediaPlaceholder.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import CTA from '../components/CTA.astro';
+import Icon from '../components/Icon.astro';
+import { products, services } from '../data/navigation.ts';
+import { serviceSchema, breadcrumbSchema } from '../data/schema.ts';
+
+const page = services.find(
+  (s) => s.href === '/driver-behaviour-monitoring-systems-for-vehicle-fleet-management/',
+)!;
+
+/** The three pillars this service is built on (inventory §4.1). */
+const pillars = [
+  {
+    icon: 'shield-check',
+    title: 'Enhanced safety',
+    body: 'Monitoring behaviour makes risky habits visible while they are still habits. Identify them, correct them, and reduce the accidents that follow from them.',
+  },
+  {
+    icon: 'fuel',
+    title: 'Reduced fuel consumption',
+    body: 'Behaviour data pinpoints where fuel is wasted — idling, suboptimal routes, aggressive driving. Data-driven changes cut both cost and emissions.',
+  },
+  {
+    icon: 'trending-up',
+    title: 'Increased productivity',
+    body: 'Optimised routes, less idle time and streamlined maintenance mean the same drivers and vehicles deliver more.',
+  },
+];
+
+const related = [
+  products.find((p) => p.href === '/vehicle-video-tracking-systems/')!,
+  products.find((p) => p.href === '/fleet-fuel-consumption-management-system/')!,
+  services.find((s) => s.href === '/fleet-analytics/')!,
+];
+---
+
+<BaseLayout
+  title={page.title!}
+  description={page.description!}
+  schemas={[
+    serviceSchema({ name: 'Driver Behaviour Monitoring', description: page.description!, url: page.href }),
+    breadcrumbSchema([{ label: 'Services', href: '/#services' }, { label: page.label, href: page.href }]),
+  ]}
+>
+  <PageHero
+    accent="tech"
+    icon="gauge"
+    eyebrow="Driver Monitoring"
+    title="Driver behaviour monitoring systems"
+    lead="The way a fleet is driven decides what it costs to run. Behaviour monitoring turns that into something you can see, measure and improve."
+    chips={['Safety', 'Fuel efficiency', 'Productivity']}
+    crumbs={[{ label: 'Services', href: '/#services' }, { label: 'Driver Monitoring' }]}
+  />
+
+  <Section tone="white">
+    <SectionHeader
+      accent="tech"
+      eyebrow="Three pillars"
+      title="What behaviour monitoring changes"
+      lead="Each pillar reinforces the others — safer driving is usually cheaper driving, and cheaper driving is usually more productive."
+    />
+
+    <ol class="mt-12 flex flex-col divide-y divide-ink-200">
+      {
+        pillars.map((pillar, i) => (
+          <li class="reveal grid gap-5 py-8 first:pt-0 md:grid-cols-[auto_1fr_1.4fr] md:items-start md:gap-10">
+            <span class="font-display text-h2 leading-none text-ink-200">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <div class="flex items-center gap-3">
+              <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-prime-50 text-prime-600">
+                <Icon name={pillar.icon} size={20} />
+              </span>
+              <h2 class="text-h3 text-ink-950">{pillar.title}</h2>
+            </div>
+            <p class="text-body text-ink-600 text-pretty">{pillar.body}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </Section>
+
+  <Section tone="tinted">
+    <div class="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
+      <MediaPlaceholder slot="driver-behaviour-review" class="lg:order-last" />
+      <SectionHeader
+        accent="tech"
+        eyebrow="Better together"
+        title="Pair it with video for the full picture"
+        lead="Behaviour scores tell you what happened. Ai-PRIME video telematics shows you why — and coaches the driver in the moment, through an in-cab AI speaker."
+      />
+    </div>
+  </Section>
+
+  <RelatedLinks items={related} />
+  <CTA />
+</BaseLayout>

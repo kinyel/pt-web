@@ -1,0 +1,33 @@
+---
+/**
+ * Page section wrapper. `tone` sets the layer; alternating tones create the
+ * section separation the design direction asks for without extra borders.
+ */
+interface Props {
+  tone?: 'white' | 'tinted' | 'dark' | 'ink';
+  id?: string;
+  class?: string;
+  size?: 'sm' | 'md' | 'lg';
+  as?: 'section' | 'div';
+}
+
+const { tone = 'white', id, class: className = '', size = 'md', as: Tag = 'section' } = Astro.props;
+
+const tones = {
+  white: 'bg-white text-ink-800',
+  tinted: 'bg-ink-50 text-ink-800',
+  dark: 'bg-ink-950 text-ink-300 on-dark',
+  ink: 'bg-ink-900 text-ink-300 on-dark',
+};
+const sizes = {
+  sm: 'py-12 md:py-16',
+  md: 'py-16 md:py-24',
+  lg: 'py-20 md:py-32',
+};
+---
+
+<Tag id={id} class={`${tones[tone]} ${sizes[size]} ${className}`}>
+  <div class="container-prime">
+    <slot />
+  </div>
+</Tag>

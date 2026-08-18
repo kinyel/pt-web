@@ -1,0 +1,290 @@
+---
+/**
+ * Animated telemetry backdrop for the homepage hero.
+ *
+ * Hand-drawn SVG — no video, no image, no animation library. Roughly 4KB of
+ * markup and CSS, all of it compositor-friendly (transform/opacity only).
+ *
+ * The geometry is deliberately ABSTRACT. It is not a map of Nigeria or of any
+ * real coverage area, and the moving markers are not live data: implying either
+ * would be a factual claim we cannot support. It reads as routes and telemetry
+ * without pretending to be a product screenshot.
+ *
+ * Motion policy:
+ *   - CSS animation lives inside `@media (prefers-reduced-motion: no-preference)`,
+ *     so a reduced-motion visitor gets the static composition with no JS at all.
+ *   - The inline script adds data-motion="off" on constrained devices (Save-Data,
+ *     2G/3G, or few CPU cores on a touch device), which switches the same
+ *     animations off.
+ *   - With JS disabled and no motion preference set, it simply animates.
+ * Either way the static state is the full drawing — nothing is missing, it just
+ * holds still.
+ */
+
+/* Route geometry. Each path is used twice: once as the drawn line, once as the
+   offset-path a vehicle travels. Declared once here so they cannot drift. */
+const routes = [
+  { d: 'M -60 508 C 180 470, 300 356, 470 332 S 762 300, 898 212 S 1120 126, 1268 148', tone: 'azure' },
+  { d: 'M -60 246 C 158 238, 262 296, 420 300 S 700 384, 846 516 S 1094 470, 1268 442', tone: 'azure' },
+  { d: 'M 286 742 C 336 606, 430 520, 520 470 S 700 380, 764 250 S 820 58, 902 -38', tone: 'prime' },
+  { d: 'M 1268 636 C 1080 606, 960 544, 846 516 S 604 502, 470 560 S 214 648, 40 742', tone: 'azure' },
+] as const;
+
+/* Vehicles: which route, how long a lap takes, and when it starts. Staggered so
+   they never pulse in lockstep, which is what makes motion look mechanical. */
+const vehicles = [
+  { route: 0, duration: 19, delay: 0, tone: 'prime', size: 5 },
+  { route: 0, duration: 19, delay: -11, tone: 'azure', size: 4 },
+  { route: 1, duration: 24, delay: -6, tone: 'azure', size: 4.5 },
+  { route: 2, duration: 21, delay: -14, tone: 'prime', size: 4.5 },
+  { route: 3, duration: 27, delay: -3, tone: 'azure', size: 4 },
+] as const;
+
+/* Location markers. One orange hub, the rest blue — the hub is the only element
+   in the drawing that carries brand orange at full strength. */
+const markers = [
+  { x: 898, y: 212, tone: 'prime', hub: true },
+  { x: 470, y: 332, tone: 'azure', hub: false },
+  { x: 846, y: 516, tone: 'azure', hub: false },
+  { x: 420, y: 300, tone: 'azure', hub: false },
+] as const;
+
+const stroke = { azure: '#5694ff', prime: '#ff7000' } as const;
+---
+
+<div class="hero-map pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+  <svg
+    class="h-full w-full"
+    viewBox="0 0 1200 700"
+    preserveAspectRatio="xMidYMid slice"
+    role="presentation"
+    focusable="false"
+  >
+    <defs>
+      <!-- Fades the whole drawing out toward the left, where the headline sits. -->
+      <linearGradient id="hm-fade" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#fff" stop-opacity="0" />
+        <stop offset="22%" stop-color="#fff" stop-opacity="0.28" />
+        <stop offset="55%" stop-color="#fff" stop-opacity="0.85" />
+        <stop offset="100%" stop-color="#fff" stop-opacity="1" />
+      </linearGradient>
+      <mask id="hm-mask">
+        <rect width="1200" height="700" fill="url(#hm-fade)" />
+      </mask>
+
+      <!-- Coordinate grid: the technical substrate, blue and very faint. -->
+      <pattern id="hm-grid" width="60" height="60" patternUnits="userSpaceOnUse">
+        <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#5694ff" stroke-opacity="0.16" stroke-width="1" />
+      </pattern>
+
+      <radialGradient id="hm-hub-glow">
+        <stop offset="0%" stop-color="#ff7000" stop-opacity="0.5" />
+        <stop offset="100%" stop-color="#ff7000" stop-opacity="0" />
+      </radialGradient>
+    </defs>
+
+    <g mask="url(#hm-mask)">
+      <rect width="1200" height="700" fill="url(#hm-grid)" />
+
+      <!-- Abstract sector outlines: the suggestion of mapped districts. Never a
+           real coastline or border — that would be a claim about coverage. -->
+      <g fill="none" stroke="#5694ff" stroke-opacity="0.2" stroke-width="1">
+        <path d="M 620 120 L 810 96 L 890 240 L 742 330 L 596 268 Z" />
+        <path d="M 300 400 L 470 332 L 560 470 L 402 560 L 268 498 Z" />
+        <path d="M 900 430 L 1080 392 L 1150 540 L 980 610 L 884 540 Z" />
+      </g>
+
+      <!-- Range rings around the hub: telemetry texture, blue against the one
+           orange marker so the two brand colours read as a pair. -->
+      <g fill="none" stroke="#5694ff" stroke-opacity="0.16" stroke-width="1">
+        <circle cx="898" cy="212" r="148" stroke-dasharray="3 9" />
+        <circle cx="898" cy="212" r="232" stroke-dasharray="3 9" />
+      </g>
+
+      <!-- Coordinate ticks. -->
+      <g stroke="#5694ff" stroke-opacity="0.35" stroke-width="1.5" stroke-linecap="round">
+        <path d="M 640 610 h 12 M 646 604 v 12" />
+        <path d="M 1090 268 h 12 M 1096 262 v 12" />
+        <path d="M 352 596 h 12 M 358 590 v 12" />
+      </g>
+
+      <!-- Routes: the base line, then a brighter dash that travels along it. -->
+      {
+        routes.map((route, i) => (
+          <>
+            <path
+              d={route.d}
+              fill="none"
+              stroke={stroke[route.tone]}
+              stroke-opacity={route.tone === 'prime' ? 0.32 : 0.38}
+              stroke-width="1.5"
+              stroke-linecap="round"
+            />
+            <path
+              class="hm-flow"
+              style={`--flow-dur:${9 + i * 2.5}s; --flow-delay:${-i * 3}s`}
+              d={route.d}
+              fill="none"
+              stroke={stroke[route.tone]}
+              stroke-opacity={route.tone === 'prime' ? 0.9 : 0.95}
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </>
+        ))
+      }
+
+      <!-- Markers: expanding rings behind a solid dot. -->
+      {
+        markers.map((marker, i) => (
+          <g>
+            {marker.hub && (
+              <circle cx={marker.x} cy={marker.y} r="70" fill="url(#hm-hub-glow)" />
+            )}
+            <circle
+              class="hm-pulse"
+              style={`--pulse-delay:${-i * 1.4}s`}
+              cx={marker.x}
+              cy={marker.y}
+              r={marker.hub ? 13 : 10}
+              fill="none"
+              stroke={stroke[marker.tone]}
+              stroke-width="1.5"
+            />
+            <circle
+              class="hm-pulse"
+              style={`--pulse-delay:${-i * 1.4 - 1.6}s`}
+              cx={marker.x}
+              cy={marker.y}
+              r={marker.hub ? 13 : 10}
+              fill="none"
+              stroke={stroke[marker.tone]}
+              stroke-width="1.5"
+            />
+            <circle
+              cx={marker.x}
+              cy={marker.y}
+              r={marker.hub ? 5.5 : 4}
+              fill={stroke[marker.tone]}
+              fill-opacity="0.95"
+            />
+            {marker.hub && (
+              <circle cx={marker.x} cy={marker.y} r="11" fill="none" stroke="#ff7000" stroke-opacity="0.55" stroke-width="1.5" />
+            )}
+          </g>
+        ))
+      }
+
+      <!-- Vehicles travelling the routes. offset-path repeats the route `d`. -->
+      {
+        vehicles.map((vehicle) => (
+          <g
+            class="hm-vehicle"
+            style={`offset-path: path('${routes[vehicle.route].d}'); --drive-dur:${vehicle.duration}s; --drive-delay:${vehicle.delay}s`}
+          >
+            <rect
+              x={-vehicle.size * 1.7}
+              y={-vehicle.size / 2}
+              width={vehicle.size * 3.4}
+              height={vehicle.size}
+              rx={vehicle.size / 2}
+              fill={stroke[vehicle.tone]}
+            />
+            <rect
+              x={-vehicle.size * 3.4}
+              y={-vehicle.size / 2}
+              width={vehicle.size * 3.4}
+              height={vehicle.size}
+              rx={vehicle.size / 2}
+              fill={stroke[vehicle.tone]}
+              fill-opacity="0.22"
+            />
+          </g>
+        ))
+      }
+    </g>
+  </svg>
+</div>
+
+<script is:inline>
+  /* Switch the hero animation off on devices that should not be spending
+     battery or data on it. Runs immediately; the animation is CSS-driven, so
+     flipping the attribute is all it takes. */
+  (() => {
+    const map = document.currentScript?.previousElementSibling;
+    if (!map || !map.classList.contains('hero-map')) return;
+    const net = navigator.connection || {};
+
+    /* Deliberately NOT gated on 3G. The animation is inline CSS on markup the
+       page has already downloaded, so it costs no additional bytes — and a
+       large share of this site's Nigerian audience is on 3G. Switching it off
+       for them would take away the visual with nothing saved in return.
+       What we do respect: an explicit Save-Data request, the near-dead network
+       tiers that correlate with very low-end hardware, and a genuinely weak
+       CPU on a touch device. */
+    const veryConstrained = /^(slow-2g|2g)$/.test(net.effectiveType || '');
+    const weakDevice =
+      navigator.hardwareConcurrency <= 4 && matchMedia('(pointer: coarse)').matches;
+
+    if (net.saveData === true || veryConstrained || weakDevice) {
+      map.setAttribute('data-motion', 'off');
+    }
+  })();
+</script>
+
+<style>
+  /* Static by default in every respect that matters; the rules below only add
+     movement, and only when the visitor has not asked us not to. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-map:not([data-motion='off']) .hm-vehicle {
+      offset-rotate: auto;
+      animation: hm-drive var(--drive-dur) linear infinite;
+      animation-delay: var(--drive-delay);
+    }
+
+    .hero-map:not([data-motion='off']) .hm-flow {
+      stroke-dasharray: 4 150;
+      animation: hm-flow var(--flow-dur) linear infinite;
+      animation-delay: var(--flow-delay);
+    }
+
+    .hero-map:not([data-motion='off']) .hm-pulse {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: hm-pulse 4.2s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+      animation-delay: var(--pulse-delay);
+    }
+  }
+
+  /* Held state: vehicles park at a sensible point on their route rather than
+     collapsing to the SVG origin, and the flow dashes read as route markings. */
+  .hm-vehicle {
+    offset-distance: 62%;
+    offset-rotate: auto;
+  }
+  .hm-flow {
+    stroke-dasharray: 4 150;
+    stroke-dashoffset: -120;
+  }
+  .hm-pulse {
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(1.35);
+    opacity: 0.28;
+  }
+
+  @keyframes hm-drive {
+    from { offset-distance: 0%; }
+    to { offset-distance: 100%; }
+  }
+
+  @keyframes hm-flow {
+    to { stroke-dashoffset: -770; }
+  }
+
+  @keyframes hm-pulse {
+    0% { transform: scale(0.5); opacity: 0.55; }
+    70% { opacity: 0; }
+    100% { transform: scale(3.1); opacity: 0; }
+  }
+</style>

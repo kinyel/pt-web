@@ -1,0 +1,42 @@
+---
+import Icon from './Icon.astro';
+
+interface Feature {
+  icon?: string;
+  title: string;
+  body: string;
+}
+
+interface Props {
+  features: Feature[];
+  columns?: 2 | 3;
+  tone?: 'light' | 'dark';
+  class?: string;
+}
+
+const { features, columns = 2, tone = 'light', class: className = '' } = Astro.props;
+
+const grid = columns === 3 ? 'sm:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2';
+const card =
+  tone === 'dark'
+    ? 'border-white/10 bg-ink-900'
+    : 'border-ink-200 bg-white';
+const titleTone = tone === 'dark' ? 'text-white' : 'text-ink-950';
+const bodyTone = tone === 'dark' ? 'text-ink-400' : 'text-ink-600';
+---
+
+<ul class={`grid gap-5 ${grid} ${className}`}>
+  {
+    features.map((feature) => (
+      <li class={`reveal rounded-panel border p-6 md:p-7 ${card}`}>
+        {feature.icon && (
+          <span class="flex h-10 w-10 items-center justify-center rounded-full bg-prime-50 text-prime-600">
+            <Icon name={feature.icon} size={19} />
+          </span>
+        )}
+        <h3 class={`mt-4 text-h4 ${titleTone}`}>{feature.title}</h3>
+        <p class={`mt-2 text-small text-pretty ${bodyTone}`}>{feature.body}</p>
+      </li>
+    ))
+  }
+</ul>

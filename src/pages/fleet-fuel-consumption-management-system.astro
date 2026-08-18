@@ -1,0 +1,116 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import FeatureBlocks from '../components/FeatureBlocks.astro';
+import ContentImage from '../components/ContentImage.astro';
+import { media } from '../data/media.ts';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import CTA from '../components/CTA.astro';
+import { products, services } from '../data/navigation.ts';
+import { productSchema, breadcrumbSchema } from '../data/schema.ts';
+
+const page = products.find(
+  (p) => p.href === '/fleet-fuel-consumption-management-system/',
+)!;
+
+const inefficiencies = [
+  {
+    icon: 'clock',
+    title: 'Excessive idling',
+    body: 'Engines burning fuel while the vehicle earns nothing.',
+  },
+  {
+    icon: 'gauge',
+    title: 'Speeding',
+    body: 'The speed that costs you twice — in fuel now and in risk later.',
+  },
+  {
+    icon: 'route',
+    title: 'Inefficient driving',
+    body: 'Habits and routes that add litres to every journey without adding value.',
+  },
+];
+
+const capabilities = [
+  {
+    icon: 'chart-line',
+    title: 'Accurate consumption tracking',
+    body: 'Proprietary software combined with GPS and telematics data measures what your fleet actually burns.',
+  },
+  {
+    icon: 'file-text',
+    title: 'Trends over time',
+    body: 'Detailed reports show consumption patterns across the fleet, not just a monthly total.',
+  },
+  {
+    icon: 'trending-up',
+    title: 'Improvement recommendations',
+    body: 'The system identifies where efficiency is being lost and what to change to recover it.',
+  },
+];
+
+const related = [
+  products.find((p) => p.href === '/vehicle-fleet-telematics-solutions-in-nigeria/')!,
+  services.find((s) => s.href === '/driver-behaviour-monitoring-systems-for-vehicle-fleet-management/')!,
+  services.find((s) => s.href === '/fleet-analytics/')!,
+];
+---
+
+<BaseLayout
+  title={page.title!}
+  description={page.description!}
+  schemas={[
+    productSchema({ name: 'Fuel Monitoring', description: page.description!, url: page.href }),
+    breadcrumbSchema([{ label: 'Products', href: '/#products' }, { label: page.label, href: page.href }]),
+  ]}
+>
+  <PageHero
+    accent="tech"
+    icon="fuel"
+    eyebrow="Fuel Monitoring"
+    title="Fuel is a fleet KPI, so measure it like one"
+    lead="Fuel consumption is one of the most critical indicators of fleet performance and one of the largest costs on the balance sheet. PrimeTrack tracks it accurately and shows you where it goes."
+    chips={['Consumption tracking', 'Trend reporting', 'Efficiency recommendations']}
+    crumbs={[{ label: 'Products', href: '/#products' }, { label: 'Fuel Monitoring' }]}
+  />
+
+  <Section tone="white">
+    <div class="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
+      <div class="flex flex-col gap-5">
+        <SectionHeader
+          accent="tech"
+          eyebrow="Why it matters"
+          title="Fuel spend is where fleet profitability is won or lost"
+          lead="Managing fuel consumption is critical to profitability — and you cannot manage what you have never accurately measured."
+        />
+        <p class="text-body text-ink-600 text-pretty">
+          PrimeTrack's fuel monitoring combines proprietary software with GPS and telematics data to
+          track usage across the fleet, identify the inefficiencies eating into margin, and
+          recommend the changes that recover it.
+        </p>
+      </div>
+
+      <ContentImage asset={media.fuelMonitoring} />
+    </div>
+  </Section>
+
+  <Section tone="dark">
+    <SectionHeader
+      accent="tech"
+      eyebrow="What it catches"
+      tone="dark"
+      title="Three habits that quietly drain the tank"
+    />
+    <FeatureBlocks features={inefficiencies} columns={3} tone="dark" class="mt-12" />
+  </Section>
+
+  <Section tone="tinted">
+    <SectionHeader eyebrow="Capabilities" title="How the system works" />
+    <FeatureBlocks features={capabilities} columns={3} class="mt-12" />
+  </Section>
+
+  <RelatedLinks items={related} />
+  <CTA />
+</BaseLayout>

@@ -1,0 +1,81 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import CTA from '../components/CTA.astro';
+import Icon from '../components/Icon.astro';
+import { PLACEHOLDER, contact } from '../data/company.ts';
+import { breadcrumbSchema } from '../data/schema.ts';
+
+/**
+ * Shell for routes that exist on the live site but whose copy was not part of
+ * the verified content audit. These pages stay indexable — the URLs already
+ * rank and must resolve — but they state plainly that content is pending
+ * rather than inventing any.
+ *
+ * See docs/information-architecture.md §1 ("Stub pages").
+ */
+interface Props {
+  title: string;
+  description: string;
+  heading: string;
+  eyebrow: string;
+  icon: string;
+  href: string;
+  /** What the client needs to supply, in one line. */
+  awaiting: string;
+}
+
+const { title, description, heading, eyebrow, icon, href, awaiting } = Astro.props;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  schemas={[breadcrumbSchema([{ label: heading, href }])]}
+>
+  <PageHero
+    icon={icon}
+    eyebrow={eyebrow}
+    title={heading}
+    crumbs={[{ label: heading }]}
+    showCta={false}
+  />
+
+  <Section tone="white">
+    <div class="mx-auto flex max-w-2xl flex-col items-start gap-6 rounded-panel border border-dashed border-ink-300 bg-ink-50 p-8 md:p-10">
+      <span class="flex h-11 w-11 items-center justify-center rounded-full bg-white text-prime-600">
+        <Icon name="file-text" size={20} />
+      </span>
+
+      <div>
+        <p class="text-label uppercase text-prime-700">{PLACEHOLDER}</p>
+        <h2 class="mt-3 text-h3 text-ink-950">Content for this page is pending</h2>
+        <p class="mt-3 text-body text-ink-600 text-pretty">
+          {awaiting} This page was rebuilt to preserve its existing address, and will publish as
+          soon as the confirmed copy is supplied — nothing here has been written on the client's
+          behalf.
+        </p>
+      </div>
+
+      <div class="flex flex-col gap-3 sm:flex-row">
+        <a
+          href="/contact-prime/"
+          class="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-prime-600 px-5 py-2.5 text-small font-semibold text-white transition-colors hover:bg-prime-700"
+        >
+          Contact PrimeTrack
+          <Icon name="arrow-right" size={16} />
+        </a>
+        <a
+          href={`mailto:${contact.email}`}
+          class="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-ink-200 px-5 py-2.5 text-small font-semibold text-ink-900 transition-colors hover:border-ink-400"
+        >
+          <Icon name="mail" size={16} />
+          {contact.email}
+        </a>
+      </div>
+    </div>
+  </Section>
+
+  <CTA />
+</BaseLayout>

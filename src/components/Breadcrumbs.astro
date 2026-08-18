@@ -1,0 +1,43 @@
+---
+import Icon from './Icon.astro';
+
+interface Crumb {
+  label: string;
+  href?: string;
+}
+interface Props {
+  items: Crumb[];
+  tone?: 'light' | 'dark';
+}
+
+const { items, tone = 'light' } = Astro.props;
+const linkTone = tone === 'dark' ? 'text-ink-400 hover:text-white' : 'text-ink-500 hover:text-ink-900';
+const currentTone = tone === 'dark' ? 'text-ink-200' : 'text-ink-700';
+---
+
+<nav aria-label="Breadcrumb" class="text-small">
+  <ol class="flex flex-wrap items-center gap-1.5">
+    <li class="flex items-center gap-1.5">
+      <a href="/" class={`transition-colors ${linkTone}`}>Home</a>
+      <Icon name="chevron-right" size={14} class={tone === 'dark' ? 'text-ink-600' : 'text-ink-300'} />
+    </li>
+    {
+      items.map((item, i) => (
+        <li class="flex items-center gap-1.5">
+          {item.href ? (
+            <a href={item.href} class={`transition-colors ${linkTone}`}>
+              {item.label}
+            </a>
+          ) : (
+            <span class={currentTone} aria-current="page">
+              {item.label}
+            </span>
+          )}
+          {i < items.length - 1 && (
+            <Icon name="chevron-right" size={14} class={tone === 'dark' ? 'text-ink-600' : 'text-ink-300'} />
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>

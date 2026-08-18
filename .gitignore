@@ -1,7 +1,17 @@
 .DS_Store
+*.log
+
+# Dependencies
 node_modules/
+
+# Build output
 dist/
 build/
+.astro/
+
+# Environment (see .env.example)
 .env
 .env.local
-*.log
+
+# scratch dir for asset downloads
+.fetch/

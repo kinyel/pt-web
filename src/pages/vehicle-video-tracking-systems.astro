@@ -1,0 +1,172 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import FeatureBlocks from '../components/FeatureBlocks.astro';
+import ContentImage from '../components/ContentImage.astro';
+import { media } from '../data/media.ts';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import CTA from '../components/CTA.astro';
+import Icon from '../components/Icon.astro';
+import { products, services } from '../data/navigation.ts';
+import { productSchema, breadcrumbSchema } from '../data/schema.ts';
+
+const page = products.find((p) => p.href === '/vehicle-video-tracking-systems/')!;
+
+/** Report types the Ai-PRIME analytics suite produces (inventory §3.1). */
+const reports = [
+  'Historical video',
+  'Idling',
+  'Odometer',
+  'Trip',
+  'Harsh acceleration',
+  'Sharp cornering',
+  'Alarm frequency',
+  'Overspeed',
+  'Driver behaviour',
+  'YAW / route deviation',
+  'Trip turnaround time',
+  'Geofence',
+  'POI marking',
+  'Traffic congestion',
+  'Parking duration',
+  'Service-due reminders',
+  'Email notifications',
+  'Engine start',
+  'SOS alarm',
+];
+
+const features = [
+  {
+    icon: 'cctv',
+    title: 'Real-time live video feeds',
+    body: 'A high-storage DVR paired with four IR weatherproof cameras — one in-cabin, three road-facing — gives a 360° view of the vehicle. ADAS driver assistance and blind-spot mitigation send instant alerts to your control centre.',
+  },
+  {
+    icon: 'cpu',
+    title: 'Ai-enabled coaching',
+    body: 'AI analyses video telematics continuously and guides driver behaviour in real time. Non-conforming activity is flagged to the control room and announced to the driver through an AI speaker.',
+  },
+  {
+    icon: 'chart-line',
+    title: 'Enhanced fleet analytics',
+    body: 'Nineteen report types cover everything from harsh acceleration and route deviation to parking duration and service-due reminders.',
+  },
+  {
+    icon: 'scale',
+    title: 'Efficient incident investigation',
+    body: 'Video evidence establishes causation, timeline and liability — so disputes are settled with footage rather than assumptions.',
+  },
+  {
+    icon: 'bell',
+    title: 'Customizable video analytics',
+    body: 'Trigger alerts on the events that matter to your operation: speeding, sudden lane changes, unauthorized access.',
+  },
+  {
+    icon: 'layers',
+    title: 'Expandable storage',
+    body: 'DVR variants ship at 256GB, 1TB and 4TB, with a minimum of eight hours of continuous recording per day.',
+  },
+];
+
+const related = [
+  products.find((p) => p.href === '/vehicle-fleet-telematics-solutions-in-nigeria/')!,
+  services.find((s) => s.href === '/driver-behaviour-monitoring-systems-for-vehicle-fleet-management/')!,
+  services.find((s) => s.href === '/fleet-analytics/')!,
+];
+---
+
+<BaseLayout
+  title={page.title!}
+  description={page.description!}
+  schemas={[
+    productSchema({ name: 'Ai-PRIME Video Trackers', description: page.description!, url: page.href }),
+    breadcrumbSchema([{ label: 'Products', href: '/#products' }, { label: page.label, href: page.href }]),
+  ]}
+>
+  <PageHero
+    icon="video"
+    eyebrow="Video Trackers"
+    title="Ai-PRIME — intelligent vehicle CCTV"
+    lead="Video telematics that watches the road and the cab at once, analyses what it sees, and coaches the driver while the trip is still happening."
+    chips={['4K DPR cameras', 'ADAS sensors', 'All-weather firmware', 'OTA upgrades']}
+    crumbs={[{ label: 'Products', href: '/#products' }, { label: 'Video Trackers' }]}
+  />
+
+  <Section tone="white">
+    <div class="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
+      <div class="flex flex-col gap-5">
+        <SectionHeader
+          eyebrow="How it works"
+          title="Four cameras, one control room, zero blind spots"
+          lead="Ai-PRIME combines a high-storage DVR with four infrared weatherproof cameras. Three face the road, one faces the cabin, and together they close the 360° gap that a single dash camera leaves open."
+        />
+        <p class="text-body text-ink-600 text-pretty">
+          ADAS sensors add driver assistance and blind-spot mitigation on top of the video itself, so
+          the system does more than record — it intervenes. Every alert reaches your control centre
+          as it happens.
+        </p>
+      </div>
+
+      <ContentImage asset={media.mdvrCameraKit} />
+    </div>
+  </Section>
+
+  <Section tone="tinted">
+    <SectionHeader
+      eyebrow="Capabilities"
+      title="What Ai-PRIME does once it is installed"
+    />
+    <FeatureBlocks features={features} columns={3} class="mt-12" />
+  </Section>
+
+  <Section tone="dark">
+    <div class="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+      <SectionHeader
+        eyebrow="Reporting"
+        tone="dark"
+        title="Nineteen report types, out of the box"
+        lead="Every report below is produced by the Ai-PRIME analytics suite and delivered through the fleet platform."
+      />
+      <ul class="grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-2">
+        {
+          reports.map((report) => (
+            <li class="flex items-start gap-2.5 border-b border-white/8 pb-3 text-small text-ink-300">
+              <Icon name="check" size={16} class="mt-0.5 shrink-0 text-prime-500" />
+              {report}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </Section>
+
+  <Section tone="white">
+    <div class="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
+      <ContentImage asset={media.videoTrackingDashcam} class="lg:order-last" />
+      <div class="flex flex-col gap-5">
+        <SectionHeader
+          eyebrow="Storage"
+          title="Recording capacity that matches your duty cycle"
+          lead="Choose the DVR that fits how long your vehicles run."
+        />
+        <ul class="flex flex-wrap gap-3">
+          {
+            ['256GB', '1TB', '4TB'].map((size) => (
+              <li class="rounded-card border border-ink-200 px-5 py-3 font-display text-h4 text-ink-950">
+                {size}
+              </li>
+            ))
+          }
+        </ul>
+        <p class="text-small text-ink-600">
+          Every variant records a minimum of eight hours per day continuously.
+        </p>
+      </div>
+    </div>
+  </Section>
+
+  <RelatedLinks items={related} />
+  <CTA />
+</BaseLayout>

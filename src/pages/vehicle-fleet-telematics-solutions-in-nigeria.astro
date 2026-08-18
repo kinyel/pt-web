@@ -1,0 +1,132 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import FeatureBlocks from '../components/FeatureBlocks.astro';
+import MediaPlaceholder from '../components/MediaPlaceholder.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import CTA from '../components/CTA.astro';
+import { products, services } from '../data/navigation.ts';
+import { productSchema, breadcrumbSchema } from '../data/schema.ts';
+
+const page = products.find(
+  (p) => p.href === '/vehicle-fleet-telematics-solutions-in-nigeria/',
+)!;
+
+const outcomes = [
+  {
+    icon: 'route',
+    title: 'Optimise routes',
+    body: 'Plan and adjust journeys against live position data instead of guesswork.',
+  },
+  {
+    icon: 'fuel',
+    title: 'Reduce fuel consumption',
+    body: 'Find the driving patterns and detours that quietly inflate your fuel bill.',
+  },
+  {
+    icon: 'clock',
+    title: 'Eliminate downtime',
+    body: 'Catch problems early and keep vehicles earning rather than waiting.',
+  },
+  {
+    icon: 'trending-up',
+    title: 'Increase operational efficiency',
+    body: 'Run the same fleet harder without adding vehicles or headcount.',
+  },
+];
+
+const capabilities = [
+  {
+    icon: 'map-pinned',
+    title: 'Real-time tracking',
+    body: 'Live vehicle positions across the whole fleet, on desktop and mobile.',
+  },
+  {
+    icon: 'gauge',
+    title: 'Driver behaviour monitoring',
+    body: 'Scoring that surfaces the habits behind your accident and fuel numbers.',
+  },
+  {
+    icon: 'file-text',
+    title: 'Automated reporting',
+    body: 'Scheduled reports that arrive without anyone having to run them.',
+  },
+  {
+    icon: 'bell',
+    title: 'Customizable alerts',
+    body: 'Notifications configured around the events your operation cares about.',
+  },
+  {
+    icon: 'chart-column',
+    title: 'Dashboard overview',
+    body: 'One view of fleet status rather than a spreadsheet per depot.',
+  },
+  {
+    icon: 'plug',
+    title: 'API integration to ERM',
+    body: 'Feed telematics data straight into the enterprise systems you already run.',
+  },
+];
+
+const related = [
+  services.find((s) => s.href === '/fleet-analytics/')!,
+  products.find((p) => p.href === '/fleet-fuel-consumption-management-system/')!,
+  services.find((s) => s.href === '/gps-telematics-api-integrations/')!,
+];
+---
+
+<BaseLayout
+  title={page.title!}
+  description={page.description!}
+  schemas={[
+    productSchema({ name: 'Fleet Trackers', description: page.description!, url: page.href }),
+    breadcrumbSchema([{ label: 'Products', href: '/#products' }, { label: page.label, href: page.href }]),
+  ]}
+>
+  <PageHero
+    icon="truck"
+    eyebrow="Fleet Trackers"
+    title="Vehicle fleet management systems"
+    lead="GPS-based fleet management that optimises routes, reduces fuel consumption, eliminates downtime and increases operational efficiency across your whole operation."
+    chips={['Real-time tracking', 'Automated reporting', 'ERM integration']}
+    crumbs={[{ label: 'Products', href: '/#products' }, { label: 'Fleet Trackers' }]}
+  />
+
+  <Section tone="white">
+    <SectionHeader
+      eyebrow="Outcomes"
+      title="What fleet telematics is actually for"
+      lead="Tracking is the mechanism. These four results are the reason operations teams install it."
+    />
+    <FeatureBlocks features={outcomes} columns={2} class="mt-12" />
+  </Section>
+
+  <Section tone="tinted">
+    <div class="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+      <SectionHeader
+        eyebrow="Platform"
+        title="Everything runs through one system"
+        lead="From a handful of vehicles to a large enterprise fleet, the same platform scales with you."
+      />
+      <FeatureBlocks features={capabilities} columns={2} />
+    </div>
+  </Section>
+
+  <Section tone="white">
+    <div class="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
+      <MediaPlaceholder slot="fleet-on-road" class="lg:order-last" />
+      <div class="flex flex-col gap-5">
+        <SectionHeader
+          eyebrow="Scale"
+          title="Sized for the fleet you have, not the one you might have"
+          lead="PrimeTrack deployments run from a handful of vehicles up to large enterprise fleets on the same architecture — so growing does not mean replacing your telematics."
+        />
+      </div>
+    </div>
+  </Section>
+
+  <RelatedLinks items={related} />
+  <CTA />
+</BaseLayout>
