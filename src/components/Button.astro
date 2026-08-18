@@ -1,7 +1,7 @@
 ---
 interface Props {
   href: string;
-  variant?: 'primary' | 'secondary' | 'tech' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'ghost';
   tone?: 'light' | 'dark';
   size?: 'md' | 'lg';
   external?: boolean;
@@ -23,26 +23,20 @@ const sizes = {
   md: 'px-5 py-2.5 text-small min-h-11',
   lg: 'px-7 py-3.5 text-body min-h-12',
 };
-/**
- * Primary sets BLACK type on the brand orange, not white. White on #ff7000 is
- * 2.8:1 and fails WCAG AA outright; black is 7.6:1 — and it is what the logo
- * itself does. See scripts/contrast-audit.mjs.
- */
 const variants = {
+  /* Black type on the brand orange, not white: white on #ff7000 is 2.8:1 and
+     fails WCAG AA outright, and prime-600 with white is still only 3.7:1.
+     Black is 7.2:1 — and it is what the logo itself does. This is the one
+     colour that intentionally differs from the pre-blue build. */
   primary: 'bg-prime-500 text-ink-950 hover:bg-prime-400 active:bg-prime-600',
   secondary:
     tone === 'dark'
-      ? 'border border-white/25 text-white hover:border-azure-400 hover:bg-azure-400/10'
-      : 'border border-ink-200 text-ink-900 hover:border-azure-500 hover:bg-azure-50',
-  /* Technology voice: analytics, API and data pages. */
-  tech:
-    tone === 'dark'
-      ? 'bg-azure-400 text-ink-950 hover:bg-azure-300 active:bg-azure-500'
-      : 'bg-azure-700 text-white hover:bg-azure-600 active:bg-azure-800',
+      ? 'border border-white/25 text-white hover:border-white/60 hover:bg-white/5'
+      : 'border border-ink-200 text-ink-900 hover:border-ink-400 hover:bg-ink-50',
   ghost:
     tone === 'dark'
-      ? 'text-white hover:text-azure-300'
-      : 'text-ink-900 hover:text-azure-700',
+      ? 'text-white hover:text-prime-300'
+      : 'text-ink-900 hover:text-prime-700',
 };
 const rel = external ? 'noopener noreferrer' : undefined;
 const target = external ? '_blank' : undefined;

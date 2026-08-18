@@ -24,32 +24,35 @@
 /* Route geometry. Each path is used twice: once as the drawn line, once as the
    offset-path a vehicle travels. Declared once here so they cannot drift. */
 const routes = [
-  { d: 'M -60 508 C 180 470, 300 356, 470 332 S 762 300, 898 212 S 1120 126, 1268 148', tone: 'azure' },
-  { d: 'M -60 246 C 158 238, 262 296, 420 300 S 700 384, 846 516 S 1094 470, 1268 442', tone: 'azure' },
+  { d: 'M -60 508 C 180 470, 300 356, 470 332 S 762 300, 898 212 S 1120 126, 1268 148', tone: 'soft' },
+  { d: 'M -60 246 C 158 238, 262 296, 420 300 S 700 384, 846 516 S 1094 470, 1268 442', tone: 'soft' },
   { d: 'M 286 742 C 336 606, 430 520, 520 470 S 700 380, 764 250 S 820 58, 902 -38', tone: 'prime' },
-  { d: 'M 1268 636 C 1080 606, 960 544, 846 516 S 604 502, 470 560 S 214 648, 40 742', tone: 'azure' },
+  { d: 'M 1268 636 C 1080 606, 960 544, 846 516 S 604 502, 470 560 S 214 648, 40 742', tone: 'soft' },
 ] as const;
 
 /* Vehicles: which route, how long a lap takes, and when it starts. Staggered so
    they never pulse in lockstep, which is what makes motion look mechanical. */
 const vehicles = [
   { route: 0, duration: 19, delay: 0, tone: 'prime', size: 5 },
-  { route: 0, duration: 19, delay: -11, tone: 'azure', size: 4 },
-  { route: 1, duration: 24, delay: -6, tone: 'azure', size: 4.5 },
+  { route: 0, duration: 19, delay: -11, tone: 'soft', size: 4 },
+  { route: 1, duration: 24, delay: -6, tone: 'soft', size: 4.5 },
   { route: 2, duration: 21, delay: -14, tone: 'prime', size: 4.5 },
-  { route: 3, duration: 27, delay: -3, tone: 'azure', size: 4 },
+  { route: 3, duration: 27, delay: -3, tone: 'soft', size: 4 },
 ] as const;
 
 /* Location markers. One orange hub, the rest blue — the hub is the only element
    in the drawing that carries brand orange at full strength. */
 const markers = [
   { x: 898, y: 212, tone: 'prime', hub: true },
-  { x: 470, y: 332, tone: 'azure', hub: false },
-  { x: 846, y: 516, tone: 'azure', hub: false },
-  { x: 420, y: 300, tone: 'azure', hub: false },
+  { x: 470, y: 332, tone: 'soft', hub: false },
+  { x: 846, y: 516, tone: 'soft', hub: false },
+  { x: 420, y: 300, tone: 'soft', hub: false },
 ] as const;
 
-const stroke = { azure: '#5694ff', prime: '#ff7000' } as const;
+/* Two steps of the same orange rather than a second hue: prime-500 carries the
+   brand, prime-300 gives the drawing depth. Structure (grid, sectors, ticks) is
+   plain white at low opacity, matching .bg-grid-prime. */
+const stroke = { soft: '#ffab6b', prime: '#ff7000' } as const;
 ---
 
 <div class="hero-map pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
@@ -74,7 +77,7 @@ const stroke = { azure: '#5694ff', prime: '#ff7000' } as const;
 
       <!-- Coordinate grid: the technical substrate, blue and very faint. -->
       <pattern id="hm-grid" width="60" height="60" patternUnits="userSpaceOnUse">
-        <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#5694ff" stroke-opacity="0.16" stroke-width="1" />
+        <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#ffffff" stroke-opacity="0.07" stroke-width="1" />
       </pattern>
 
       <radialGradient id="hm-hub-glow">
@@ -88,21 +91,20 @@ const stroke = { azure: '#5694ff', prime: '#ff7000' } as const;
 
       <!-- Abstract sector outlines: the suggestion of mapped districts. Never a
            real coastline or border — that would be a claim about coverage. -->
-      <g fill="none" stroke="#5694ff" stroke-opacity="0.2" stroke-width="1">
+      <g fill="none" stroke="#ffffff" stroke-opacity="0.11" stroke-width="1">
         <path d="M 620 120 L 810 96 L 890 240 L 742 330 L 596 268 Z" />
         <path d="M 300 400 L 470 332 L 560 470 L 402 560 L 268 498 Z" />
         <path d="M 900 430 L 1080 392 L 1150 540 L 980 610 L 884 540 Z" />
       </g>
 
-      <!-- Range rings around the hub: telemetry texture, blue against the one
-           orange marker so the two brand colours read as a pair. -->
-      <g fill="none" stroke="#5694ff" stroke-opacity="0.16" stroke-width="1">
+      <!-- Range rings around the hub: telemetry texture. -->
+      <g fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1">
         <circle cx="898" cy="212" r="148" stroke-dasharray="3 9" />
         <circle cx="898" cy="212" r="232" stroke-dasharray="3 9" />
       </g>
 
       <!-- Coordinate ticks. -->
-      <g stroke="#5694ff" stroke-opacity="0.35" stroke-width="1.5" stroke-linecap="round">
+      <g stroke="#ffffff" stroke-opacity="0.28" stroke-width="1.5" stroke-linecap="round">
         <path d="M 640 610 h 12 M 646 604 v 12" />
         <path d="M 1090 268 h 12 M 1096 262 v 12" />
         <path d="M 352 596 h 12 M 358 590 v 12" />
@@ -116,7 +118,7 @@ const stroke = { azure: '#5694ff', prime: '#ff7000' } as const;
               d={route.d}
               fill="none"
               stroke={stroke[route.tone]}
-              stroke-opacity={route.tone === 'prime' ? 0.32 : 0.38}
+              stroke-opacity={route.tone === 'prime' ? 0.34 : 0.24}
               stroke-width="1.5"
               stroke-linecap="round"
             />
@@ -126,7 +128,7 @@ const stroke = { azure: '#5694ff', prime: '#ff7000' } as const;
               d={route.d}
               fill="none"
               stroke={stroke[route.tone]}
-              stroke-opacity={route.tone === 'prime' ? 0.9 : 0.95}
+              stroke-opacity={route.tone === 'prime' ? 0.9 : 0.7}
               stroke-width="2"
               stroke-linecap="round"
             />

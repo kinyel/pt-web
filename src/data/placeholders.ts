@@ -26,6 +26,15 @@ export interface PlaceholderSlot {
 
 export const placeholderSlots = [
   {
+    id: 'hero-fleet-photography',
+    page: '/',
+    location: 'Homepage hero, right-hand column beside the headline',
+    needs:
+      'A strong vertical photograph of a tracked vehicle or customer fleet — the first image a visitor sees, so it carries the most weight. Real vehicles, ideally Nigerian roads.',
+    ratio: 'portrait',
+    recommended: '1200 × 1500px',
+  },
+  {
     id: 'fleet-on-road',
     page: '/vehicle-fleet-telematics-solutions-in-nigeria/',
     location: '“Scale” section, image sits right of the copy on desktop',

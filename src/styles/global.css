@@ -5,33 +5,9 @@
 /* ==========================================================================
    PrimeTrack design system
    Single source of truth for colour, type, spacing, radius, shadow, motion.
-
-   BRAND COLOUR PROVENANCE
-   Every brand hex below is extracted from PrimeTrack's own assets, not chosen
-   by eye:
-     #ff7000  --nectar-accent-color in salient-dynamic-styles.css (56 uses)
-     #f49200  light-orange extra-colour slot, same stylesheet (12 uses)
-     #ff5433  red extra-colour slot, same stylesheet (11 uses)
-     #5694ff  blue extra-colour slot, same stylesheet (18 uses)
-     #ff6e00  sampled from the logo PNG (dominant non-black pixel)
-     #000000 / #ffffff  logo + theme
-   The logo orange (#ff6e00) and the theme accent (#ff7000) differ by two
-   steps of red; the theme value wins because it is the deliberate site-wide
-   setting and is what customers have actually been looking at.
-
-   COLOUR USAGE RULE — one dominant, one supporting, per section.
-     ORANGE (prime)  brand voice. CTAs, primary emphasis, product identity.
-                     Always the strongest presence on the page.
-     BLUE (azure)    the technology voice. Data, analytics, connectivity,
-                     routes, signals, links, informational UI. Clearly present,
-                     never louder than orange.
-     RED (signal)    live/alert states only. Never decorative.
-     AMBER           the light-orange partner to prime; used for warm gradient
-                     ends and dark-surface highlights, not for flat fills.
-   Orange and blue may share a section; red never joins them at full strength.
-
-   CONTRAST — measured against #ffffff and against ink-950 (#08090b).
-   Ratios are noted inline. Anything failing 4.5:1 is marked non-text-only.
+   Usage rule (from the design direction): one dominant colour and one accent
+   per section. Orange carries the brand; red is reserved for live/alert
+   signals only; black and white do the structural work.
    ========================================================================== */
 @theme {
   /* --- Ink: the structural black scale ---------------------------------- */
@@ -40,55 +16,45 @@
   --color-ink-850: #14171c;
   --color-ink-800: #1b1f26;
   --color-ink-700: #262c35;
-  --color-ink-600: #39414d;   /* 9.9:1 on white  — body text */
-  --color-ink-500: #5a6472;   /* 6.0:1 on white  — secondary text */
-  --color-ink-400: #808b99;   /* 3.5:1 on white  — NON-TEXT on light;
-                                 5.8:1 on ink-950 — safe as text on dark */
-  --color-ink-300: #a8b1bd;   /* 8.0:1 on ink-950 */
+  --color-ink-600: #39414d;
+  --color-ink-500: #5a6472;
+  --color-ink-400: #808b99;
+  --color-ink-300: #a8b1bd;
   --color-ink-200: #cdd3db;
   --color-ink-100: #e6e9ee;
   --color-ink-50: #f4f6f8;
 
-  /* --- Prime orange: the brand ------------------------------------------
-     500 is the exact live-site accent. It is a FILL and LARGE-TYPE colour on
-     light surfaces (2.8:1 on white — fails text and fails 3:1 UI contrast).
-     For orange text or fine icons on white, use 700.                      */
+  /* --- Prime orange: the brand accent (dark → light) ---------------------
+     500 is PrimeTrack's real accent, read out of the live site's own
+     stylesheet (--nectar-accent-color in salient-dynamic-styles.css, 56 uses).
+     The logo art samples two steps warmer at #ff6e00; the theme value wins
+     because it is the deliberate site-wide setting customers already see.
+
+     CONTRAST: prime-500 is a FILL and LARGE-TYPE colour on light surfaces
+     (2.8:1 on white). For orange text or fine icons on white, use 700.      */
   --color-prime-950: #3d1802;
   --color-prime-900: #6b2c04;
   --color-prime-800: #8f3a02;
   --color-prime-700: #b84a00;   /* 5.2:1 on white — orange text/links */
   --color-prime-600: #e05c00;   /* 3.6:1 on white — large text / UI only */
   --color-prime-500: #ff7000;   /* BRAND. 7.2:1 on ink-950 */
-  --color-prime-400: #ff8f38;   /* 9.3:1 on ink-950 — orange text on dark */
+  --color-prime-400: #ff8f38;   /* 8.8:1 on ink-950 — orange text on dark */
   --color-prime-300: #ffab6b;
   --color-prime-200: #ffc9a1;
   --color-prime-100: #ffe4d0;
   --color-prime-50: #fff4ec;
 
-  /* --- Amber: the light-orange partner ----------------------------------- */
+  /* --- Amber: the light-orange partner, also from the live stylesheet ----- */
   --color-amber-600: #d17a00;
   --color-amber-500: #f49200;   /* BRAND light orange */
   --color-amber-400: #ffab2e;
   --color-amber-300: #ffc46b;
 
-  /* --- Azure: the technology blue ----------------------------------------
-     400 is the exact live-site blue. 600/700 carry blue text on white.    */
-  --color-azure-950: #101f45;
-  --color-azure-900: #1a3472;
-  --color-azure-800: #1b3b8a;
-  --color-azure-700: #1d47af;   /* 8.2:1 on white — blue text/links */
-  --color-azure-600: #245ad9;   /* 5.9:1 on white — blue links, icons */
-  --color-azure-500: #3576f0;   /* 4.0:1 on white — large text / UI only */
-  --color-azure-400: #5694ff;   /* BRAND. 6.7:1 on ink-950 */
-  --color-azure-300: #97bcff;   /* 10.4:1 on ink-950 */
-  --color-azure-200: #c2d8ff;
-  --color-azure-100: #dde9ff;
-  --color-azure-50: #f0f6ff;
-
-  /* --- Signal red: live indicators and genuine alerts ONLY ---------------- */
+  /* --- Signal red: live indicators and genuine alerts ONLY ---------------
+     500 is the live stylesheet's red. Non-text on light surfaces.          */
   --color-signal-700: #b82a0e;   /* 5.9:1 on white — the only red safe as text */
   --color-signal-600: #e63a19;
-  --color-signal-500: #ff5433;   /* BRAND red. Non-text on light. */
+  --color-signal-500: #ff5433;   /* BRAND red */
   --color-signal-400: #ff7a61;
   --color-signal-100: #ffe3dd;
 
@@ -97,7 +63,6 @@
      Inter carries everything read at length.                              */
   --font-display: "Space Grotesk Variable", "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
 
   --text-display-xl: clamp(2.75rem, 1.6rem + 4.6vw, 5.25rem);
   --text-display-xl--line-height: 1.02;
@@ -182,14 +147,15 @@
     text-wrap: balance;
   }
 
-  /* Focus ring is blue: it is UI feedback, not brand voice, and blue reads
-     unambiguously as "interactive" against an orange-led palette. */
+  /* Focus ring uses prime-700, not prime-500: the brand orange is 2.8:1 on
+     white and a focus indicator needs 3:1 (WCAG 1.4.11 / 2.4.11). Identical
+     to a mouse user; only visible when tabbing. On dark, prime-400. */
   :focus-visible {
-    outline: 2px solid var(--color-azure-500);
+    outline: 2px solid var(--color-prime-700);
     outline-offset: 3px;
     border-radius: 2px;
   }
-  .on-dark :focus-visible { outline-color: var(--color-azure-400); }
+  .on-dark :focus-visible { outline-color: var(--color-prime-400); }
 
   ::selection {
     background-color: var(--color-prime-500);
@@ -218,8 +184,7 @@
   }
   @media (min-width: 768px) { .container-prime { padding-inline: 2rem; } }
 
-  /* Eyebrow label above section headings. Orange by default (brand voice);
-     `.eyebrow-tech` switches it to blue for data/technology sections. */
+  /* Eyebrow label above section headings */
   .eyebrow {
     display: inline-flex;
     align-items: center;
@@ -228,6 +193,9 @@
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
+    /* prime-700, not 600: the eyebrow renders at 12px, and prime-600 is 3.7:1
+       on white / 3.4:1 on tinted — under the 4.5:1 AA needs for small text.
+       One step darker, visually near-identical. */
     color: var(--color-prime-700);
   }
   .eyebrow::before {
@@ -238,71 +206,36 @@
   }
   .on-dark .eyebrow { color: var(--color-prime-400); }
 
-  .eyebrow-tech { color: var(--color-azure-700); }
-  .eyebrow-tech::before { background-color: var(--color-azure-500); }
-  .on-dark .eyebrow-tech { color: var(--color-azure-300); }
-  .on-dark .eyebrow-tech::before { background-color: var(--color-azure-400); }
-
-  /* Long-form body copy inside content pages. Links are blue — the standard
-     signal for "this is a link", and it keeps blue present on every page. */
+  /* Long-form body copy inside content pages */
   .prose-prime :is(p, ul, ol) { margin-block: 0.85rem; }
   .prose-prime ul { list-style: disc; padding-inline-start: 1.25rem; }
   .prose-prime ol { list-style: decimal; padding-inline-start: 1.25rem; }
   .prose-prime li { margin-block: 0.35rem; }
-  .prose-prime li::marker { color: var(--color-azure-500); }
   .prose-prime a {
-    color: var(--color-azure-700);
+    color: var(--color-prime-700);
     text-decoration: underline;
-    text-decoration-color: color-mix(in srgb, var(--color-azure-500) 45%, transparent);
     text-underline-offset: 3px;
-    transition: color var(--duration-fast) var(--ease-prime),
-                text-decoration-color var(--duration-fast) var(--ease-prime);
   }
-  .prose-prime a:hover {
-    color: var(--color-azure-600);
-    text-decoration-color: currentColor;
-  }
-  .on-dark .prose-prime a { color: var(--color-azure-300); }
-  .on-dark .prose-prime a:hover { color: var(--color-azure-200); }
   .prose-prime h2 { font-size: var(--text-h3); margin-block: 2rem 0.75rem; }
   .prose-prime h3 { font-size: var(--text-h4); margin-block: 1.5rem 0.5rem; }
 }
 
 /* --- Utilities ------------------------------------------------------------ */
 @layer utilities {
-  /* Telemetry motif: a faint coordinate grid, tinted blue so the technical
-     substrate of every dark section reads as data. Dark surfaces only. */
+  /* Telemetry motif: a faint coordinate grid. Used sparingly, on dark only. */
   .bg-grid-prime {
     background-image:
-      linear-gradient(to right, rgb(86 148 255 / 0.07) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(86 148 255 / 0.07) 1px, transparent 1px);
+      linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
     background-size: 56px 56px;
   }
 
-  /* Paired wash behind dark sections: orange anchored bottom-left (brand),
-     blue anchored top-right (technology). Neither reads as a gradient bar. */
+  /* Soft directional wash behind dark hero content. */
   .bg-prime-glow {
-    background-image:
-      radial-gradient(60% 80% at 12% 4%, rgb(255 112 0 / 0.16) 0%, transparent 60%),
-      radial-gradient(55% 75% at 92% 8%, rgb(86 148 255 / 0.14) 0%, transparent 62%);
-  }
-
-  /* Blue-led variant for analytics/API/technology sections. */
-  .bg-azure-glow {
-    background-image:
-      radial-gradient(60% 80% at 85% 0%, rgb(86 148 255 / 0.18) 0%, transparent 62%),
-      radial-gradient(45% 60% at 8% 92%, rgb(255 112 0 / 0.10) 0%, transparent 60%);
-  }
-
-  /* Hairline rule that fades orange → blue. Section dividers on dark. */
-  .rule-prime {
-    height: 1px;
-    background-image: linear-gradient(
-      to right,
-      transparent,
-      rgb(255 112 0 / 0.5) 22%,
-      rgb(86 148 255 / 0.5) 68%,
-      transparent
+    background-image: radial-gradient(
+      70% 90% at 15% 0%,
+      rgb(255 112 0 / 0.16) 0%,
+      transparent 62%
     );
   }
 

@@ -49,8 +49,8 @@ const shell =
     : 'bg-ink-50 border-ink-300 text-ink-600';
 
 // Both tones are contrast-checked; see scripts/contrast-audit.mjs.
-const markTone = tone === 'dark' ? 'text-azure-300' : 'text-azure-600';
-const labelTone = tone === 'dark' ? 'text-prime-400' : 'text-prime-700';
+const markTone = tone === 'dark' ? 'text-prime-400' : 'text-prime-600';
+const labelTone = tone === 'dark' ? 'text-prime-300' : 'text-prime-700';
 ---
 
 <div
@@ -62,7 +62,7 @@ const labelTone = tone === 'dark' ? 'text-prime-400' : 'text-prime-700';
   <div class="bg-grid-prime pointer-events-none absolute inset-0 opacity-50"></div>
 
   <span
-    class={`relative flex h-11 w-11 items-center justify-center rounded-full border border-azure-400/40 bg-azure-400/10 ${markTone}`}
+    class={`relative flex h-11 w-11 items-center justify-center rounded-full border border-prime-500/40 bg-prime-500/10 ${markTone}`}
   >
     <Icon name="image" size={20} />
   </span>

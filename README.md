@@ -69,12 +69,12 @@ Every colour, type step, radius, shadow and motion token is defined once in
 it is `noindex` and excluded from the sitemap.
 
 Brand hexes are extracted from PrimeTrack's own assets, not picked by eye — `#ff7000` orange,
-`#f49200` light orange, `#ff5433` red and `#5694ff` blue all come from the live theme's stylesheet;
-the file header records the provenance of each. **Orange is dominant** (brand, CTAs, products);
-**blue is the supporting technology voice** (data, analytics, links, focus, routes); red is reserved
-for live and alert states. `npm run check:contrast` reads the tokens straight out of `global.css`
-and fails if any pair drops below its WCAG threshold — which is why primary buttons set black type
-on orange rather than white (2.8:1 fails; black is 7.2:1).
+`#f49200` light orange and `#ff5433` red all come from the live theme's stylesheet; the file header
+records the provenance of each. **Orange carries the brand**, black and white do the structural
+work, and red is reserved for live and alert states only — one dominant colour and one accent per
+section. `npm run check:contrast` reads the tokens straight out of `global.css` and fails if any
+pair drops below its WCAG threshold, which is why primary buttons set black type on orange rather
+than white (2.8:1 fails; black is 7.2:1) and the focus ring uses `prime-700`.
 
 ### Images
 

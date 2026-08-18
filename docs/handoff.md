@@ -1,7 +1,7 @@
 # PrimeTrack rebuild — handoff
 
 Status: design system, build and responsive pass complete, plus the real-image integration,
-the blue palette extension and the animated hero.
+the corrected brand hexes and the animated hero.
 
 ---
 
@@ -11,7 +11,7 @@ the blue palette extension and the animated hero.
 
 | Route | Status |
 |---|---|
-| `/` | Complete — animated SVG map hero with the 4 verified stats, 6 products, 4 services, why-choose, capabilities, credentials, CTA |
+| `/` | Complete — animated SVG map behind the hero, stats band, 6 products, 4 services, why-choose, capabilities, credentials, CTA |
 | `/vehicle-video-tracking-systems/` | Complete — Ai-PRIME, 19 report types, storage variants |
 | `/primesolar/` | Complete — 6 claim points, 5 capabilities |
 | `/vehicle-fleet-telematics-solutions-in-nigeria/` | Complete — 4 outcomes, 6 platform capabilities |
@@ -56,7 +56,7 @@ one `<h1>`, real `<nav>` / `<main>` / `<footer>` landmarks, skip link.
 | 6 | **vRAS** — keep in the Nigeria nav or remove? | Currently in the Services menu as an external link to primetrack.rw, marked as opening the Rwanda site. |
 | 7 | **Vector logo (SVG or EPS)** | The real logo is now in use, but the only file the live site publishes is 111×99px. It is crisp up to ~48px tall and cannot go larger. See §4. |
 | 8 | **Confirm the SON accreditation** | The accreditations graphic shows NCC and SON emblems, but the certificates PDF is named for CAC, NCC and FRSC. SON is not corroborated anywhere in the content inventory. The graphic is displayed as published; **no accreditation claim is made in words**. Confirm before any copy references SON. |
-| 9 | **Four photographs** | See the placeholder table in §4.2. |
+| 9 | **Five photographs** | See the placeholder table in §4.2. |
 
 ---
 
@@ -85,7 +85,7 @@ footer. `scripts/make-logo-variant.mjs` derives `primetrack-logo-light.png` by l
 near-black pixels to white — the brand orange ring is left exactly as drawn. Re-run it if the source
 logo is ever replaced.
 
-### 4.2 Placeholders — four slots still empty
+### 4.2 Placeholders — five slots still empty
 
 No stock photography, no AI-generated imagery and no mocked-up dashboards were used anywhere. Every
 remaining slot renders a labelled block reading "Image placeholder — client to supply" at the correct
@@ -95,6 +95,7 @@ Run `npm run check:placeholders` for the live list. As of this build:
 
 | Slot | Page | Needs | Size |
 |---|---|---|---|
+| `hero-fleet-photography` | `/` | A strong vertical photograph of a tracked vehicle or customer fleet — the first image a visitor sees. | 1200 × 1500px |
 | `fleet-on-road` | `/vehicle-fleet-telematics-solutions-in-nigeria/` | A managed customer fleet on the road or at a depot — trucks, vans or buses, ideally Nigerian roads. | 1600 × 1000px |
 | `driver-behaviour-review` | `/driver-behaviour-monitoring-systems-for-vehicle-fleet-management/` | A driver-behaviour review actually happening — a manager and driver going over reports, or a depot briefing. **Not** a mocked-up dashboard. | 1600 × 1000px |
 | `star-container-tracker` | `/reliable-container-tracking/` | The STAR tracker magnetically attached to a container or cargo unit, showing its real size. | 1600 × 1000px |
@@ -119,27 +120,31 @@ Every brand hex is extracted from PrimeTrack's own assets, not chosen by eye:
 | Primary orange | `#ff7000` | `--nectar-accent-color` in the live theme's `salient-dynamic-styles.css` (56 uses) |
 | Light orange | `#f49200` | extra-colour slot, same stylesheet (12 uses) |
 | Red | `#ff5433` | extra-colour slot, same stylesheet (11 uses) |
-| **Blue** | `#5694ff` | extra-colour slot, same stylesheet (**18 uses**) |
+| Blue | `#5694ff` | extra-colour slot, same stylesheet (18 uses) — **present in the theme but deliberately not used on this site** |
 | Logo orange | `#ff6e00` | sampled from the logo PNG's dominant non-black pixel |
 
 The logo orange and the theme accent differ by two steps of red. The theme value wins: it is the
 deliberate site-wide setting and what customers have actually been looking at.
 
-**Blue was already PrimeTrack's colour.** `#5694ff` sits in the live theme's own palette and is used
-18 times, mostly paired with the red in gradients. Making it a proper supporting colour amplifies
-something that was already there rather than introducing anything new.
+**On blue.** PrimeTrack's live theme carries a blue in its palette, and an earlier iteration of this
+build promoted it to a supporting colour across the technology pages. That was reverted at the
+client's direction: the site is orange-led, with black and white doing the structural work. No blue
+appears anywhere in the built output — `grep -ril "5694ff\|azure" dist/` returns nothing.
 
-**How the colours are used.** Orange stays dominant — brand voice, CTAs, product identity, the hero
-hub. Blue carries the technology voice — data, analytics, connectivity, routes, links, focus rings,
-and the whole services/analytics/API layer. Red is reserved for live and alert states only. Orange
-and blue may share a section; red never joins them at full strength. The rule is written at the top
-of `src/styles/global.css`, which is the single source of truth for the palette.
+**How the colours are used.** Orange carries the brand — CTAs, product identity, eyebrows, the hero
+hub and routes. Black and white do the structural work. Red is reserved for live and alert states
+only. One dominant colour and one accent per section; the rule is written at the top of
+`src/styles/global.css`, which is the single source of truth for the palette.
 
 **Contrast.** `npm run check:contrast` reads the tokens straight out of `global.css` and checks all
 32 foreground/background pairs the site uses. Two findings worth recording:
 
 - White on the brand orange is **2.8:1** and fails WCAG AA. Primary buttons therefore set **black**
-  type on orange — 7.2:1, and what the logo itself does.
+  type on orange — 7.2:1, and what the logo itself does. This is the one colour that intentionally
+  differs from the pre-blue build; say the word and it goes back to white on `prime-600`, at the
+  cost of the AA failure returning.
+- The focus ring uses `prime-700`, not the brand orange, because a focus indicator needs 3:1
+  (WCAG 1.4.11 / 2.4.11) and `prime-500` is 2.8:1 on white. Invisible unless tabbing.
 - `ink-500` is a light-surface token (6.0:1 on white) but only 3.3:1 on the dark footer. Dark
   surfaces use `ink-400` or lighter.
 
@@ -150,6 +155,11 @@ of `src/styles/global.css`, which is the single source of truth for the palette.
 The hero backdrop is hand-drawn SVG — roughly 4KB of markup and CSS, no video, no image, no
 animation library. Route lines carry vehicles along them, location markers pulse, and a coordinate
 grid sits underneath. All movement is `transform`/`opacity` only, so it stays on the compositor.
+
+It sits *behind* the original two-column hero: headline and CTAs on the left, the hero photography
+placeholder and the "Operating since" panel on the right, exactly as before. Structural lines in the
+drawing are white at low opacity; the routes and markers use two steps of the brand orange rather
+than a second hue.
 
 The geometry is **deliberately abstract**. It is not a map of Nigeria or of any coverage area, and
 the markers are not live data — implying either would be a factual claim the inventory cannot
@@ -220,5 +230,5 @@ npm run check:placeholders  # placeholder registry vs. what the pages actually u
 Current state — 20 pages, 0 QA problems, 1 tracked pending asset (the certificates PDF, item 3):
 
 - **GATE 4: PASS** — 178 verified facts across 18 routes, none lost.
-- **Contrast: PASS** — 32/32 pairs.
-- **Placeholders: PASS** — registry and pages agree, 4 slots outstanding.
+- **Contrast: PASS** — 29/29 pairs.
+- **Placeholders: PASS** — registry and pages agree, 5 slots outstanding.

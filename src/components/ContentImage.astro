@@ -38,12 +38,6 @@ const widths = [...new Set([400, 640, 900, 1200, image.width])]
 ---
 
 <figure class={`relative ${className}`}>
-  <!-- Blue hairline corner: the technology motif, applied to real media. -->
-  <span
-    aria-hidden="true"
-    class="pointer-events-none absolute -left-1.5 -top-1.5 h-10 w-10 rounded-tl-panel border-l-2 border-t-2 border-azure-400/60"
-  ></span>
-
   <Picture
     src={image}
     formats={['avif', 'webp']}

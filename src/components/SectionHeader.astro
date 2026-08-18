@@ -5,8 +5,6 @@ interface Props {
   lead?: string;
   align?: 'left' | 'center';
   tone?: 'light' | 'dark';
-  /** `tech` turns the eyebrow blue for data/technology sections. */
-  accent?: 'brand' | 'tech';
   class?: string;
   as?: 'h2' | 'h3';
 }
@@ -17,7 +15,6 @@ const {
   lead,
   align = 'left',
   tone = 'light',
-  accent = 'brand',
   class: className = '',
   as: Tag = 'h2',
 } = Astro.props;
@@ -28,7 +25,7 @@ const leadTone = tone === 'dark' ? 'text-ink-300' : 'text-ink-600';
 ---
 
 <div class={`flex max-w-3xl flex-col gap-4 ${alignment} ${className}`}>
-  {eyebrow && <span class={`eyebrow ${accent === 'tech' ? 'eyebrow-tech' : ''}`}>{eyebrow}</span>}
+  {eyebrow && <span class="eyebrow">{eyebrow}</span>}
   <Tag class={`text-h2 ${titleTone}`}>{title}</Tag>
   {lead && <p class={`text-lead text-pretty ${leadTone}`}>{lead}</p>}
 </div>

@@ -18,7 +18,8 @@ import { fileURLToPath } from 'node:url';
 const W = 1200;
 const H = 630;
 const ORANGE = '#ff7000';
-const BLUE = '#5694ff';
+const SOFT = '#ffab6b';   // prime-300 — depth without a second hue
+const LINE = '#ffffff';   // structural lines
 const INK = '#08090b';
 
 const stats = [
@@ -44,7 +45,7 @@ const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
   <defs>
     <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
-      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="${BLUE}" stroke-opacity="0.13" stroke-width="1"/>
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="${LINE}" stroke-opacity="0.07" stroke-width="1"/>
     </pattern>
     <radialGradient id="hubGlow">
       <stop offset="0%" stop-color="${ORANGE}" stop-opacity="0.42"/>
@@ -52,7 +53,7 @@ const svg = `
     </radialGradient>
     <linearGradient id="rule" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="${ORANGE}" stop-opacity="0.85"/>
-      <stop offset="100%" stop-color="${BLUE}" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="${SOFT}" stop-opacity="0.7"/>
     </linearGradient>
     <linearGradient id="leftFade" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#fff" stop-opacity="0"/>
@@ -69,21 +70,21 @@ const svg = `
     <circle cx="965" cy="212" r="150" fill="url(#hubGlow)"/>
 
     <path d="M 640 452 C 760 420 800 330 900 250 S 1160 150 1240 170" fill="none"
-          stroke="${BLUE}" stroke-opacity="0.5" stroke-width="2"/>
+          stroke="${SOFT}" stroke-opacity="0.42" stroke-width="2"/>
     <path d="M 700 232 C 820 268 860 340 940 408 S 1150 442 1240 418" fill="none"
-          stroke="${BLUE}" stroke-opacity="0.35" stroke-width="2"/>
+          stroke="${SOFT}" stroke-opacity="0.28" stroke-width="2"/>
     <path d="M 872 448 C 900 380 880 320 908 250 S 946 118 986 46" fill="none"
           stroke="${ORANGE}" stroke-opacity="0.4" stroke-width="2"/>
 
-    <g fill="none" stroke="${BLUE}" stroke-opacity="0.22" stroke-width="1">
+    <g fill="none" stroke="${LINE}" stroke-opacity="0.14" stroke-width="1">
       <circle cx="965" cy="212" r="96" stroke-dasharray="3 9"/>
       <circle cx="965" cy="212" r="152" stroke-dasharray="3 9"/>
     </g>
 
     <circle cx="965" cy="212" r="13" fill="none" stroke="${ORANGE}" stroke-opacity="0.65" stroke-width="2"/>
     <circle cx="965" cy="212" r="6" fill="${ORANGE}"/>
-    <circle cx="806" cy="330" r="5" fill="${BLUE}"/>
-    <circle cx="1128" cy="330" r="5" fill="${BLUE}"/>
+    <circle cx="806" cy="330" r="5" fill="${SOFT}"/>
+    <circle cx="1128" cy="330" r="5" fill="${SOFT}"/>
   </g>
 
   <text x="72" y="268" font-size="76" font-weight="700" fill="#ffffff"

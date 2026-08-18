@@ -12,32 +12,13 @@ interface Props {
   icon?: string;
   crumbs: { label: string; href?: string }[];
   showCta?: boolean;
-  /**
-   * `tech` gives the page the blue voice — blue-led backdrop wash, blue icon
-   * and eyebrow. Used on the data/analytics/integration pages so the service
-   * layer reads differently from the hardware pages.
-   */
-  accent?: 'brand' | 'tech';
 }
 
-const {
-  eyebrow,
-  title,
-  lead,
-  chips = [],
-  icon,
-  crumbs,
-  showCta = true,
-  accent = 'brand',
-} = Astro.props;
-
-const isTech = accent === 'tech';
-const glow = isTech ? 'bg-azure-glow' : 'bg-prime-glow';
-const iconTone = isTech ? 'text-azure-300' : 'text-prime-400';
+const { eyebrow, title, lead, chips = [], icon, crumbs, showCta = true } = Astro.props;
 ---
 
 <section class="on-dark relative overflow-hidden bg-ink-950">
-  <div class={`${glow} absolute inset-0`}></div>
+  <div class="bg-prime-glow absolute inset-0"></div>
   <div class="bg-grid-prime absolute inset-0"></div>
 
   <div class="container-prime relative py-12 md:py-20">
@@ -46,12 +27,12 @@ const iconTone = isTech ? 'text-azure-300' : 'text-prime-400';
     <div class="mt-8 flex max-w-3xl flex-col gap-5">
       {
         icon && (
-          <span class={`flex h-12 w-12 items-center justify-center rounded-card border border-white/10 ${iconTone}`}>
+          <span class="flex h-12 w-12 items-center justify-center rounded-card border border-white/10 text-prime-400">
             <Icon name={icon} size={22} />
           </span>
         )
       }
-      {eyebrow && <span class={`eyebrow ${isTech ? 'eyebrow-tech' : ''}`}>{eyebrow}</span>}
+      {eyebrow && <span class="eyebrow">{eyebrow}</span>}
       <h1 class="text-display text-white">{title}</h1>
       {lead && <p class="text-lead text-ink-300 text-pretty">{lead}</p>}
 
