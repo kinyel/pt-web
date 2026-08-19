@@ -7,10 +7,12 @@ import FeatureBlocks from '../components/FeatureBlocks.astro';
 import MediaPlaceholder from '../components/MediaPlaceholder.astro';
 import RelatedLinks from '../components/RelatedLinks.astro';
 import CTA from '../components/CTA.astro';
-import { products, services } from '../data/navigation.ts';
+import { retiredProducts, products, services } from '../data/navigation.ts';
 import { productSchema, breadcrumbSchema } from '../data/schema.ts';
 
-const page = products.find((p) => p.href === '/reliable-container-tracking/')!;
+/* Withdrawn product — this route is still published, so it still needs its
+   title and description. See the note on `retiredProducts`. */
+const page = retiredProducts.find((p) => p.href === '/reliable-container-tracking/')!;
 
 const features = [
   {

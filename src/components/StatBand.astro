@@ -14,13 +14,27 @@ const ruleTone = tone === 'dark' ? 'divide-white/10' : 'divide-ink-200';
 
 <!-- The only four numeric claims permitted on this site (inventory §5).
      The value reads first, but <dt> must precede <dd> in the markup for the
-     definition list to be valid, so flex-col-reverse handles the visual order. -->
-<dl class={`grid grid-cols-2 gap-y-10 sm:divide-x lg:grid-cols-4 ${ruleTone} ${className}`}>
+     definition list to be valid, so flex-col-reverse handles the visual order.
+
+     MOTION: `data-count` asks the runtime to count the value up once, the
+     first time the band scrolls into view. The verified string is what the
+     server renders and what the runtime writes back at the end, so the page
+     states the correct figure with JavaScript off, with reduced motion on,
+     and to anything reading the HTML rather than the screen — the animation
+     only ever occupies the seconds in between. `tabular-nums` holds the digit
+     advance steady so the number does not shimmer as it climbs. -->
+<dl class={`grid grid-cols-2 gap-y-10 sm:divide-x lg:grid-cols-4 ${ruleTone} ${className}`}
+    data-reveal-stagger="80">
   {
     stats.map((stat) => (
-      <div class="flex flex-col-reverse items-center gap-2 px-4 text-center">
+      <div class="reveal flex flex-col-reverse items-center gap-2 px-4 text-center">
         <dt class={`text-small ${labelTone}`}>{stat.label}</dt>
-        <dd class={`text-stat font-display ${valueTone}`}>{stat.value}</dd>
+        <dd
+          class={`text-stat font-display tabular-nums ${valueTone}`}
+          data-count={stat.value}
+        >
+          {stat.value}
+        </dd>
       </div>
     ))
   }

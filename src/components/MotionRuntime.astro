@@ -1,0 +1,149 @@
+---
+/**
+ * Motion runtime — scroll reveal and stat counters.
+ *
+ * No library, no bundle, no extra request. IntersectionObserver does the
+ * watching off the main thread, the reveal itself is two compositor properties
+ * (opacity + transform), and the counters are a single requestAnimationFrame
+ * loop that stops when it lands.
+ *
+ * NOTE ON COMMENTS: everything below the `---` fence is shipped verbatim to
+ * every page — `is:inline` scripts are deliberately not processed by Astro, so
+ * a paragraph of explanation there is a paragraph of explanation downloaded by
+ * every visitor on every page. The reasoning therefore lives up here, in
+ * frontmatter, which is build-time only. The script keeps just enough comment
+ * to be navigable.
+ *
+ * WHY IT IS INLINE AND IN <head>
+ * The `data-motion` flag it sets is what switches on the hidden state in
+ * global.css. That has to land before first paint: set it any later and every
+ * reveal target would paint visible and then snap to hidden, which is a worse
+ * artefact than having no reveals at all. Inline in <head> is the only
+ * placement that guarantees it, and it also means there is no separate request
+ * that could fail and leave content stranded at opacity 0.
+ *
+ * WHY IT IS OPT-IN
+ * The runtime returns early — leaving the flag unset — when the visitor
+ * prefers reduced motion, has Save-Data on, or the browser has no
+ * IntersectionObserver. With the flag unset the CSS rule that hides content
+ * never matches, so the page is simply a static page. The failure mode of this
+ * whole system is "no animation", never "invisible content". The same holds
+ * with JavaScript disabled entirely.
+ *
+ * REVEALS ARE ONE-SHOT
+ * Each element is unobserved the moment it fires, so scrolling back up never
+ * replays anything and nothing moves while the reader is idle.
+ *
+ * COUNTERS
+ * The verified figure is server-rendered and written back verbatim on the last
+ * frame — the animation can never change what the page claims, and a visitor
+ * with the runtime disabled reads the correct number immediately. If the tab
+ * is backgrounded mid-count, rAF pauses; on return the elapsed time already
+ * exceeds the duration, so the first resumed frame lands on the final value
+ * rather than replaying.
+ */
+---
+
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+    const saveData = (navigator.connection || {}).saveData === true;
+
+    /* Opt in only. See MotionRuntime.astro frontmatter for why. */
+    if (!('IntersectionObserver' in window) || reduce.matches || saveData) return;
+    root.dataset.motion = 'on';
+
+    const SELECTOR = '.reveal, [data-reveal]';
+    /* Fires as the element's top edge crosses ~92% of viewport height, so the
+       transition is finishing as the reader arrives rather than starting. */
+    const OPTS = { rootMargin: '0px 0px -8% 0px', threshold: 0 };
+    const all = (sel) => document.querySelectorAll(sel);
+
+    /* Nothing may stay hidden if the preference changes mid-visit. */
+    reduce.addEventListener('change', (e) => {
+      if (!e.matches) return;
+      delete root.dataset.motion;
+      all(SELECTOR).forEach((el) => el.classList.add('is-revealed'));
+    });
+
+    /** Runs `fn` once, the first time each element comes into view. */
+    const onFirstView = (nodes, fn) => {
+      if (!nodes.length) return;
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          io.unobserve(entry.target); /* one-shot — never replays */
+          fn(entry.target);
+        }
+      }, OPTS);
+      nodes.forEach((el) => io.observe(el));
+    };
+
+    const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+
+    const countUp = (el) => {
+      const final = (el.dataset.count || el.textContent || '').trim();
+      /* Splits "5,000" / "15+" / "24/7" into what counts and what does not. */
+      const parts = final.match(/^(\D*)([0-9][0-9.,]*)(.*)$/s);
+      if (!parts) return;
+
+      const [, prefix, digits, suffix] = parts;
+      const grouped = digits.includes(',');
+      const decimals = (digits.split('.')[1] || '').length;
+      const target = Number(digits.replace(/,/g, ''));
+      if (!isFinite(target)) return;
+
+      const format = (n) =>
+        grouped || decimals
+          ? n.toLocaleString('en-US', {
+              minimumFractionDigits: decimals,
+              maximumFractionDigits: decimals,
+            })
+          : String(Math.round(n));
+
+      /* Pin the final value's width first, so a number growing from one digit
+         to five does not shove the layout around for the whole run. */
+      el.style.minWidth = el.getBoundingClientRect().width + 'px';
+
+      const dur =
+        parseFloat(getComputedStyle(root).getPropertyValue('--duration-count')) || 1100;
+      const t0 = performance.now();
+
+      const frame = (now) => {
+        const p = Math.min(1, (now - t0) / dur);
+        if (p < 1) {
+          el.textContent = prefix + format(target * easeOut(p)) + suffix;
+          requestAnimationFrame(frame);
+        } else {
+          el.textContent = final; /* authored string, restored verbatim */
+          el.style.minWidth = '';
+        }
+      };
+
+      el.textContent = prefix + format(0) + suffix;
+      requestAnimationFrame(frame);
+    };
+
+    const start = () => {
+      /* Stagger: a container marked data-reveal-stagger hands each revealing
+         descendant an incremental delay, capped at five steps so a long grid
+         never becomes a queue the reader has to sit through. */
+      all('[data-reveal-stagger]').forEach((group) => {
+        const step = Number(group.dataset.revealStagger) || 70;
+        group.querySelectorAll(SELECTOR).forEach((el, i) => {
+          el.style.setProperty('--reveal-delay', Math.min(i, 5) * step + 'ms');
+        });
+      });
+
+      onFirstView(all(SELECTOR), (el) => el.classList.add('is-revealed'));
+      onFirstView(all('[data-count]'), countUp);
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', start, { once: true });
+    } else {
+      start();
+    }
+  })();
+</script>

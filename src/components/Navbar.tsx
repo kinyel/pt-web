@@ -139,8 +139,14 @@ export default function Navbar({ currentPath, logo }: Props) {
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== 'Tab' || !drawerRef.current) return;
-      const focusable = drawerRef.current.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled])',
+      const focusable = Array.from(
+        drawerRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled])'),
+      ).filter(
+        /* Collapsed accordion sections stay mounted so they can animate, and
+           are marked inert while closed. They still match the selector, but
+           they cannot take focus — leaving them in would hand the trap a
+           dead end and swallow the Tab. */
+        (el) => !el.closest('[inert]'),
       );
       if (focusable.length === 0) return;
       const first = focusable[0];
@@ -163,10 +169,20 @@ export default function Navbar({ currentPath, logo }: Props) {
 
   const menuItems: Record<'products' | 'services', NavItem[]> = { products, services };
 
-  const renderMegaMenu = (key: 'products' | 'services') => (
+  /* The panel is always mounted and toggled with data-state, never mounted and
+     unmounted. React tearing the node out on close would cut the exit
+     transition off at the first frame, so the menu would ease open and then
+     vanish — the asymmetry is exactly what makes a dropdown feel cheap.
+     `.menu-panel` (global.css) owns the fade, the 6px drop, and the deferred
+     visibility; `inert` keeps a closed panel out of the tab order and the
+     accessibility tree. It also means every nav link is now in the served
+     HTML rather than appearing only after a hover. */
+  const renderMegaMenu = (key: 'products' | 'services', open: boolean) => (
     <div
       id={`megamenu-${key}`}
-      className="absolute inset-x-0 top-full z-40 origin-top border-b border-ink-200 bg-white shadow-menu"
+      data-state={open ? 'open' : 'closed'}
+      inert={!open}
+      className="menu-panel absolute inset-x-0 top-full z-40 border-b border-ink-200 bg-white shadow-menu"
       onMouseEnter={() => openWithHover(key)}
       onMouseLeave={closeWithDelay}
     >
@@ -264,7 +280,7 @@ export default function Navbar({ currentPath, logo }: Props) {
                     aria-expanded={openMenu === key}
                     aria-controls={`megamenu-${key}`}
                     onClick={() => setOpenMenu(openMenu === key ? null : key)}
-                    className="flex items-center gap-1.5 rounded-full px-4 py-2 text-small font-semibold text-ink-800 transition-colors duration-[var(--duration-fast)] hover:text-prime-700"
+                    className="flex items-center gap-1.5 rounded-full px-4 py-2 text-small font-semibold text-ink-800 transition-colors duration-[var(--duration-fast)] hover:bg-ink-50 hover:text-prime-700"
                   >
                     {key === 'products' ? 'Products' : 'Services'}
                     <ChevronDown
@@ -278,7 +294,7 @@ export default function Navbar({ currentPath, logo }: Props) {
                       moves from the trigger straight into the menu, rather than
                       through the rest of the header first. It still spans the
                       full width because it positions against the header. */}
-                  {openMenu === key && renderMegaMenu(key)}
+                  {renderMegaMenu(key, openMenu === key)}
                 </li>
               ))}
 
@@ -287,7 +303,7 @@ export default function Navbar({ currentPath, logo }: Props) {
                   <a
                     href={link.href}
                     aria-current={isActive(currentPath, link.href) ? 'page' : undefined}
-                    className={`rounded-full px-4 py-2 text-small font-semibold transition-colors duration-[var(--duration-fast)] hover:text-prime-700 ${
+                    className={`rounded-full px-4 py-2 text-small font-semibold transition-colors duration-[var(--duration-fast)] hover:bg-ink-50 hover:text-prime-700 ${
                       isActive(currentPath, link.href) ? 'text-prime-700' : 'text-ink-800'
                     }`}
                   >
@@ -321,30 +337,30 @@ export default function Navbar({ currentPath, logo }: Props) {
                 />
               </button>
 
-              {openMenu === 'regions' && (
-                <ul
-                  id="menu-regions"
-                  className="absolute right-0 top-full z-40 mt-2 w-56 overflow-hidden rounded-card border border-ink-200 bg-white py-1.5 shadow-menu"
-                >
-                  {countries.map((c) => (
-                    <li key={c.code}>
-                      <a
-                        href={c.href}
-                        target={c.external ? '_blank' : undefined}
-                        rel={c.external ? 'noopener noreferrer' : undefined}
-                        className="flex items-center justify-between gap-2 px-4 py-2.5 text-small text-ink-700 hover:bg-ink-50"
-                        onClick={() => setOpenMenu(null)}
-                      >
-                        <span>
-                          <span className="font-semibold text-ink-950">{c.code}</span>
-                          <span className="ml-2 text-ink-500">{c.label}</span>
-                        </span>
-                        {c.external && <ExternalLink />}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <ul
+                id="menu-regions"
+                data-state={openMenu === 'regions' ? 'open' : 'closed'}
+                inert={openMenu !== 'regions'}
+                className="menu-panel absolute right-0 top-full z-40 mt-2 w-56 overflow-hidden rounded-card border border-ink-200 bg-white py-1.5 shadow-menu"
+              >
+                {countries.map((c) => (
+                  <li key={c.code}>
+                    <a
+                      href={c.href}
+                      target={c.external ? '_blank' : undefined}
+                      rel={c.external ? 'noopener noreferrer' : undefined}
+                      className="flex items-center justify-between gap-2 px-4 py-2.5 text-small text-ink-700 transition-colors duration-[var(--duration-fast)] hover:bg-ink-50"
+                      onClick={() => setOpenMenu(null)}
+                    >
+                      <span>
+                        <span className="font-semibold text-ink-950">{c.code}</span>
+                        <span className="ml-2 text-ink-500">{c.label}</span>
+                      </span>
+                      {c.external && <ExternalLink />}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
 
             <a
@@ -359,7 +375,7 @@ export default function Navbar({ currentPath, logo }: Props) {
               href="/contact-prime/"
               /* Black on brand orange — white on #ff7000 is 2.8:1 and even prime-600 is
                  only 3.7:1. Matches Button.astro's primary variant. */
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-prime-500 px-5 py-2.5 text-small font-semibold text-ink-950 transition-colors duration-[var(--duration-base)] hover:bg-prime-400"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-prime-500 px-5 py-2.5 text-small font-semibold text-ink-950 transition duration-[var(--duration-base)] ease-[var(--ease-prime)] hover:-translate-y-0.5 hover:bg-prime-400 hover:shadow-lift active:translate-y-0 active:shadow-none"
             >
               Contact us
               <ArrowRight />
@@ -380,13 +396,18 @@ export default function Navbar({ currentPath, logo }: Props) {
         </div>
       </div>
 
-      {/* ---------- Mobile drawer ---------- */}
-      {mobileOpen && (
-        <div
-          id="mobile-nav"
-          ref={drawerRef}
-          className="fixed inset-x-0 bottom-0 top-16 z-40 overflow-y-auto overscroll-contain bg-white lg:hidden"
-        >
+      {/* ---------- Mobile drawer ----------
+           Mounted always, shown with data-state, for the same reason as the
+           mega-menus: an exit transition needs the node to still exist. It is
+           `visibility: hidden` while closed, so it takes no pointer events,
+           holds nothing focusable, and costs no paint. */}
+      <div
+        id="mobile-nav"
+        ref={drawerRef}
+        data-state={mobileOpen ? 'open' : 'closed'}
+        inert={!mobileOpen}
+        className="menu-panel menu-drawer fixed inset-x-0 bottom-0 top-16 z-40 overflow-y-auto overscroll-contain bg-white lg:hidden"
+      >
           <nav aria-label="Mobile" className="container-prime flex flex-col gap-1 py-6">
             {(['products', 'services'] as const).map((key) => (
               <div key={key} className="border-b border-ink-100">
@@ -404,27 +425,41 @@ export default function Navbar({ currentPath, logo }: Props) {
                     }`}
                   />
                 </button>
-                {mobileSection === key && (
-                  <ul id={`mobile-${key}`} className="flex flex-col pb-3">
-                    {menuItems[key].map((item) => (
-                      <li key={item.href}>
-                        <a
-                          href={item.href}
-                          target={item.external ? '_blank' : undefined}
-                          rel={item.external ? 'noopener noreferrer' : undefined}
-                          className="flex min-h-12 flex-col justify-center gap-0.5 rounded-card px-3 py-2.5 hover:bg-ink-50"
-                          onClick={() => setMobileOpen(false)}
-                        >
-                          <span className="flex items-center gap-1.5 font-semibold text-ink-900">
-                            {item.label}
-                            {item.external && <ExternalLink />}
-                          </span>
-                          <span className="text-small text-ink-500">{item.descriptor}</span>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                {/* `.accordion` animates grid-template-rows 0fr → 1fr, which
+                    resolves to the content's real height — no JS measurement,
+                    no max-height guess that either clips long sections or
+                    leaves short ones easing through empty space. */}
+                <div
+                  className="accordion"
+                  data-state={mobileSection === key ? 'open' : 'closed'}
+                  inert={mobileSection !== key}
+                >
+                  {/* The row track collapses the grid item's CONTENT to zero,
+                      but padding is outside that and would hold the closed
+                      section open by its own height. So the item is this bare
+                      wrapper, and all spacing lives on the list inside it. */}
+                  <div>
+                    <ul id={`mobile-${key}`} className="flex flex-col pb-3">
+                      {menuItems[key].map((item) => (
+                        <li key={item.href}>
+                          <a
+                            href={item.href}
+                            target={item.external ? '_blank' : undefined}
+                            rel={item.external ? 'noopener noreferrer' : undefined}
+                            className="flex min-h-12 flex-col justify-center gap-0.5 rounded-card px-3 py-2.5 transition-colors duration-[var(--duration-fast)] hover:bg-ink-50"
+                            onClick={() => setMobileOpen(false)}
+                          >
+                            <span className="flex items-center gap-1.5 font-semibold text-ink-900">
+                              {item.label}
+                              {item.external && <ExternalLink />}
+                            </span>
+                            <span className="text-small text-ink-500">{item.descriptor}</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
               </div>
             ))}
 
@@ -443,7 +478,7 @@ export default function Navbar({ currentPath, logo }: Props) {
             <div className="mt-6 flex flex-col gap-3">
               <a
                 href="/contact-prime/"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-prime-500 px-6 py-3 font-semibold text-ink-950 hover:bg-prime-400"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-prime-500 px-6 py-3 font-semibold text-ink-950 transition-colors duration-[var(--duration-base)] hover:bg-prime-400"
                 onClick={() => setMobileOpen(false)}
               >
                 Contact us
@@ -482,8 +517,7 @@ export default function Navbar({ currentPath, logo }: Props) {
               </ul>
             </div>
           </nav>
-        </div>
-      )}
+      </div>
     </header>
   );
 }

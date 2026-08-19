@@ -3,6 +3,7 @@ import '../styles/global.css';
 import { getImage } from 'astro:assets';
 import Navbar from '../components/Navbar.tsx';
 import Footer from '../components/Footer.astro';
+import MotionRuntime from '../components/MotionRuntime.astro';
 import { organizationSchema } from '../data/schema.ts';
 import logoDark from '../assets/brand/primetrack-logo.png';
 
@@ -74,6 +75,9 @@ const logo = {
 
     <meta name="theme-color" content="#08090b" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    {/* Must run before first paint — see the note in the component. */}
+    <MotionRuntime />
 
     {
       allSchemas.map((schema) => (

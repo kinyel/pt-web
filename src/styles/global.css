@@ -117,11 +117,22 @@
   --shadow-lift: 0 2px 4px rgb(8 9 11 / 0.05), 0 18px 40px -18px rgb(8 9 11 / 0.22);
   --shadow-menu: 0 24px 64px -24px rgb(8 9 11 / 0.35);
 
-  /* --- Motion: subtle, fast, consistent --------------------------------- */
+  /* --- Motion: subtle, fast, consistent ---------------------------------
+     One easing curve carries the whole site. Durations are short on purpose:
+     nothing here is a performance, it is feedback. Every value below is used
+     through a token so the site can be slowed down or sped up in one place. */
   --ease-prime: cubic-bezier(0.22, 0.61, 0.36, 1);
-  --duration-fast: 140ms;
-  --duration-base: 220ms;
-  --duration-slow: 420ms;
+  --duration-fast: 140ms;   /* colour/opacity feedback under the cursor */
+  --duration-base: 220ms;   /* menus, lifts, anything the user triggered */
+  --duration-slow: 420ms;   /* the longest a UI transition may run */
+
+  /* Scroll reveal. 16px is roughly one line of body copy — far enough to read
+     as arrival, short enough that nothing appears to fly in. */
+  --duration-reveal: 520ms;
+  --reveal-distance: 16px;
+  /* Read by the motion runtime; the per-element stagger step is authored on
+     the container as data-reveal-stagger. */
+  --duration-count: 1100ms;
 }
 
 /* --- Base ---------------------------------------------------------------- */
@@ -218,6 +229,48 @@
   }
   .prose-prime h2 { font-size: var(--text-h3); margin-block: 2rem 0.75rem; }
   .prose-prime h3 { font-size: var(--text-h4); margin-block: 1.5rem 0.5rem; }
+
+  /* --- Overlay panels: mega-menus, the region dropdown, the mobile drawer ---
+     These live in a React island, so they cannot use Astro's scoped styles.
+
+     The panels stay MOUNTED and are toggled with data-state, which is what
+     makes the close transition possible at all — React unmounting the node
+     would cut any exit animation off mid-frame. `visibility` does the work
+     that `display` would otherwise do: it is transitionable, so it can be
+     deferred until the fade has finished, and a hidden subtree takes no
+     pointer events and holds nothing focusable. The island also marks closed
+     panels `inert`, which keeps them out of the accessibility tree.          */
+  .menu-panel {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate3d(0, -6px, 0);
+    transition:
+      opacity var(--duration-base) var(--ease-prime),
+      transform var(--duration-base) var(--ease-prime),
+      visibility 0s linear var(--duration-base);
+  }
+  .menu-panel[data-state='open'] {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    /* Opening must not wait on the closing rule's deferred visibility. */
+    transition-delay: 0s;
+  }
+
+  /* The mobile drawer is full-height, so it rises rather than drops. */
+  .menu-drawer { transform: translate3d(0, 8px, 0); }
+
+  /* --- Accordion (mobile nav sections) -------------------------------------
+     grid-template-rows 0fr → 1fr animates to the content's natural height
+     without measuring it in JS and without a max-height guess that clips or
+     lags. The child must own the overflow for the row track to clip it.      */
+  .accordion {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--duration-base) var(--ease-prime);
+  }
+  .accordion[data-state='open'] { grid-template-rows: 1fr; }
+  .accordion > * { min-height: 0; overflow: hidden; }
 }
 
 /* --- Utilities ------------------------------------------------------------ */
@@ -242,17 +295,40 @@
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }
 
-  /* Scroll reveal — CSS-only, no JS, no library. */
-  .reveal {
-    animation: reveal-in linear both;
-    animation-timeline: view();
-    animation-range: entry 0% cover 22%;
+  /* --- Scroll reveal -----------------------------------------------------
+     Sections fade and rise a short distance as they enter the viewport, once.
+     Two properties only (opacity + transform), so it stays on the compositor.
+
+     This is opt-IN, not opt-out: the hidden state applies only under
+     html[data-motion='on'], which the runtime in MotionRuntime.astro sets
+     before first paint and only when the visitor has not asked for reduced
+     motion, is not on Save-Data, and the browser has IntersectionObserver.
+     With no JS, an old browser, or reduced motion, the markup renders exactly
+     as it would have without any of this — nothing can get stuck invisible.
+
+     Reveals are one-shot. The runtime unobserves each element as it fires, so
+     scrolling back up never replays anything.                              */
+  [data-motion='on'] :is(.reveal, [data-reveal]) {
+    opacity: 0;
+    transform: translate3d(0, var(--reveal-distance), 0);
+    transition:
+      opacity var(--duration-reveal) var(--ease-prime) var(--reveal-delay, 0ms),
+      transform var(--duration-reveal) var(--ease-prime) var(--reveal-delay, 0ms);
   }
-  @keyframes reveal-in {
-    from { opacity: 0; transform: translateY(14px); }
-    to { opacity: 1; transform: none; }
+
+  [data-motion='on'] :is(.reveal, [data-reveal]).is-revealed {
+    opacity: 1;
+    transform: none;
   }
+
+  /* Belt and braces. The runtime already refuses to set data-motion under a
+     reduced-motion preference, but if the preference is switched on mid-visit
+     the hidden state must fall away instantly rather than wait for a
+     transition that the base layer has already reduced to 0.01ms.            */
   @media (prefers-reduced-motion: reduce) {
-    .reveal { animation: none; opacity: 1; transform: none; }
+    [data-motion='on'] :is(.reveal, [data-reveal]) {
+      opacity: 1 !important;
+      transform: none !important;
+    }
   }
 }

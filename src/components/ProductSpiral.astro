@@ -1,0 +1,685 @@
+---
+/**
+ * Product spiral — the homepage products showcase.
+ *
+ * The product cards sit on a helix around a central vertical spine. Scrolling
+ * turns the helix and lifts it, so each product rises to the front in turn,
+ * like walking up a spiral staircase.
+ *
+ * HOW IT IS DRIVEN
+ * A tall track element sets the scroll length; a sticky child pins the stage
+ * for the duration. The page scrolls completely normally throughout — nothing
+ * is captured, no wheel or touch event is intercepted, and momentum, flings,
+ * scrollbar drags and Find-in-page all behave as they always do. If a visitor
+ * scrolls hard through the section, the spiral simply spins past.
+ *
+ * The whole arrangement is one number: `--p`, 0 → 1 across the pinned span.
+ * Per frame the driver does one `getBoundingClientRect()` read and one custom
+ * property write; every card position, the spine, and the depth fade are
+ * derived from `--p` in CSS. No per-element JavaScript, no layout thrash, and
+ * no library — a scroll library would be a larger download than this entire
+ * component.
+ *
+ * PROGRESSIVE ENHANCEMENT
+ * The server renders a plain responsive grid of product cards. The driver adds
+ * `data-on`, which is what switches the 3D arrangement on. So the fallback for
+ * reduced motion, for no JavaScript, and for a failed script is the same thing:
+ * a static grid of exactly the same links. Nothing can end up invisible or
+ * stuck mid-rotation, and the cards are real crawlable anchors either way.
+ *
+ * ACCESSIBILITY
+ * In 3D mode the cards duplicate the pinned "What are you looking for?" list,
+ * which is always on screen and fully keyboard reachable. So the driver marks
+ * the rotating cards presentational (`aria-hidden` + `tabindex="-1"`) to avoid
+ * five duplicate tab stops, some of them on a card that is currently facing
+ * away. In the static fallback the driver never runs, the attributes are never
+ * applied, and the cards are ordinary focusable links.
+ */
+import Icon from './Icon.astro';
+import { products } from '../data/navigation.ts';
+
+interface Props {
+  id?: string;
+  eyebrow?: string;
+  title?: string;
+}
+
+const {
+  id,
+  eyebrow = 'Products',
+  title = 'Hardware for every asset you move',
+} = Astro.props;
+---
+
+<section
+  id={id}
+  class="spiral"
+  data-spiral
+  style={`--count:${products.length}`}
+>
+  <div class="spiral-track" data-spiral-track>
+    <div class="spiral-viewport">
+      <div class="container-prime spiral-layout">
+        <!-- ============ Pinned index ============ -->
+        <div class="spiral-menu">
+          <span class="eyebrow">{eyebrow}</span>
+          <h2 class="mt-4 text-h2 text-ink-950">{title}</h2>
+
+          <p class="spiral-menu-title">What are you looking for?</p>
+
+          <ul class="spiral-list">
+            {
+              products.map((product, i) => (
+                <li>
+                  <a href={product.href} class="spiral-link" data-spiral-link style={`--i:${i}`}>
+                    <span class="spiral-link-index">{String(i + 1).padStart(2, '0')}</span>
+                    <span class="spiral-link-label">{product.label}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <!-- ============ Stage ============ -->
+        <div class="spiral-stage">
+          {/* The spine only exists in 3D mode — it is the axis the cards turn
+              around, and it means nothing next to a static grid. */}
+          <div class="spiral-spine" aria-hidden="true">
+            <span class="spiral-spine-line"></span>
+            <span class="spiral-glow"></span>
+            <span class="spiral-ripple" style="--delay:0s"></span>
+            <span class="spiral-ripple" style="--delay:-1.6s"></span>
+            <span class="spiral-marker">
+              <Icon name="pin-location" size={46} />
+            </span>
+          </div>
+
+          <div class="spiral-ring">
+            {
+              products.map((product, i) => (
+                <a href={product.href} class="spiral-item" data-spiral-item style={`--i:${i}`}>
+                  <span class="spiral-card">
+                    <span class="spiral-card-icon">
+                      <Icon name={product.icon!} size={20} />
+                    </span>
+                    <span class="spiral-card-label">{product.label}</span>
+                    <span class="spiral-card-desc">{product.descriptor}</span>
+                    <span class="spiral-card-cta">
+                      Explore
+                      <Icon name="arrow-right" size={15} />
+                    </span>
+                  </span>
+                </a>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ======================================================================
+     Geometry. Every dimension is a custom property so the whole arrangement
+     can be retuned per breakpoint by overriding four numbers, and so the
+     transforms below never contain a magic value.
+     ====================================================================== */
+  /* Registering the property is not decoration. An unregistered custom
+     property is an untyped token that the engine must re-parse everywhere it
+     lands; a registered <number> is stored typed, validated once, and given
+     a guaranteed initial value so a missing --p can never invalidate a
+     transform. */
+  @property --p {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 0;
+  }
+
+  .spiral {
+    /* --count is set inline from the data. */
+    --step-angle: calc(360deg / var(--count));
+    --radius: 8rem;
+    --step-rise: 4.75rem;
+    --card-w: 11rem;
+    --scroll-per-item: 55vh;
+    --perspective: 760px;
+
+    /* Cards swing wide of the container on the way round. Clip rather than
+       scroll: `overflow: clip` does not create a scroll container, so the
+       sticky child still pins against the page. `hidden` would compute
+       overflow-y to auto and quietly break the pinning. */
+    overflow: clip;
+    padding-block: 4rem;
+    color: var(--color-ink-800);
+    background-color: var(--color-ink-50);
+    background-image:
+      /* Orange bloom behind the spine — the section's light source. */
+      radial-gradient(56% 48% at 60% 44%, rgb(255 112 0 / 0.15) 0%, transparent 70%),
+      /* A warm cream falling across the top-left, so the ground has a
+         direction to it rather than reading as flat paper. */
+      linear-gradient(158deg, var(--color-prime-50) 0%, transparent 48%),
+      /* Settles onto ink-50 at the bottom edge, which is exactly the tone the
+         Services section opens with — no seam between the two. */
+      linear-gradient(to bottom, transparent 84%, var(--color-ink-50) 100%);
+  }
+
+  @media (min-width: 768px) {
+    .spiral {
+      --radius: 11.5rem;
+      --step-rise: 7rem;
+      --card-w: 15.5rem;
+      --scroll-per-item: 58vh;
+      --perspective: 1000px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .spiral {
+      --radius: 14.5rem;
+      --step-rise: 8rem;
+      --card-w: 17rem;
+      --scroll-per-item: 62vh;
+      --perspective: 1200px;
+    }
+  }
+
+  /* ======================================================================
+     STATIC BASELINE — reduced motion, no JavaScript, or a script that never
+     arrived. A plain responsive grid of the same links.
+     ====================================================================== */
+  .spiral-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .spiral-menu-title {
+    margin-top: 2rem;
+    font-size: var(--text-label);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-500);
+  }
+
+  .spiral-list {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .spiral-link {
+    display: flex;
+    align-items: baseline;
+    gap: 0.85rem;
+    padding-block: 0.6rem;
+    color: var(--color-ink-500);
+    transition:
+      color var(--duration-base) var(--ease-prime),
+      transform var(--duration-base) var(--ease-prime);
+  }
+  .spiral-link-index {
+    font-family: var(--font-display);
+    font-size: var(--text-label);
+    color: var(--color-ink-300);
+    transition: color var(--duration-base) var(--ease-prime);
+  }
+  .spiral-link-label {
+    font-family: var(--font-display);
+    font-size: var(--text-h3);
+    line-height: 1.25;
+  }
+  @media (hover: hover) {
+    .spiral-link:hover { color: var(--color-ink-900); transform: translateX(3px); }
+    .spiral-link:hover .spiral-link-index { color: var(--color-ink-500); }
+  }
+
+  /* The card that is currently front-and-centre on the spiral. */
+  /* The product currently front-and-centre on the spiral. prime-700 rather
+     than the brand 500: this is small text on a light ground, where 500 is
+     2.8:1 and 700 is 5.2:1. */
+  .spiral-link[data-current] { color: var(--color-prime-700); }
+  .spiral-link[data-current] .spiral-link-index { color: var(--color-prime-600); }
+
+  .spiral-spine { display: none; }
+
+  .spiral-ring {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  }
+
+  .spiral-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    height: 100%;
+    padding: 1.5rem;
+    border: 1px solid rgb(255 255 255 / 0.1);
+    border-radius: var(--radius-panel);
+    /* A shallow gradient rather than a flat fill — on a card this size a single
+       tone reads as a rectangle, a slight fall of light reads as an object. */
+    background-image: linear-gradient(158deg, var(--color-ink-850), var(--color-ink-950));
+    /* One shadow layer, not two. These are 3D-transformed compositor layers and
+       every extra blurred layer is fill-rate on a phone GPU. Deeper than it
+       would be on a dark ground: a dark card on a light one has to look like it
+       is floating above the page, not printed on it. */
+    box-shadow: 0 18px 40px -20px rgb(8 9 11 / 0.5);
+  }
+
+  .spiral-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    background-color: rgb(255 112 0 / 0.16);
+    color: var(--color-prime-400);
+  }
+  .spiral-card-label {
+    font-family: var(--font-display);
+    font-size: var(--text-h4);
+    color: var(--color-white);
+  }
+  .spiral-card-desc {
+    font-size: var(--text-small);
+    line-height: 1.5;
+    color: var(--color-ink-300);
+  }
+  .spiral-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: auto;
+    padding-top: 0.4rem;
+    font-size: var(--text-small);
+    font-weight: 600;
+    color: var(--color-prime-400);
+  }
+
+  @media (hover: hover) {
+    .spiral-item:hover .spiral-card { border-color: rgb(255 112 0 / 0.55); }
+  }
+
+  /* prime-700 is the section's focus colour, but it is only 3.4:1 on ink-950.
+     On the dark cards the ring switches to prime-400 (8.8:1). */
+  .spiral-item:focus-visible { outline-color: var(--color-prime-400); }
+
+  /* ======================================================================
+     3D MODE — only once the driver has said so.
+     ====================================================================== */
+  .spiral[data-on] { padding-block: 0; }
+
+  .spiral[data-on] .spiral-track {
+    /* One viewport to hold the stage still in, plus one scroll allowance per
+       step after the first. This is the entire "how long does it last". */
+    min-height: calc(100vh + (var(--count) - 1) * var(--scroll-per-item));
+    min-height: calc(100svh + (var(--count) - 1) * var(--scroll-per-item));
+  }
+
+  .spiral[data-on] .spiral-viewport {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    display: flex;
+    align-items: center;
+    /* Clears the sticky site header so the heading never sits under it. */
+    padding-top: 4rem;
+  }
+  @media (min-width: 1024px) {
+    .spiral[data-on] .spiral-viewport { padding-top: 5rem; }
+  }
+
+  .spiral[data-on] .spiral-layout {
+    width: 100%;
+    height: 100%;
+    align-items: stretch;
+    gap: 1.5rem;
+  }
+
+  /* On a phone the pinned index and the stage share one viewport, so the index
+     is compressed to buy the helix room to turn in. Below `lg` the heading
+     drops a step and the list tightens; the static fallback keeps full size. */
+  .spiral[data-on] .spiral-menu { flex: none; }
+  .spiral[data-on] .spiral-menu h2 { font-size: var(--text-h3); }
+  .spiral[data-on] .spiral-menu-title { margin-top: 1rem; }
+  .spiral[data-on] .spiral-list { margin-top: 0.35rem; }
+  .spiral[data-on] .spiral-link { padding-block: 0.22rem; }
+  .spiral[data-on] .spiral-link-label { font-size: var(--text-body); }
+
+  /* Cards are smaller in the round than in the static grid — they are magnified
+     by the perspective as they come forward, so they read larger than they are. */
+  .spiral[data-on] .spiral-card { padding: 1.15rem; gap: 0.5rem; }
+  .spiral[data-on] .spiral-card-icon { width: 2.25rem; height: 2.25rem; }
+  .spiral[data-on] .spiral-card-desc { font-size: 0.8125rem; }
+
+  @media (min-width: 1024px) {
+    .spiral[data-on] .spiral-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+      /* Stretch, NOT center. The stage's children are all absolutely
+         positioned, so it has no intrinsic height — centring the grid items
+         would collapse it to zero and take the whole helix with it. The menu
+         opts out of the stretch individually below. */
+      align-items: stretch;
+      gap: 3rem;
+    }
+    .spiral[data-on] .spiral-menu { align-self: center; }
+    .spiral[data-on] .spiral-menu h2 { font-size: var(--text-h2); }
+    .spiral[data-on] .spiral-menu-title { margin-top: 2.25rem; }
+    .spiral[data-on] .spiral-list { margin-top: 1rem; }
+    .spiral[data-on] .spiral-link { padding-block: 0.55rem; }
+    .spiral[data-on] .spiral-link-label { font-size: var(--text-h3); }
+    .spiral[data-on] .spiral-card { padding: 1.5rem; gap: 0.65rem; }
+    .spiral[data-on] .spiral-card-icon { width: 2.5rem; height: 2.5rem; }
+    .spiral[data-on] .spiral-card-desc { font-size: var(--text-small); }
+  }
+
+  /* ---- Stage ---- */
+  .spiral[data-on] .spiral-stage {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    perspective: var(--perspective);
+    perspective-origin: 50% 50%;
+  }
+
+  /* ---- The spine: the axis the staircase turns around ----
+     Fills the stage and stacks every part in one centred grid cell, so the
+     line is exactly as tall as the stage. Sizing it in viewport units instead
+     would overshoot a short stage and run the line up through the heading. */
+  .spiral[data-on] .spiral-spine {
+    display: grid;
+    place-items: center;
+    position: absolute;
+    inset: 0;
+  }
+
+  .spiral-spine > * { grid-area: 1 / 1; }
+
+  .spiral-spine-line {
+    width: 1px;
+    height: 100%;
+    background-image: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(255 112 0 / 0.34) 24%,
+      rgb(255 112 0 / 0.34) 76%,
+      transparent
+    );
+  }
+
+  /* A radial gradient rather than a blur filter: filters are re-rasterised
+     every frame on a moving layer, gradients are not. */
+  .spiral-glow {
+    width: 21rem;
+    height: 21rem;
+    border-radius: 999px;
+    background-image: radial-gradient(
+      closest-side,
+      rgb(255 112 0 / 0.5),
+      rgb(255 143 56 / 0.2) 42%,
+      transparent 72%
+    );
+  }
+
+  .spiral-ripple {
+    width: 6.5rem;
+    height: 6.5rem;
+    border-radius: 999px;
+    border: 1px solid rgb(255 112 0 / 0.5);
+    opacity: 0;
+  }
+
+  .spiral-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 999px;
+    width: auto;
+    height: auto;
+    border: 0;
+    background: none;
+    color: var(--color-prime-500);
+    /* A tight warm halo hugging the glyph, so it reads as lit rather than
+       drawn. drop-shadow on a 38px glyph is cheap; a blur filter over the
+       whole marker would not be. */
+    filter: drop-shadow(0 0 14px rgb(255 112 0 / 0.7));
+  }
+
+  /* The pulse runs ONLY while the section is actually on screen — the driver
+     adds data-live. Off screen it is paused, not merely invisible, so it costs
+     no compositing and no battery for the rest of the page. */
+  .spiral[data-on][data-live] .spiral-glow {
+    animation: spiral-breathe 3.4s var(--ease-prime) infinite alternate;
+  }
+  .spiral[data-on][data-live] .spiral-ripple {
+    animation: spiral-ripple 3.2s var(--ease-prime) infinite;
+    animation-delay: var(--delay);
+  }
+
+  @keyframes spiral-breathe {
+    from { transform: scale(0.86); opacity: 0.55; }
+    to { transform: scale(1.12); opacity: 1; }
+  }
+
+  @keyframes spiral-ripple {
+    0% { transform: scale(0.55); opacity: 0.55; }
+    70% { opacity: 0; }
+    100% { transform: scale(2.6); opacity: 0; }
+  }
+
+  /* ---- The helix ---- */
+  /* --p and --k live HERE, not on the section. Changing an inherited custom
+     property dirties the whole subtree below wherever it is declared, so
+     declaring it on the section made the heading and the five index links
+     recalc on every scroll frame despite neither using it. Scoped to the ring,
+     the per-frame invalidation is the cards and nothing else. */
+  .spiral-ring {
+    /* Scroll progress, 0 → 1, written by the driver. */
+    --p: 0;
+    /* Progress expressed in card indices: card N is front and centre at N. */
+    --k: calc(var(--p) * (var(--count) - 1));
+  }
+
+  .spiral[data-on] .spiral-ring {
+    display: block;
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    /* Counter-rotate and lift so that card --k is front and centre. This is
+       the only transform that changes as the page scrolls. */
+    transform:
+      translateY(calc(var(--k) * var(--step-rise)))
+      rotateY(calc(var(--k) * var(--step-angle) * -1));
+  }
+
+  .spiral[data-on] .spiral-item {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--card-w);
+    /* The card must turn about the SPINE, not about itself. `left/top: 50%`
+       puts the card's top-left corner exactly on the axis, so pinning the
+       transform origin there makes every rotation below concentric with the
+       spine. Leave it at the default centre and each card rotates about a
+       point half its own width off-axis, which slews the whole helix sideways
+       at every angle except zero. */
+    transform-origin: 0 0;
+    /* Read right to left: centre the card on the axis, raise it one step per
+       index, push it out to the radius, then swing it round. That is a helix. */
+    transform:
+      rotateY(calc(var(--i) * var(--step-angle)))
+      translateZ(var(--radius))
+      translateY(calc(var(--i) * var(--step-rise) * -1))
+      translate(-50%, -50%);
+    /* A card past a quarter turn shows its reverse; hiding it there costs
+       nothing and saves compositing the ones behind the spine. */
+    backface-visibility: hidden;
+  }
+
+  .spiral[data-on] .spiral-card {
+    height: auto;
+    /* How square-on the card is to the viewer: 1 dead ahead, 0 side-on.
+       Everything behind the spine is already gone to backface-visibility. */
+    --face: cos(calc((var(--i) - var(--k)) * var(--step-angle)));
+    /* Squared rather than linear: on a phone the radius is small enough that
+       neighbouring cards overlap the front one, and a linear fade leaves them
+       bright enough to compete with it. Squaring pushes them back without
+       making them vanish. The floor is higher than it was on the dark ground —
+       a translucent white card on white washes out far faster than a dark card
+       on black, so it needs more opacity to still read as a card. */
+    opacity: min(1, 0.28 + 0.9 * max(0, var(--face)) * max(0, var(--face)));
+  }
+
+  /* ---- Motion preference ----
+     Belt and braces: the driver already declines to set data-on under a
+     reduced-motion preference, so this only matters if the preference is
+     switched on mid-visit, before the driver's own listener tears down. */
+  @media (prefers-reduced-motion: reduce) {
+    .spiral[data-on] .spiral-track { min-height: 0; }
+    .spiral[data-on] .spiral-viewport { position: static; height: auto; padding-top: 0; }
+    .spiral[data-on] .spiral-stage { perspective: none; }
+    .spiral[data-on] .spiral-spine { display: none; }
+    .spiral[data-on] .spiral-ring {
+      position: static;
+      display: grid;
+      transform: none;
+      transform-style: flat;
+    }
+    .spiral[data-on] .spiral-item {
+      position: static;
+      width: auto;
+      transform: none;
+    }
+    .spiral[data-on] .spiral-card { opacity: 1; }
+  }
+</style>
+
+<script>
+  /**
+   * Spiral driver. Bundled as a module, so it is deferred and never blocks
+   * the page, and it does no work at all until the section is near the
+   * viewport. Per frame: one rect read, one custom property write.
+   */
+  interface SpiralState {
+    stop: () => void;
+  }
+
+  const REDUCE = '(prefers-reduced-motion: reduce)';
+
+  const init = (root: HTMLElement): SpiralState | null => {
+    const track = root.querySelector<HTMLElement>('[data-spiral-track]');
+    const ring = root.querySelector<HTMLElement>('.spiral-ring');
+    const pinned = root.querySelector<HTMLElement>('.spiral-viewport');
+    const links = Array.from(root.querySelectorAll<HTMLElement>('[data-spiral-link]'));
+    const cards = Array.from(root.querySelectorAll<HTMLElement>('[data-spiral-item]'));
+    const count = links.length;
+    if (!track || !ring || !pinned || count < 2) return null;
+
+    /* The rotating cards restate the pinned list beside them. Keep them
+       clickable, take them out of the tab order — see the note at the top. */
+    for (const card of cards) {
+      card.setAttribute('aria-hidden', 'true');
+      card.setAttribute('tabindex', '-1');
+    }
+
+    root.dataset.on = '';
+
+    let frame = 0;
+    let live = false;
+    let current = -1;
+
+    const update = () => {
+      frame = 0;
+      const rect = track.getBoundingClientRect();
+      /* The span over which the stage is pinned is the track's height less the
+         pinned element's own height. Measure the element rather than using
+         window.innerHeight: on a phone innerHeight grows and shrinks as the URL
+         bar hides, while the stage is sized in svh and does not — dividing by
+         innerHeight would make progress drift every time the bar moves. */
+      const span = rect.height - pinned.offsetHeight;
+      const p = span > 0 ? Math.min(1, Math.max(0, -rect.top / span)) : 0;
+
+      /* One write, on the ring — see the note beside its rule. */
+      ring.style.setProperty('--p', p.toFixed(4));
+
+      const index = Math.round(p * (count - 1));
+      if (index !== current) {
+        links[current]?.removeAttribute('data-current');
+        links[index]?.setAttribute('data-current', '');
+        current = index;
+      }
+    };
+
+    /* Coalesce to one update per frame. A burst of scroll events between
+       frames collapses into a single rect read. */
+    const schedule = () => {
+      if (!frame && live) frame = requestAnimationFrame(update);
+    };
+
+    const listen = (on: boolean) => {
+      const fn = on ? window.addEventListener : window.removeEventListener;
+      fn('scroll', schedule, { passive: true });
+      fn('resize', schedule, { passive: true });
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting === live) return;
+        live = entry.isIntersecting;
+        root.toggleAttribute('data-live', live);
+        listen(live);
+        if (live) {
+          update();
+        } else if (frame) {
+          cancelAnimationFrame(frame);
+          frame = 0;
+        }
+      },
+      /* A little early, so the first frame after it appears is already right. */
+      { rootMargin: '15% 0px' },
+    );
+    observer.observe(track);
+
+    return {
+      stop() {
+        observer.disconnect();
+        listen(false);
+        if (frame) cancelAnimationFrame(frame);
+        root.removeAttribute('data-on');
+        root.removeAttribute('data-live');
+        ring.style.removeProperty('--p');
+        links[current]?.removeAttribute('data-current');
+        for (const card of cards) {
+          card.removeAttribute('aria-hidden');
+          card.removeAttribute('tabindex');
+        }
+      },
+    };
+  };
+
+  const motion = window.matchMedia(REDUCE);
+  const roots = Array.from(document.querySelectorAll<HTMLElement>('[data-spiral]'));
+  let running: SpiralState[] = [];
+
+  const start = () => {
+    if (motion.matches || running.length) return;
+    running = roots.map(init).filter((s): s is SpiralState => s !== null);
+  };
+
+  const stop = () => {
+    running.forEach((s) => s.stop());
+    running = [];
+  };
+
+  /* Honour a preference change mid-visit in both directions. */
+  motion.addEventListener('change', (e) => (e.matches ? stop() : start()));
+  start();
+</script>

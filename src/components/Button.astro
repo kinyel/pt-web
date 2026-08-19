@@ -17,8 +17,13 @@ const {
   class: className = '',
 } = Astro.props;
 
+/* `transition` rather than `transition-colors`: the hover state now also moves
+   the button 2px and casts a shadow, and all three have to share one curve or
+   they arrive out of step. Tailwind scopes `hover:` to `@media (hover: hover)`,
+   so none of it can stick to a touch tap. `active:` returns the button to rest
+   on press, which is the whole point of the lift — it reads as depressible. */
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-colors duration-[var(--duration-base)] ease-[var(--ease-prime)] whitespace-nowrap';
+  'inline-flex items-center justify-center gap-2 rounded-full font-semibold transition duration-[var(--duration-base)] ease-[var(--ease-prime)] whitespace-nowrap';
 const sizes = {
   md: 'px-5 py-2.5 text-small min-h-11',
   lg: 'px-7 py-3.5 text-body min-h-12',
@@ -28,11 +33,15 @@ const variants = {
      fails WCAG AA outright, and prime-600 with white is still only 3.7:1.
      Black is 7.2:1 — and it is what the logo itself does. This is the one
      colour that intentionally differs from the pre-blue build. */
-  primary: 'bg-prime-500 text-ink-950 hover:bg-prime-400 active:bg-prime-600',
+  primary:
+    'bg-prime-500 text-ink-950 shadow-none hover:bg-prime-400 hover:-translate-y-0.5 hover:shadow-lift active:translate-y-0 active:bg-prime-600 active:shadow-none',
   secondary:
     tone === 'dark'
-      ? 'border border-white/25 text-white hover:border-white/60 hover:bg-white/5'
-      : 'border border-ink-200 text-ink-900 hover:border-ink-400 hover:bg-ink-50',
+      ? /* No shadow on dark: a drop shadow against ink-950 is invisible, so the
+           border carries the state change on its own. */
+        'border border-white/25 text-white hover:border-white/60 hover:bg-white/5 hover:-translate-y-0.5 active:translate-y-0'
+      : 'border border-ink-200 text-ink-900 hover:border-ink-400 hover:bg-ink-50 hover:-translate-y-0.5 active:translate-y-0',
+  /* Ghost buttons have no surface, so there is nothing to lift — colour alone. */
   ghost:
     tone === 'dark'
       ? 'text-white hover:text-prime-300'

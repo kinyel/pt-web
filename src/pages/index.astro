@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Section from '../components/Section.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import ProductCard from '../components/ProductCard.astro';
+import ProductSpiral from '../components/ProductSpiral.astro';
 import StatBand from '../components/StatBand.astro';
 import Button from '../components/Button.astro';
 import Icon from '../components/Icon.astro';
@@ -175,50 +176,33 @@ const description =
     <StatBand tone="dark" />
   </Section>
 
-  <!-- ================= PRODUCTS ================= -->
-  <Section tone="white" id="products">
-    <SectionHeader
-      eyebrow="Products"
-      title="Hardware for every asset you move"
-      lead="Six tracker families covering vehicles, cargo and people — all reporting into one fleet management platform."
-    />
+  <!-- ================= PRODUCTS =================
+       The products section is the scroll-driven spiral. It keeps id="products"
+       because /#products is the Products breadcrumb target on every product
+       page and is linked from the header.
 
-    <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {
-        products.map((product, i) => (
-          <ProductCard
-            href={product.href}
-            label={product.label}
-            descriptor={product.descriptor}
-            icon={product.icon!}
-            featured={i < 2}
-            blurb={
-              i === 0
-                ? 'Ai-PRIME pairs a high-storage DVR with four weatherproof cameras and ADAS sensors, streaming live video and flagging risky driving as it happens.'
-                : 'PrimeSOLAR keeps reporting even when a truck sits in the workshop — it never touches the vehicle battery, and the cell recharges daily in sunlight.'
-            }
-            class="reveal"
-          />
-        ))
-      }
-    </div>
-  </Section>
+       On reveals elsewhere: the hero is deliberately left alone. Fading in the
+       H1 or the hero photograph would delay Largest Contentful Paint by the
+       length of the transition, and the first thing a visitor sees should be
+       there when they get there. Motion starts below the fold. -->
+  <ProductSpiral id="products" />
 
   <!-- ================= SERVICES ================= -->
   <Section tone="tinted" id="services">
     <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
       <SectionHeader
+        class="reveal"
         eyebrow="Services"
         title="The intelligence layer on top of the hardware"
         lead="Trackers collect the data. These services turn it into decisions your operation can act on."
       />
-      <Button href="/fleet-analytics/" variant="secondary" class="shrink-0">
+      <Button href="/fleet-analytics/" variant="secondary" class="reveal shrink-0">
         Explore fleet analytics
         <Icon name="arrow-right" size={16} />
       </Button>
     </div>
 
-    <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4" data-reveal-stagger="70">
       {
         services.map((service) => (
           <ProductCard
@@ -227,7 +211,7 @@ const description =
             descriptor={service.descriptor}
             icon={service.icon!}
             external={service.external}
-                class="reveal"
+            class="reveal"
           />
         ))
       }
@@ -238,6 +222,7 @@ const description =
   <Section tone="dark">
     <div class="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
       <SectionHeader
+        class="reveal"
         eyebrow="Why PrimeTrack"
         tone="dark"
         title="Why fleets trust us with their vehicles"
@@ -245,10 +230,10 @@ const description =
       />
 
       <div class="flex flex-col gap-8">
-        <ul class="flex flex-col divide-y divide-white/10">
+        <ul class="flex flex-col divide-y divide-white/10" data-reveal-stagger="80">
           {
             advantages.map((advantage) => (
-              <li class="flex gap-5 py-6 first:pt-0">
+              <li class="reveal flex gap-5 py-6 first:pt-0">
                 <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/10 text-prime-400">
                   <Icon name={advantage.icon} size={20} />
                 </span>
@@ -261,7 +246,12 @@ const description =
           }
         </ul>
 
-        <Button href="/why-choose-primetrack/" variant="secondary" tone="dark" class="self-start">
+        <Button
+          href="/why-choose-primetrack/"
+          variant="secondary"
+          tone="dark"
+          class="reveal self-start"
+        >
           See all seven advantages
           <Icon name="arrow-right" size={16} />
         </Button>
@@ -272,12 +262,16 @@ const description =
   <!-- ================= CAPABILITIES ================= -->
   <Section tone="white">
     <SectionHeader
+      class="reveal"
       eyebrow="Capabilities"
       title="What you get, day to day"
       lead="The everyday features PrimeTrack customers rely on across Nigeria."
     />
 
-    <ul class="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+    <ul
+      class="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3"
+      data-reveal-stagger="60"
+    >
       {
         capabilities.map((capability) => (
           <li class="reveal flex flex-col gap-3">
@@ -289,10 +283,14 @@ const description =
             {capability.href && (
               <a
                 href={capability.href}
-                class="inline-flex items-center gap-1.5 text-small font-semibold text-prime-700 hover:text-prime-800"
+                class="group/link inline-flex items-center gap-1.5 text-small font-semibold text-prime-700 transition-colors duration-[var(--duration-fast)] hover:text-prime-800"
               >
                 Learn more<span class="sr-only"> about {capability.title.toLowerCase()}</span>
-                <Icon name="arrow-right" size={15} />
+                <Icon
+                  name="arrow-right"
+                  size={15}
+                  class="transition-transform duration-[var(--duration-base)] ease-[var(--ease-prime)] group-hover/link:translate-x-0.5"
+                />
               </a>
             )}
           </li>
@@ -305,16 +303,17 @@ const description =
   <Section tone="tinted">
     <div class="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
       <SectionHeader
+        class="reveal"
         eyebrow="Credentials"
         title="Licensed, accountable, and here when you call"
         lead="Every claim on this page is one we can evidence — including the paperwork."
       />
 
-      <div class="flex flex-col gap-5">
+      <div class="flex flex-col gap-5" data-reveal-stagger="70">
         <ul class="grid gap-4 sm:grid-cols-2">
           {
             credentials.map((credential) => (
-              <li class="rounded-panel border border-ink-200 bg-white p-6">
+              <li class="reveal rounded-panel border border-ink-200 bg-white p-6">
                 <span class="flex h-10 w-10 items-center justify-center rounded-full bg-prime-50 text-prime-600">
                   <Icon name="badge-check" size={19} />
                 </span>
@@ -325,7 +324,7 @@ const description =
           }
         </ul>
 
-        <div class="flex flex-col gap-4 rounded-panel border border-ink-200 bg-white p-6">
+        <div class="reveal flex flex-col gap-4 rounded-panel border border-ink-200 bg-white p-6">
           <p class="text-label uppercase text-ink-500">Regulatory bodies</p>
           {/* The client's own accreditation artwork, reproduced as published.
               No accreditation is asserted in copy beyond what §6.2 of the
@@ -342,7 +341,7 @@ const description =
               client publishes, so a 2× render would just be upscaling. */}
           <a
             href={certificatesPdf.href}
-            class="inline-flex items-center gap-2 self-start text-small font-semibold text-prime-700 hover:text-prime-800"
+            class="inline-flex items-center gap-2 self-start text-small font-semibold text-prime-700 transition-colors duration-[var(--duration-fast)] hover:text-prime-800"
           >
             <Icon name="file-text" size={16} />
             {certificatesPdf.label}

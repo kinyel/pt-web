@@ -11,6 +11,8 @@
  * without pretending to be a product screenshot.
  *
  * Motion policy:
+ *   - The drawing loops continuously: vehicles run their routes, markers ping,
+ *     telemetry flows. It is ambient, slow, and low-contrast by design.
  *   - CSS animation lives inside `@media (prefers-reduced-motion: no-preference)`,
  *     so a reduced-motion visitor gets the static composition with no JS at all.
  *   - The inline script adds data-motion="off" on constrained devices (Save-Data,

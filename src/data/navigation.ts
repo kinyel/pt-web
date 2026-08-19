@@ -48,15 +48,6 @@ export const products: NavItem[] = [
       'GPS-based fleet management to optimise routes, cut fuel consumption and eliminate downtime — real-time tracking, alerts, reporting and API integration.',
   },
   {
-    label: 'Goods Trackers',
-    href: '/reliable-container-tracking/',
-    icon: 'container',
-    descriptor: 'Stand-alone rechargeable container tracking',
-    title: 'STAR Container & Goods Trackers — Reliable Container Tracking | PrimeTrack',
-    description:
-      'Stand-alone rechargeable trackers running for months per charge, with a magnetized weather-proof body for containers and cargo in off-grid areas.',
-  },
-  {
     label: 'Human Trackers',
     href: '/employee-monitoring-solutions/',
     icon: 'watch',
@@ -73,6 +64,34 @@ export const products: NavItem[] = [
     title: 'Fleet Fuel Consumption Management System | PrimeTrack',
     description:
       'Track fleet fuel usage accurately, identify idling, speeding and inefficient driving, and act on consumption trends with detailed reports.',
+  },
+];
+
+/**
+ * Products the company no longer offers.
+ *
+ * Goods Trackers ("STAR" container trackers, inventory §3.4) was withdrawn —
+ * client-confirmed, Aug 2026. It is out of `products`, so it no longer appears
+ * in the header mega-menu, the homepage product spiral, the contact form's
+ * interest list, or the 404 suggestions.
+ *
+ * The entry survives here rather than being deleted because
+ * /reliable-container-tracking/ is still a built route and reads its own title
+ * and meta description from this record. That page is now unlinked from the
+ * site's navigation but still published and still in the sitemap — see the
+ * open question raised with the client about whether to 301 it or remove it.
+ * Deleting this array without settling that would 404 an indexed URL and fail
+ * the Gate 4 content-preservation check.
+ */
+export const retiredProducts: NavItem[] = [
+  {
+    label: 'Goods Trackers',
+    href: '/reliable-container-tracking/',
+    icon: 'container',
+    descriptor: 'Stand-alone rechargeable container tracking',
+    title: 'STAR Container & Goods Trackers — Reliable Container Tracking | PrimeTrack',
+    description:
+      'Stand-alone rechargeable trackers running for months per charge, with a magnetized weather-proof body for containers and cargo in off-grid areas.',
   },
 ];
 
