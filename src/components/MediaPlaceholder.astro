@@ -2,27 +2,19 @@
 import Icon from './Icon.astro';
 import { getSlot, type PlaceholderId } from '../data/placeholders.ts';
 
-/**
- * A clearly-labelled stand-in for imagery that does not exist yet.
- *
- * This renders a placeholder and nothing else — it never falls back to a stock
- * photo or a generated image. Slots are declared in src/data/placeholders.ts;
- * pass an id and the label, ratio and target dimensions come from there, so the
- * on-page block and the client handoff list can never disagree.
- *
- * `demo` renders an unregistered example for the design-system page only.
- */
 interface Props {
   slot?: PlaceholderId;
+  src?: string;
+  alt?: string;
   demo?: boolean;
   class?: string;
   tone?: 'light' | 'dark';
 }
 
-const { slot, demo = false, class: className = '', tone = 'light' } = Astro.props;
+const { slot, src, alt = '', demo = false, class: className = '', tone = 'light' } = Astro.props;
 
-if (!slot && !demo) {
-  throw new Error('MediaPlaceholder needs a registered `slot` id (or `demo` for the style guide).');
+if (!slot && !demo && !src) {
+  throw new Error('MediaPlaceholder needs a registered `slot` id, an `src` path, or `demo` mode.');
 }
 
 const entry = slot
@@ -48,28 +40,39 @@ const shell =
     ? 'bg-ink-900 border-white/15 text-ink-300'
     : 'bg-ink-50 border-ink-300 text-ink-600';
 
-// Both tones are contrast-checked; see scripts/contrast-audit.mjs.
 const markTone = tone === 'dark' ? 'text-prime-400' : 'text-prime-600';
 const labelTone = tone === 'dark' ? 'text-prime-300' : 'text-prime-700';
 ---
 
-<div
-  class={`${ratios[entry.ratio]} ${shell} ${className} relative flex flex-col items-center justify-center gap-2.5 overflow-hidden rounded-panel border border-dashed px-6 text-center`}
-  role="img"
-  aria-label={`Image placeholder — client to supply: ${entry.needs}`}
-  data-placeholder-slot={entry.id}
->
-  <div class="bg-grid-prime pointer-events-none absolute inset-0 opacity-50"></div>
+{
+  src ? (
+    /* IF 'src' IS PROVIDED: Show the actual image */
+    <img 
+      src={src} 
+      alt={alt || entry.needs} 
+      class={`${ratios[entry.ratio]} ${className} w-full h-full object-cover rounded-panel`} 
+    />
+  ) : (
+    /* ELSE: Show the placeholder box as before */
+    <div
+      class={`${ratios[entry.ratio]} ${shell} ${className} relative flex flex-col items-center justify-center gap-2.5 overflow-hidden rounded-panel border border-dashed px-6 text-center`}
+      role="img"
+      aria-label={`Image placeholder — client to supply: ${entry.needs}`}
+      data-placeholder-slot={entry.id}
+    >
+      <div class="bg-grid-prime pointer-events-none absolute inset-0 opacity-50"></div>
 
-  <span
-    class={`relative flex h-11 w-11 items-center justify-center rounded-full border border-prime-500/40 bg-prime-500/10 ${markTone}`}
-  >
-    <Icon name="image" size={20} />
-  </span>
+      <span
+        class={`relative flex h-11 w-11 items-center justify-center rounded-full border border-prime-500/40 bg-prime-500/10 ${markTone}`}
+      >
+        <Icon name="image" size={20} />
+      </span>
 
-  <p class={`relative text-label uppercase ${labelTone}`}>Image placeholder — client to supply</p>
+      <p class={`relative text-label uppercase ${labelTone}`}>Image placeholder — client to supply</p>
 
-  {!demo && <p class="relative max-w-sm text-small leading-snug">{entry.needs}</p>}
+      {!demo && <p class="relative max-w-sm text-small leading-snug">{entry.needs}</p>}
 
-  <p class="relative font-mono text-[0.7rem] opacity-70">{entry.recommended}</p>
-</div>
+      <p class="relative font-mono text-[0.7rem] opacity-70">{entry.recommended}</p>
+    </div>
+  )
+}
