@@ -1,5 +1,16 @@
-@import "@fontsource-variable/inter";
-@import "@fontsource-variable/space-grotesk";
+/* Alegreya Sans, self-hosted. Two weights only: 400 for everything read at
+   length and 700 for headings and UI emphasis. Nothing on the site asks for a
+   third, so a third would be bytes a phone downloads and never renders.
+
+   NOTE: Alegreya Sans ships 100/300/400/500/700/800/900. There is NO 600, which
+   is what the old Inter/Space Grotesk pairing used for every heading and for
+   Tailwind's `font-semibold`. Rather than leave those asking for a weight that
+   does not exist, the tokens below retarget 600 to 700 explicitly, so the
+   browser renders a real bold rather than picking one by fallback rules. */
+@import "@fontsource/alegreya-sans/latin-400.css";
+@import "@fontsource/alegreya-sans/latin-ext-400.css";
+@import "@fontsource/alegreya-sans/latin-700.css";
+@import "@fontsource/alegreya-sans/latin-ext-700.css";
 @import "tailwindcss";
 
 /* ==========================================================================
@@ -59,35 +70,40 @@
   --color-signal-100: #ffe3dd;
 
   /* --- Type --------------------------------------------------------------
-     Space Grotesk carries headings (technical, slightly engineered).
-     Inter carries everything read at length.                              */
-  --font-display: "Space Grotesk Variable", "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+     One family across the whole site. The display/sans split is kept as two
+     tokens so headings can be re-pointed at a second face later without
+     touching every component, but today they resolve to the same stack.     */
+  --font-display: "Alegreya Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans: "Alegreya Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* Tailwind's `font-semibold` is 600, which this family does not have.
+     Point it at the bold it does have. */
+  --font-weight-semibold: 700;
 
   --text-display-xl: clamp(2.75rem, 1.6rem + 4.6vw, 5.25rem);
   --text-display-xl--line-height: 1.02;
   --text-display-xl--letter-spacing: -0.035em;
-  --text-display-xl--font-weight: 600;
+  --text-display-xl--font-weight: 700;
 
   --text-display: clamp(2.125rem, 1.35rem + 3.1vw, 3.75rem);
   --text-display--line-height: 1.06;
   --text-display--letter-spacing: -0.03em;
-  --text-display--font-weight: 600;
+  --text-display--font-weight: 700;
 
   --text-h2: clamp(1.75rem, 1.3rem + 1.8vw, 2.625rem);
   --text-h2--line-height: 1.12;
   --text-h2--letter-spacing: -0.025em;
-  --text-h2--font-weight: 600;
+  --text-h2--font-weight: 700;
 
   --text-h3: clamp(1.3rem, 1.15rem + 0.6vw, 1.625rem);
   --text-h3--line-height: 1.2;
   --text-h3--letter-spacing: -0.018em;
-  --text-h3--font-weight: 600;
+  --text-h3--font-weight: 700;
 
   --text-h4: 1.125rem;
   --text-h4--line-height: 1.35;
   --text-h4--letter-spacing: -0.01em;
-  --text-h4--font-weight: 600;
+  --text-h4--font-weight: 700;
 
   --text-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
   --text-lead--line-height: 1.6;
@@ -101,12 +117,12 @@
   --text-label: 0.75rem;
   --text-label--line-height: 1.2;
   --text-label--letter-spacing: 0.14em;
-  --text-label--font-weight: 600;
+  --text-label--font-weight: 700;
 
   --text-stat: clamp(2.5rem, 1.8rem + 2.6vw, 3.75rem);
   --text-stat--line-height: 1;
   --text-stat--letter-spacing: -0.04em;
-  --text-stat--font-weight: 600;
+  --text-stat--font-weight: 700;
 
   /* --- Radius ----------------------------------------------------------- */
   --radius-card: 0.875rem;
@@ -201,7 +217,7 @@
     align-items: center;
     gap: 0.5rem;
     font-size: var(--text-label);
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     /* prime-700, not 600: the eyebrow renders at 12px, and prime-600 is 3.7:1

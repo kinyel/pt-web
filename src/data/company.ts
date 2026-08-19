@@ -4,7 +4,7 @@
  * If a value is needed but unverified, use the PLACEHOLDER constant.
  */
 
-export const PLACEHOLDER = '[PLACEHOLDER — client to confirm]' as const;
+export const PLACEHOLDER = '[PLACEHOLDER: client to confirm]' as const;
 
 export const company = {
   name: 'PrimeTrack Telematics',
@@ -63,7 +63,7 @@ export const credentials = [
   },
   {
     title: '3-year product warranty',
-    body: 'Three years from date of purchase for the original purchaser — one of the longest warranties in the industry.',
+    body: 'Three years from date of purchase for the original purchaser, one of the longest warranties in the industry.',
   },
   {
     title: '24/7 PrimeCARE support',

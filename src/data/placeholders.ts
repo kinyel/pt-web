@@ -30,7 +30,7 @@ export const placeholderSlots = [
     page: '/',
     location: 'Homepage hero, right-hand column beside the headline',
     needs:
-      'A strong vertical photograph of a tracked vehicle or customer fleet — the first image a visitor sees, so it carries the most weight. Real vehicles, ideally Nigerian roads.',
+      'A strong vertical photograph of a tracked vehicle or customer fleet. This is the first image a visitor sees, so it carries the most weight. Real vehicles, ideally Nigerian roads.',
     ratio: 'portrait',
     recommended: '1200 × 1500px',
   },
@@ -39,7 +39,7 @@ export const placeholderSlots = [
     page: '/vehicle-fleet-telematics-solutions-in-nigeria/',
     location: '“Scale” section, image sits right of the copy on desktop',
     needs:
-      'A photograph of a managed customer fleet on the road or at a depot — trucks, vans or buses. Real vehicles, ideally Nigerian roads.',
+      'A photograph of a managed customer fleet on the road or at a depot: trucks, vans or buses. Real vehicles, ideally Nigerian roads.',
     ratio: 'video',
     recommended: '1600 × 1000px',
   },
@@ -48,7 +48,7 @@ export const placeholderSlots = [
     page: '/driver-behaviour-monitoring-systems-for-vehicle-fleet-management/',
     location: '“Better together” section, image sits right of the copy on desktop',
     needs:
-      'A photograph of a driver-behaviour review actually happening — a fleet manager and driver going over reports, or a depot briefing. Do NOT substitute a mocked-up dashboard screenshot.',
+      'A photograph of a driver-behaviour review actually happening, such as a fleet manager and driver going over reports, or a depot briefing. Do NOT substitute a mocked-up dashboard screenshot.',
     ratio: 'video',
     recommended: '1600 × 1000px',
   },
@@ -66,7 +66,7 @@ export const placeholderSlots = [
     page: '/employee-monitoring-solutions/',
     location: 'Product detail section, below the device list',
     needs:
-      'A photograph of the wearable personnel devices — the watch, keyring, modem and chip formats named in the copy, ideally together for scale.',
+      'A photograph of the wearable personnel devices in the watch, keyring, modem and chip formats named in the copy, ideally together for scale.',
     ratio: 'video',
     recommended: '1600 × 1000px',
   },

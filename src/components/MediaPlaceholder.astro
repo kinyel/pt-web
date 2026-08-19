@@ -57,7 +57,7 @@ const labelTone = tone === 'dark' ? 'text-prime-300' : 'text-prime-700';
     <div
       class={`${ratios[entry.ratio]} ${shell} ${className} relative flex flex-col items-center justify-center gap-2.5 overflow-hidden rounded-panel border border-dashed px-6 text-center`}
       role="img"
-      aria-label={`Image placeholder — client to supply: ${entry.needs}`}
+      aria-label={`Image placeholder, client to supply: ${entry.needs}`}
       data-placeholder-slot={entry.id}
     >
       <div class="bg-grid-prime pointer-events-none absolute inset-0 opacity-50"></div>
@@ -68,11 +68,11 @@ const labelTone = tone === 'dark' ? 'text-prime-300' : 'text-prime-700';
         <Icon name="image" size={20} />
       </span>
 
-      <p class={`relative text-label uppercase ${labelTone}`}>Image placeholder — client to supply</p>
+      <p class={`relative text-label uppercase ${labelTone}`}>Image placeholder: client to supply</p>
 
       {!demo && <p class="relative max-w-sm text-small leading-snug">{entry.needs}</p>}
 
-      <p class="relative font-mono text-[0.7rem] opacity-70">{entry.recommended}</p>
+      <p class="relative text-[0.7rem] opacity-70">{entry.recommended}</p>
     </div>
   )
 }

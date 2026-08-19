@@ -195,7 +195,7 @@ export default function Navbar({ currentPath, logo }: Props) {
                 target={item.external ? '_blank' : undefined}
                 rel={item.external ? 'noopener noreferrer' : undefined}
                 aria-label={
-                  item.external ? `${item.label} — opens the PrimeTrack Rwanda site` : undefined
+                  item.external ? `${item.label}, opens the PrimeTrack Rwanda site` : undefined
                 }
                 className="group flex flex-col gap-1 rounded-card px-4 py-3 transition-colors duration-[var(--duration-fast)] hover:bg-ink-50"
                 onClick={() => setOpenMenu(null)}
@@ -248,7 +248,7 @@ export default function Navbar({ currentPath, logo }: Props) {
     >
       <div className="container-prime">
         <div className="flex h-16 items-center justify-between gap-4 lg:h-20">
-          <a href="/" className="flex items-center" aria-label="PrimeTrack Telematics — home">
+          <a href="/" className="flex items-center" aria-label="PrimeTrack Telematics, home">
             {/* alt is empty on purpose: the link already carries the accessible
                 name, and a second one would be announced twice. */}
             <img

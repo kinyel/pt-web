@@ -80,7 +80,7 @@ export default function ContactForm({ accessKey, interests, recipientEmail }: Pr
     setStatus('submitting');
     const formData = new FormData(event.currentTarget);
     formData.append('access_key', accessKey);
-    formData.append('subject', `Website enquiry — ${fields.interest || 'General'}`);
+    formData.append('subject', `Website enquiry: ${fields.interest || 'General'}`);
     formData.append('from_name', 'PrimeTrack website');
 
     try {
@@ -121,7 +121,7 @@ export default function ContactForm({ accessKey, interests, recipientEmail }: Pr
         </span>
         <h2 className="mt-4 font-display text-h3 text-ink-950">Message sent</h2>
         <p className="mt-2 text-body text-ink-600">
-          Thank you — our team will be in touch. For anything urgent, call us directly on the
+          Thank you. Our team will be in touch. For anything urgent, call us directly on the
           numbers listed on this page.
         </p>
         <button
@@ -269,7 +269,7 @@ export default function ContactForm({ accessKey, interests, recipientEmail }: Pr
           value={fields.message}
           onChange={update('message')}
           required
-          placeholder="Tell us about your fleet, cargo or team — size, locations, and what you need to track."
+          placeholder="Tell us about your fleet, cargo or team: size, locations, and what you need to track."
           aria-invalid={Boolean(errors.message)}
           aria-describedby={errors.message ? `${formId}-message-error` : undefined}
           className={`${inputClass} min-h-32 resize-y`}
@@ -296,7 +296,7 @@ export default function ContactForm({ accessKey, interests, recipientEmail }: Pr
       </button>
 
       <p className="text-small text-ink-500">
-        Prefer to talk? Call us — the numbers are beside this form and go straight to our Lagos
+        Prefer to talk? Call us on the numbers beside this form. They go straight to our Lagos
         office.
       </p>
     </form>

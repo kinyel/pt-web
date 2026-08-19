@@ -26,7 +26,7 @@ export interface MediaAsset {
 export const media = {
   primesolarTracker: {
     image: primesolarTracker,
-    alt: 'PrimeSOLAR promotional graphic: a long-haul truck at sunset beneath a GPS location pin, captioned with the tracker’s features — 3-year battery lifespan, SIM-loss proof, tamper proof, water proof, removal proof, power-off proof, temperature proof, and SMS notifications for movement, incident and breach alerts.',
+    alt: 'PrimeSOLAR promotional graphic: a long-haul truck at sunset beneath a GPS location pin, captioned with the tracker’s features: 3-year battery lifespan, SIM-loss proof, tamper proof, water proof, removal proof, power-off proof, temperature proof, and SMS notifications for movement, incident and breach alerts.',
     source: '/wp-content/uploads/2024/03/2-website-image-solar-tracker-1024x724.jpg',
     note: 'Marketing collage with baked-in text, not a clean product shot. The text is unreadable at small sizes and cannot be translated or restyled. Worth replacing with a plain photograph of the device.',
   },

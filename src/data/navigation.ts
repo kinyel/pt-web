@@ -27,7 +27,7 @@ export const products: NavItem[] = [
     descriptor: 'Ai-PRIME intelligent vehicle CCTV with ADAS',
     title: 'Ai-PRIME Vehicle Video Tracking & CCTV Systems | PrimeTrack',
     description:
-      '4K DVR cameras, ADAS sensors and AI video telematics for Nigerian fleets — live video feeds, incident evidence and real-time driver alerts.',
+      '4K DVR cameras, ADAS sensors and AI video telematics for Nigerian fleets, with live video feeds, incident evidence and real-time driver alerts.',
   },
   {
     label: 'Solar Trackers',
@@ -45,7 +45,7 @@ export const products: NavItem[] = [
     descriptor: 'GPS fleet management, 3 to 3,000 vehicles',
     title: 'Vehicle Fleet Telematics & Fleet Management in Nigeria | PrimeTrack',
     description:
-      'GPS-based fleet management to optimise routes, cut fuel consumption and eliminate downtime — real-time tracking, alerts, reporting and API integration.',
+      'GPS-based fleet management to optimise routes, cut fuel consumption and eliminate downtime, with real-time tracking, alerts, reporting and API integration.',
   },
   {
     label: 'Human Trackers',
@@ -54,7 +54,7 @@ export const products: NavItem[] = [
     descriptor: 'Wearable personnel trackers with panic SOS',
     title: 'Employee & Personnel GPS Monitoring Solutions | PrimeTrack',
     description:
-      'Wearable GPS trackers — watches, keyrings, modems and chips — with panic-button SOS, geofencing and real-time personnel tracking.',
+      'Wearable GPS trackers in watch, keyring, modem and chip formats, with panic-button SOS, geofencing and real-time personnel tracking.',
   },
   {
     label: 'Fuel Monitoring',
@@ -89,7 +89,7 @@ export const retiredProducts: NavItem[] = [
     href: '/reliable-container-tracking/',
     icon: 'container',
     descriptor: 'Stand-alone rechargeable container tracking',
-    title: 'STAR Container & Goods Trackers — Reliable Container Tracking | PrimeTrack',
+    title: 'STAR Container & Goods Trackers | Reliable Container Tracking | PrimeTrack',
     description:
       'Stand-alone rechargeable trackers running for months per charge, with a magnetized weather-proof body for containers and cargo in off-grid areas.',
   },
@@ -121,7 +121,7 @@ export const services: NavItem[] = [
     descriptor: '15 reporting and analytics capabilities',
     title: 'Fleet Analytics & Telematics Reporting | PrimeTrack',
     description:
-      'Fifteen fleet analytics capabilities — real-time tracking, history playback, geofencing, fuel, temperature, video telematics, TAT and utilisation reporting.',
+      'Fifteen fleet analytics capabilities, covering real-time tracking, history playback, geofencing, fuel, temperature, video telematics, TAT and utilisation reporting.',
   },
   {
     // Rwanda property. Never rebuilt as a Nigeria page (inventory §4.4).
@@ -129,7 +129,7 @@ export const services: NavItem[] = [
     label: 'vRAS',
     href: 'https://primetrack.rw/vras',
     icon: 'globe',
-    descriptor: 'Rwanda — opens the PrimeTrack Rwanda site',
+    descriptor: 'Rwanda, opens the PrimeTrack Rwanda site',
     external: true,
   },
 ];
