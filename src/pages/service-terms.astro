@@ -1,12 +1,108 @@
 ---
-import StubPage from '../layouts/StubPage.astro';
+/**
+ * Terms of Service — client-supplied copy, reproduced verbatim.
+ *
+ * Legal text is never paraphrased. The only editorial decisions here are
+ * structural: the ten numbered clauses become an <ol> so their numbering is
+ * semantic rather than typed, and each clause heading is emphasised inline.
+ * No wording has been changed, shortened or reordered.
+ */
+import PolicyPage from '../layouts/PolicyPage.astro';
+import { contact } from '../data/company.ts';
+
+const title = 'Terms of Service | PrimeTrack Telematics';
+const description =
+  'The terms of service governing use of PrimeTrack Telematics Nigeria Limited GPS tracking and telematics services.';
+
+const clauses = [
+  {
+    heading: 'Service Description',
+    body: 'PrimeTrack Nigeria provides GPS tracking and telematics services that enable users to track and monitor vehicles, assets, or individuals through our platform and associated software.',
+  },
+  {
+    heading: 'User Obligations',
+    body: 'By using our services, you represent and warrant that you are legally capable and have the authority to enter into this agreement. You agree to use the services in compliance with applicable laws and regulations in Nigeria, and you will not use the services for any illegal, unauthorized, or fraudulent purposes.',
+  },
+  {
+    heading: 'User Account',
+    body: 'To access and use our services, we provide you appropriate user accounts with rights commensurate to your purchase plan. You are responsible for maintaining the confidentiality of your account information, and you agree to accept responsibility for all activities that occur under your account.',
+  },
+  {
+    heading: 'Data Privacy and Security',
+    body: null, // rendered with an inline link, see below
+  },
+  {
+    heading: 'Intellectual Property',
+    body: 'Our services and all related software, technology, and content are protected by intellectual property laws. You agree not to copy, modify, distribute, or create derivative works based on our services without our prior written consent.',
+  },
+  {
+    heading: 'Caveat Emptor',
+    body: 'Tracking devices serve as valuable aids in monitoring assets, ensuring vehicular safety and gathering telematics data. However, it is imperative to understand that their functionality is dependent upon a number of external factors beyond the control of the tracker hardware. These factors include: availability/reliability of GSM network signals, availability of GPS satellites in the area, variations in terrain and topography, as well as influence of weather conditions from time to time. Therefore users are advised not to solely rely on trackers in emergency situations or critical data assessments. While trackers play a major role in enhancing security measures and telematics data collection, users may consider having in place alternative emergency measures to augment their tracking devices. This caveat is an industry-wide acknowledgment of the multifaceted dependencies inherent in tracking technology the world over.',
+  },
+  {
+    heading: 'Termination',
+    body: 'We may suspend or terminate your access to our services at any time and for any reason, including if you violate these TOS. You may also terminate your account by providing written notice to us.',
+  },
+  {
+    heading: 'Amendments',
+    body: 'We reserve the right to modify or update these TOS at any time. We will notify you of any material changes. Your continued use of our services after the changes will constitute your acceptance of the updated TOS.',
+  },
+  {
+    heading: 'Governing Law and Jurisdiction',
+    body: 'These TOS are governed by the laws of Nigeria. Any disputes arising out of or relating to these TOS shall be subject to the exclusive jurisdiction of the courts in Nigeria.',
+  },
+  {
+    heading: 'Entire Agreement',
+    body: 'These TOS constitute the entire agreement between you and PrimeTrack Nigeria regarding the use of our services and supersede any prior agreements or understandings.',
+  },
+];
 ---
-<StubPage
-  title="Terms of Service | PrimeTrack Telematics"
-  description="PrimeTrack Telematics terms of service. The current terms are being confirmed."
+
+<PolicyPage
+  title={title}
+  description={description}
   heading="Terms of Service"
   eyebrow="PrimeTOOLS"
   icon="scale"
   href="/service-terms/"
-  awaiting="The current terms of service are with the client for confirmation. We never paraphrase or reconstruct legal copy."
-/>
+  lead="These terms govern your use of PrimeTrack's GPS tracking and telematics services. By accessing or using our services, you agree to be bound by them."
+  ctaTitle="Questions about these terms?"
+  ctaLead="Our Lagos team can talk you through anything in this document before you commit."
+>
+  <p>
+    Welcome to PrimeTrack Telematics Nigeria Limited (ref. herein as PrimeTrack Nigeria)! These
+    Terms of Service (“TOS”) govern your use of our GPS tracking and telematics services. By
+    accessing or using our services, you agree to comply with and be bound by these TOS. Please read
+    them carefully.
+  </p>
+
+  <ol>
+    {
+      clauses.map((clause) => (
+        <li>
+          <strong class="text-ink-950">{clause.heading}:</strong>{' '}
+          {clause.body ?? (
+            <>
+              At PrimeTrack Nigeria, we prioritize the privacy and security of your data. Our{' '}
+              <a
+                href="https://primetracknigeria.com/privacy-policy"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Privacy Policy
+              </a>{' '}
+              explains how we collect, use, and protect your personal information. By using our
+              services, you consent to the collection, use, and disclosure of your information as
+              described in our Privacy Policy.
+            </>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+
+  <p>
+    If you have any questions about our TOS, please contact us at:{' '}
+    <a href={`mailto:${contact.email}`}>{contact.email}</a>.
+  </p>
+</PolicyPage>

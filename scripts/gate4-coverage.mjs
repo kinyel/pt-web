@@ -145,7 +145,11 @@ const CHECKS = {
       ['authorized', 'authorised'], ['tamper', 'tampering'],
       ['unauthorized repair', 'unauthorised repair', 'unauthorized'],
       'fire', ['surge', 'power'], ['force majeure', 'majeure'],
-      ['sabotage'], ['non-transferable', 'transferable'], 'resale',
+      ['sabotage'], ['non-transferable', 'transferable'],
+      /* The client's own policy wording ends the warranty on the product being
+         "sold or ownership is transferred" rather than on "resale". Same fact,
+         different words — which is exactly what the alternatives list is for. */
+      ['resale', 'ownership is transferred', 'is sold or ownership'],
     ],
   },
   '/': {

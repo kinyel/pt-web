@@ -1,0 +1,65 @@
+---
+/**
+ * Shell for long-form policy and information pages whose body is prose the
+ * client supplied verbatim: Terms of Service, Prime Careers, I.C.C.P.
+ *
+ * These replaced stub pages. The copy is reproduced as given — legal and HR
+ * text is never paraphrased, condensed or "improved" — so the only thing this
+ * layout contributes is the hero, the reading measure and the closing CTA.
+ */
+import BaseLayout from './BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import CTA from '../components/CTA.astro';
+import { breadcrumbSchema } from '../data/schema.ts';
+
+interface Props {
+  title: string;
+  description: string;
+  heading: string;
+  eyebrow: string;
+  icon: string;
+  href: string;
+  lead?: string;
+  chips?: string[];
+  ctaTitle?: string;
+  ctaLead?: string;
+}
+
+const {
+  title,
+  description,
+  heading,
+  eyebrow,
+  icon,
+  href,
+  lead,
+  chips = [],
+  ctaTitle,
+  ctaLead,
+} = Astro.props;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  schemas={[breadcrumbSchema([{ label: heading, href }])]}
+>
+  <PageHero
+    icon={icon}
+    eyebrow={eyebrow}
+    title={heading}
+    lead={lead}
+    chips={chips}
+    crumbs={[{ label: heading }]}
+    showCta={false}
+  />
+
+  <Section tone="white">
+    <div class="prose-prime max-w-3xl text-ink-600">
+      <slot />
+    </div>
+  </Section>
+
+  <CTA title={ctaTitle} lead={ctaLead} />
+</BaseLayout>

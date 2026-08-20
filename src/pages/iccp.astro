@@ -1,12 +1,98 @@
 ---
-import StubPage from '../layouts/StubPage.astro';
+/**
+ * I.C.C.P. — the document itself is the page.
+ *
+ * The client supplied the current I.C.C.P. as a PDF (public/documents/). No
+ * summary or paraphrase is offered alongside it: the document is the
+ * authority, and restating it in our own words would create a second version
+ * that could drift out of step with it.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import CTA from '../components/CTA.astro';
+import Icon from '../components/Icon.astro';
+import { breadcrumbSchema } from '../data/schema.ts';
+import { iccpDocument } from '../data/company.ts';
+
+const title = 'I.C.C.P. | PrimeTrack Telematics';
+const description =
+  'Read or download the current PrimeTrack Telematics I.C.C.P. document.';
 ---
-<StubPage
-  title="I.C.C.P. | PrimeTrack Telematics"
-  description="I.C.C.P. at PrimeTrack Telematics. Page content is being confirmed."
-  heading="I.C.C.P."
-  eyebrow="Company"
-  icon="book-open"
-  href="/iccp/"
-  awaiting="The current copy for this page is with the client for confirmation."
-/>
+
+<BaseLayout
+  title={title}
+  description={description}
+  schemas={[breadcrumbSchema([{ label: 'I.C.C.P.', href: '/iccp/' }])]}
+>
+  <PageHero
+    icon="book-open"
+    eyebrow="Company"
+    title="I.C.C.P."
+    lead="The current PrimeTrack I.C.C.P. document, available to read in your browser or download as a PDF."
+    crumbs={[{ label: 'I.C.C.P.' }]}
+    showCta={false}
+  />
+
+  <Section tone="white">
+    <div class="mx-auto flex max-w-3xl flex-col gap-6">
+      <div
+        class="flex flex-col gap-5 rounded-panel border border-ink-200 bg-white p-6 sm:flex-row sm:items-center sm:gap-6 md:p-8"
+      >
+        <span
+          class="flex h-14 w-14 shrink-0 items-center justify-center rounded-panel bg-prime-50 text-prime-700"
+        >
+          <Icon name="file-text" size={26} />
+        </span>
+
+        <div class="flex flex-col gap-1">
+          <h2 class="text-h4 text-ink-950">{iccpDocument.label}</h2>
+          <p class="text-small text-ink-600">PDF document</p>
+        </div>
+
+        <div class="flex flex-col gap-3 sm:ml-auto sm:flex-row">
+          <a
+            href={iccpDocument.href}
+            target="_blank"
+            rel="noopener"
+            class="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-prime-500 px-5 py-2.5 text-small font-semibold text-ink-950 transition duration-[var(--duration-base)] ease-[var(--ease-prime)] hover:-translate-y-0.5 hover:bg-prime-400 hover:shadow-lift active:translate-y-0"
+          >
+            <Icon name="external-link" size={16} />
+            Open PDF
+          </a>
+          <a
+            href={iccpDocument.href}
+            download
+            class="inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-full border border-ink-200 px-5 py-2.5 text-small font-semibold text-ink-900 transition-colors duration-[var(--duration-base)] hover:border-ink-400 hover:bg-ink-50"
+          >
+            <Icon name="download" size={16} />
+            Download
+          </a>
+        </div>
+      </div>
+
+      {/* Inline preview. Kept below the buttons so the document is reachable
+          even where a browser refuses to render a PDF in an iframe. */}
+      <object
+        data={iccpDocument.href}
+        type="application/pdf"
+        class="h-[34rem] w-full rounded-panel border border-ink-200 bg-ink-50"
+        aria-label={iccpDocument.label}
+      >
+        <div class="flex h-full flex-col items-center justify-center gap-3 p-8 text-center">
+          <p class="text-small text-ink-600">
+            Your browser cannot display the PDF inline.
+          </p>
+          <a href={iccpDocument.href} class="text-small font-semibold text-prime-700 underline">
+            Open the document in a new tab
+          </a>
+        </div>
+      </object>
+    </div>
+  </Section>
+
+  <CTA
+    title="Questions about our I.C.C.P.?"
+    lead="Our Lagos team can walk you through the document and what it means for your account."
+  />
+</BaseLayout>

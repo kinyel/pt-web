@@ -1,12 +1,43 @@
 ---
-import StubPage from '../layouts/StubPage.astro';
+/**
+ * Prime Careers — client-supplied copy, reproduced verbatim.
+ * Applications go to the company inbox; there is no listings feed to build.
+ */
+import PolicyPage from '../layouts/PolicyPage.astro';
+import { contact } from '../data/company.ts';
+
+const title = 'Prime Careers | PrimeTrack Telematics';
+const description =
+  'A job at PrimeTrack is different. If you have the talent, skills or qualifications to be a PrimePerson, send us your brief or resume.';
 ---
-<StubPage
-  title="Prime Careers | PrimeTrack Telematics"
-  description="Careers at PrimeTrack Telematics. Current listings and application details are being confirmed."
+
+<PolicyPage
+  title={title}
+  description={description}
   heading="Prime Careers"
   eyebrow="Company"
   icon="briefcase"
   href="/careers/"
-  awaiting="Current vacancies and application details are with the client for confirmation."
-/>
+  lead="A job at PrimeTrack is different. It will challenge you, inspire you, and reward you to the measure of the talent and productivity you bring."
+  ctaTitle="Ready to become a PrimePerson?"
+  ctaLead="Send your brief or resume to our team and tell us what you would bring to PrimeTrack."
+>
+  <h2 class="text-h3 text-ink-950">A job at PrimeTrack is different!</h2>
+
+  <p>
+    It will challenge you. It will inspire you. And beyond all that it will reward you to the
+    measure of talent and productivity you bring to bear, so that you can grow infinitely and
+    achieve your every dream. All PrimePersons know this from the day they join our elite team.
+  </p>
+
+  <p>
+    How big are your dreams, and how self-confident are you in your capability to achieve them? How
+    passionate are you about creating exceptional value in all that you do?
+  </p>
+
+  <p>
+    Ponder these questions. If you are convinced that you have what it takes to be a PrimePerson,
+    either by sheer talent, skills set or qualifications, then send us your brief/resume at:{' '}
+    <a href={`mailto:${contact.email}`}>{contact.email}</a>.
+  </p>
+</PolicyPage>

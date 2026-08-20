@@ -7,12 +7,12 @@ import FeatureBlocks from '../components/FeatureBlocks.astro';
 import MediaPlaceholder from '../components/MediaPlaceholder.astro';
 import RelatedLinks from '../components/RelatedLinks.astro';
 import CTA from '../components/CTA.astro';
-import { retiredProducts, products, services } from '../data/navigation.ts';
+import { products, services } from '../data/navigation.ts';
 import { productSchema, breadcrumbSchema } from '../data/schema.ts';
 
 /* Withdrawn product — this route is still published, so it still needs its
-   title and description. See the note on `retiredProducts`. */
-const page = retiredProducts.find((p) => p.href === '/reliable-container-tracking/')!;
+   title and description. */
+const page = products.find((p) => p.href === '/reliable-container-tracking/')!;
 
 const features = [
   {
@@ -53,17 +53,17 @@ const related = [
   title={page.title!}
   description={page.description!}
   schemas={[
-    productSchema({ name: 'STAR Goods & Container Trackers', description: page.description!, url: page.href }),
+    productSchema({ name: 'STAR Cargo & Container Trackers', description: page.description!, url: page.href }),
     breadcrumbSchema([{ label: 'Products', href: '/#products' }, { label: page.label, href: page.href }]),
   ]}
 >
   <PageHero
     icon="container"
-    eyebrow="Goods Trackers"
+    eyebrow="Cargo Trackers"
     title="STAR Trackers: stand-alone & rechargeable"
     lead="Container and goods tracking for cargo that travels where there is no power source. STAR stands for Stand-Alone and Rechargeable, and that is exactly the problem it solves."
     chips={['Months per charge', 'Magnetized base', 'Weather-proof alloy', 'Off-grid capable']}
-    crumbs={[{ label: 'Products', href: '/#products' }, { label: 'Goods Trackers' }]}
+    crumbs={[{ label: 'Products', href: '/#products' }, { label: 'Cargo Trackers' }]}
   />
 
   <Section tone="white">
@@ -80,7 +80,7 @@ const related = [
         </p>
       </div>
 
-      <MediaPlaceholder slot="star-container-tracker" />
+      <MediaPlaceholder src="/fleet management.jpeg" slot="star-container-tracker" />
     </div>
   </Section>
 

@@ -5,7 +5,7 @@ import Section from '../components/Section.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import ContactForm from '../components/ContactForm.tsx';
 import Icon from '../components/Icon.astro';
-import { contact, countries, socials } from '../data/company.ts';
+import { contact, countries, socials, whatsapp } from '../data/company.ts';
 import { products, services } from '../data/navigation.ts';
 import { breadcrumbSchema } from '../data/schema.ts';
 
@@ -84,6 +84,19 @@ const mapSrc = `https://www.google.com/maps?q=${lat},${lng}&hl=en&z=16&output=em
             >
               <Icon name="mail" size={19} class="shrink-0 text-prime-600" />
               {contact.email}
+            </a>
+
+            {/* Opens WhatsApp with the message pre-typed but NOT sent, so the
+                visitor still edits and sends it themselves. */}
+            <a
+              href={`https://wa.me/${whatsapp.international}?text=${encodeURIComponent(whatsapp.message)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex min-h-11 items-center gap-3 text-body text-ink-700 transition-colors hover:text-prime-700"
+            >
+              <Icon name="whatsapp" size={19} class="shrink-0 text-prime-600" />
+              {whatsapp.display}
+              <span class="text-small text-ink-500">on WhatsApp</span>
             </a>
           </address>
 

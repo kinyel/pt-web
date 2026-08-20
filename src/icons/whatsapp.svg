@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Drawn to match the other brand glyphs in this folder: a monochrome
+       stroked outline in Lucide's geometry, not a reproduction of the WhatsApp
+       colour mark. Bubble with the tail at bottom-left, handset inside. -->
+  <path d="M7.9 20.1A9 9 0 1 0 3.9 16.1L2 22Z"/>
+  <path d="M9.2 9.4a.9.9 0 0 1 .9-.8h.9l.8 2-1 .8a6.3 6.3 0 0 0 2.8 2.8l.8-1 2 .8v.9a.9.9 0 0 1-.8.9 7.7 7.7 0 0 1-6.4-6.4Z"/>
+</svg>

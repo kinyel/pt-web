@@ -1,4 +1,14 @@
 ---
+/**
+ * Prime Warranties — the client's warranty policy, reproduced verbatim.
+ *
+ * The covered/excluded lists are set as cards because that is how the policy
+ * itself is organised, and because those two lists are what a customer with a
+ * broken device is actually looking for. Nothing is paraphrased or summarised:
+ * every clause below is the client's wording.
+ *
+ * The term is three (3) years. Never "lifetime" — check-content.mjs enforces it.
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import Section from '../components/Section.astro';
@@ -9,22 +19,26 @@ import { breadcrumbSchema } from '../data/schema.ts';
 
 const title = 'Prime Warranties | 3-Year Product Warranty | PrimeTrack';
 const description =
-  'PrimeTrack products carry a 3-year warranty from date of purchase for the original purchaser, covering defects in materials and workmanship.';
+  'PrimeTrack products carry a 3-year warranty from date of purchase for the original purchaser, covering defects in materials and workmanship under normal and proper use.';
 
-/** Warranty policy (inventory §6.2). The duration is three years — never "lifetime". */
 const covered = [
-  'Defects in materials and workmanship under normal use',
-  'Products bought through authorized PrimeTrack channels',
-  'Service carried out by PrimeTrack or authorized personnel',
+  'The warranty applies only to products purchased through PrimeTrack’s authorized representatives or distribution channels.',
+  'Any factory defects identified during installation, before the product is used operationally, are covered.',
+  'All warranty services must be performed by PrimeTrack or authorized PrimeTrack personnel. Unauthorized repairs or alterations will void this warranty.',
 ];
 
 const excluded = [
-  'Accidental damage occurring after installation',
-  'Tampering with the device or its installation',
-  'Repair or service by unauthorized personnel',
-  'Fire, earthquake, power surge or vehicle power failure',
-  'Force majeure events',
-  'Sabotage',
+  'Damage occurring after installation and confirmation of proper operation is not covered if caused by accidents, unauthorized removal, tampering, or attempts to repair or modify the device.',
+  'Issues arising from third-party repair or fault-management activities, device tampering, or self-troubleshooting are excluded.',
+  'Damage due to fire, earthquake, electrical surges, vehicle power/battery failures, improper storage and handling, or force majeure events is not covered.',
+  'Sabotage by third parties or damage from mechanical, electrical, or cosmetic services performed by anyone other than a PrimeTrack Authorized Service technician is not covered.',
+  'The warranty does not extend to any other equipment, vehicle, or watercraft to which the product is attached or connected.',
+];
+
+const transfer = [
+  'Warranty coverage is limited to products found defective within the applicable warranty period. PrimeTrack reserves the right to inspect the product to determine the validity of the warranty claim. The final decision on warranty coverage rests solely with PrimeTrack.',
+  'If a product is deemed to be out of warranty coverage, the customer will be informed and given the option for paid repair services or other disposition choices.',
+  'The warranty terminates automatically if the covered product is sold or ownership is transferred.',
 ];
 ---
 
@@ -36,8 +50,8 @@ const excluded = [
   <PageHero
     icon="shield-check"
     eyebrow="Prime Warranties"
-    title="A 3-year warranty, stated plainly"
-    lead="Three years from date of purchase, for the original purchaser. It is one of the longest warranties in the industry, with terms you can read in a minute."
+    title="PrimeTrack Warranty Policy"
+    lead="PrimeTrack offers a warranty to the original purchaser of its products, which is valid for three (3) years from the date of purchase."
     chips={['3 years from purchase', 'Original purchaser', 'Non-transferable']}
     crumbs={[{ label: 'Prime Warranties' }]}
     showCta={false}
@@ -46,44 +60,57 @@ const excluded = [
   <Section tone="white">
     <div class="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
       <SectionHeader
-        eyebrow="Duration"
+        eyebrow="Coverage duration"
         title="Three years, from the date of purchase"
-        lead="The warranty runs for three (3) years from date of purchase and applies to the original purchaser only. It is non-transferable and terminates on resale of the product."
+        lead="PrimeTrack offers a warranty to the original purchaser of its products, which is valid for three (3) years from the date of purchase."
       />
 
-      <div class="grid gap-5 sm:grid-cols-2">
+      <div class="flex flex-col gap-5">
         <div class="rounded-panel border border-ink-200 bg-white p-6">
           <h2 class="flex items-center gap-2 text-h4 text-ink-950">
-            <Icon name="circle-check" size={19} class="text-prime-600" />
-            What is covered
+            <Icon name="file-text" size={19} class="text-prime-600" />
+            Coverage details
           </h2>
-          <ul class="mt-4 flex flex-col gap-3">
-            {
-              covered.map((item) => (
-                <li class="flex gap-2.5 text-small text-ink-600">
-                  <Icon name="check" size={16} class="mt-0.5 shrink-0 text-prime-600" />
-                  {item}
-                </li>
-              ))
-            }
-          </ul>
+          <p class="mt-3 text-small text-ink-600 text-pretty">
+            This warranty ensures that the product is free from defects in materials and workmanship
+            under normal and proper use during the warranty period.
+          </p>
         </div>
 
-        <div class="rounded-panel border border-ink-200 bg-white p-6">
-          <h2 class="flex items-center gap-2 text-h4 text-ink-950">
-            <Icon name="shield" size={19} class="text-ink-500" />
-            What is excluded
-          </h2>
-          <ul class="mt-4 flex flex-col gap-3">
-            {
-              excluded.map((item) => (
-                <li class="flex gap-2.5 text-small text-ink-600">
-                  <span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-ink-400" />
-                  {item}
-                </li>
-              ))
-            }
-          </ul>
+        <div class="grid gap-5 sm:grid-cols-2">
+          <div class="rounded-panel border border-ink-200 bg-white p-6">
+            <h2 class="flex items-center gap-2 text-h4 text-ink-950">
+              <Icon name="circle-check" size={19} class="text-prime-600" />
+              What is covered
+            </h2>
+            <ul class="mt-4 flex flex-col gap-3">
+              {
+                covered.map((item) => (
+                  <li class="flex gap-2.5 text-small text-ink-600 text-pretty">
+                    <Icon name="check" size={16} class="mt-0.5 shrink-0 text-prime-600" />
+                    {item}
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+
+          <div class="rounded-panel border border-ink-200 bg-white p-6">
+            <h2 class="flex items-center gap-2 text-h4 text-ink-950">
+              <Icon name="shield" size={19} class="text-ink-500" />
+              What is not covered
+            </h2>
+            <ul class="mt-4 flex flex-col gap-3">
+              {
+                excluded.map((item) => (
+                  <li class="flex gap-2.5 text-small text-ink-600 text-pretty">
+                    <span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-ink-400" />
+                    {item}
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -91,16 +118,16 @@ const excluded = [
 
   <Section tone="tinted" size="sm">
     <div class="prose-prime max-w-3xl text-ink-600">
-      <h2 class="text-h3 text-ink-950">Conditions</h2>
+      <h2 class="text-h3 text-ink-950">Warranty extension and transfer</h2>
+      <ul>
+        {transfer.map((item) => <li>{item}</li>)}
+      </ul>
+
       <p>
-        The warranty covers defects in materials and workmanship under normal use. It applies only
-        to products purchased through authorized PrimeTrack channels, and servicing must be carried
-        out by PrimeTrack or personnel we have authorized.
+        PrimeTrack is committed to ensuring the quality and reliability of our products, and we
+        stand by our warranty policy to protect both our interests and those of our customers.
       </p>
-      <p>
-        Cover is non-transferable. If the product is resold, the warranty terminates at the point of
-        resale.
-      </p>
+
       <p>
         Need to make a claim or check whether your device is still in cover?{' '}
         <a href="/contact-prime/">Contact our team</a> with your purchase details.

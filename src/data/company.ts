@@ -37,10 +37,25 @@ export const contact = {
   map: { lat: 6.5894, lng: 3.3582, label: 'L’Monarch Towers, Opebi Road, Ikeja, Lagos' },
 } as const;
 
+/**
+ * WhatsApp click-to-chat.
+ *
+ * wa.me needs the number in full international form with no plus sign and no
+ * separators, so the local 0806... is stored here already converted: the
+ * leading 0 is Nigeria's trunk prefix and is replaced by the 234 country code.
+ * `display` keeps the local form, which is how a Nigerian customer reads it.
+ */
+export const whatsapp = {
+  display: '0806 440 1656',
+  /** 08064401656 -> +234 806 440 1656 */
+  international: '2348064401656',
+  message: 'Hello PrimeTrack, I need more info about your services',
+} as const;
+
 /** Multi-country operation (inventory §1). Only these three destinations exist. */
 export const countries = [
   { code: 'NGA', label: 'Nigeria', href: '/', external: false },
-  { code: 'RWA', label: 'Rwanda', href: 'https://primetrack.rw', external: true },
+  { code: 'RWA', label: 'Rwanda', href: 'https://www.primetrack.rw', external: true },
   { code: 'EGY', label: 'Egypt', href: '/egy/', external: false },
 ] as const;
 
@@ -79,6 +94,12 @@ export const credentials = [
 export const certificatesPdf = {
   href: '/primetrack_cac_ncc_frsc%20certifictes.pdf',
   label: 'CAC · NCC · FRSC Certificates (PDF)',
+} as const;
+
+/** The current I.C.C.P. document, supplied by the client as a PDF. */
+export const iccpDocument = {
+  href: '/documents/PrimeTrack-Current-ICCP-.pdf',
+  label: 'PrimeTrack Current I.C.C.P.',
 } as const;
 
 /**

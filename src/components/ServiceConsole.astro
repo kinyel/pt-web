@@ -279,6 +279,7 @@ const tiles = [
      and the white display, which are the two things that should be carrying
      this section. */
   .svc {
+    overflow-x: clip;
     background-color: var(--color-white);
     background-image:
       radial-gradient(44% 36% at 88% 2%, rgb(59 111 232 / 0.05) 0%, transparent 72%),
@@ -349,7 +350,12 @@ const tiles = [
     gap: 0.875rem;
     padding: 1.0625rem 1.25rem;
     border-radius: var(--radius-card) var(--radius-card) 0 0;
-    background-image: linear-gradient(180deg, var(--color-ink-700), var(--color-ink-800));
+    /* Light grey, running slightly deeper toward the bottom so each card still
+       reads as a solid object rather than a flat patch of the page. The
+       gradient's dark end (ink-100) is the worst case for contrast, which is
+       what every foreground colour below is chosen against. */
+    background-image: linear-gradient(180deg, var(--color-ink-50), var(--color-ink-100));
+    border: 1px solid var(--color-ink-200);
     text-decoration: none;
     transition:
       background-color var(--duration-base) var(--ease-prime),
@@ -381,7 +387,7 @@ const tiles = [
     font-size: var(--text-label);
     font-weight: 700;
     letter-spacing: 0.08em;
-    color: var(--color-ink-400);
+    color: var(--color-ink-500);
     transition: color var(--duration-base) var(--ease-prime);
   }
 
@@ -393,8 +399,8 @@ const tiles = [
     align-items: center;
     justify-content: center;
     border-radius: 999px;
-    background-color: rgb(255 255 255 / 0.07);
-    color: var(--color-data-300);
+    background-color: var(--color-white);
+    color: var(--color-data-600);
     transition:
       background-color var(--duration-base) var(--ease-prime),
       color var(--duration-base) var(--ease-prime);
@@ -409,20 +415,20 @@ const tiles = [
   .svc-row-label {
     font-size: var(--text-h4);
     font-weight: 700;
-    color: var(--color-ink-200);
+    color: var(--color-ink-900);
     transition: color var(--duration-base) var(--ease-prime);
   }
   .svc-row-desc {
     font-size: var(--text-small);
     line-height: 1.45;
-    color: var(--color-ink-300);
+    color: var(--color-ink-600);
   }
 
   .svc-row-arrow {
     margin-left: auto;
     display: flex;
     flex-shrink: 0;
-    color: var(--color-ink-400);
+    color: var(--color-ink-500);
     transition:
       color var(--duration-base) var(--ease-prime),
       transform var(--duration-base) var(--ease-prime);
@@ -659,11 +665,29 @@ const tiles = [
          which is what keeps the run reading as one group. */
       --svc-step: 4.5rem;
 
-      /* The cylinder the displays are arranged on. */
-      --svc-persp: 1400px;
-      --svc-radius: 220px;
-      --svc-turn: 620ms;
-      --svc-spin: cubic-bezier(0.33, 0.02, 0.2, 1);
+      /* The cylinder the displays ride on.
+         ------------------------------------------------------------------
+         For flat panels to sit ON a cylinder rather than pivot in front of
+         one, each panel has to be a CHORD of that cylinder:
+
+             W = 2R sin(theta/2)   ->   R = W / (2 sin(theta/2))
+
+         The display is 35rem (560px) wide. At a 36deg pitch that gives
+         R = 560 / (2 sin 18deg) = 906px, so 900px puts the panel edges almost
+         exactly on the surface: a 556px chord under a 560px panel.
+
+         This is what was wrong before. The old radius was 220px while the
+         panel's own half-width is 280px, so R < W/2 — the panel's edges stuck
+         out past its own axis of rotation. That is a flat plate spinning on a
+         thin axle, which is exactly the hinged, propeller-like motion it had.
+         The old 120deg pitch made it worse: three faces 120deg apart is not an
+         approximation of a cylinder, it is a triangular prism. 36deg gives a
+         ten-sided drum, which reads as curved. */
+      --svc-persp: 2000px;   /* long lens: gentle foreshortening, not a fisheye */
+      --svc-radius: 900px;
+      --svc-arc-pitch: 36deg;
+      --svc-turn: 760ms;
+      --svc-spin: cubic-bezier(0.32, 0.06, 0.22, 1);
 
       max-width: 67rem;
       grid-template-columns: minmax(0, 29rem) minmax(0, 1fr);
@@ -692,7 +716,7 @@ const tiles = [
       border-radius: var(--radius-card);
       cursor: pointer;
       /* Resting elevation. Enough to sit off the page, not enough to shout. */
-      box-shadow: 0 8px 20px -12px rgb(8 9 11 / 0.4);
+      box-shadow: 0 6px 16px -12px rgb(8 9 11 / 0.22);
     }
 
     /* The three displays sit on a cylinder, 120 degrees apart, turning about
@@ -718,7 +742,7 @@ const tiles = [
       pointer-events: none;
       backface-visibility: hidden;
       opacity: 0;
-      --a: 120deg;
+      --a: var(--svc-arc-pitch);
       transform:
         perspective(var(--svc-persp))
         translateZ(calc(var(--svc-radius) * -1))
@@ -786,46 +810,50 @@ const tiles = [
 
     /* --- resting state: service one faces the front --- */
     .svc-panel[data-svc='1'] { --a: 0deg; opacity: 1; }
-    .svc-panel[data-svc='2'] { --a: 120deg; }
-    .svc-panel[data-svc='3'] { --a: 240deg; }
+    .svc-panel[data-svc='2'] { --a: calc(var(--svc-arc-pitch) * 1); }
+    .svc-panel[data-svc='3'] { --a: calc(var(--svc-arc-pitch) * 2); }
     .svc-row[data-svc='1'] {
-      background-color: rgb(255 255 255 / 0.07);
+      background-color: var(--color-white);
+      background-image: none;
+      border-color: var(--color-prime-300);
       transform: translateY(-2px);
       box-shadow:
-        0 0 0 1px rgb(255 112 0 / 0.45),
-        0 18px 34px -16px rgb(8 9 11 / 0.5);
+        0 0 0 1px rgb(255 112 0 / 0.32),
+        0 14px 28px -14px rgb(8 9 11 / 0.28);
     }
     .svc-row[data-svc='1']::before { opacity: 1; transform: translateY(-50%) scaleY(1); }
-    .svc-row[data-svc='1'] .svc-row-label { color: var(--color-white); }
-    .svc-row[data-svc='1'] .svc-row-index { color: var(--color-prime-400); }
+    .svc-row[data-svc='1'] .svc-row-label { color: var(--color-ink-950); }
+    .svc-row[data-svc='1'] .svc-row-index { color: var(--color-prime-800); }
     .svc-row[data-svc='1'] .svc-row-icon {
-      background-color: rgb(255 112 0 / 0.18);
-      color: var(--color-prime-300);
+      background-color: var(--color-prime-50);
+      color: var(--color-prime-800);
     }
-    .svc-row[data-svc='1'] .svc-row-arrow { color: var(--color-prime-300); }
+    .svc-row[data-svc='1'] .svc-row-arrow { color: var(--color-prime-800); }
 
     /* --- pointing at any row hands control to that row --- */
     .svc-console:has(.svc-row:is(:hover, :focus-visible)) .svc-row[data-svc='1'] {
       background-color: transparent;
+      background-image: linear-gradient(180deg, var(--color-ink-50), var(--color-ink-100));
+      border-color: var(--color-ink-200);
       transform: none;
-      box-shadow: 0 8px 20px -12px rgb(8 9 11 / 0.4);
+      box-shadow: 0 6px 16px -12px rgb(8 9 11 / 0.22);
     }
     .svc-console:has(.svc-row:is(:hover, :focus-visible)) .svc-row[data-svc='1']::before {
       opacity: 0;
       transform: translateY(-50%) scaleY(0.3);
     }
     .svc-console:has(.svc-row:is(:hover, :focus-visible)) .svc-row[data-svc='1'] .svc-row-label {
-      color: var(--color-ink-200);
+      color: var(--color-ink-900);
     }
     .svc-console:has(.svc-row:is(:hover, :focus-visible)) .svc-row[data-svc='1'] .svc-row-index {
-      color: var(--color-ink-400);
+      color: var(--color-ink-500);
     }
     .svc-console:has(.svc-row:is(:hover, :focus-visible)) .svc-row[data-svc='1'] .svc-row-icon {
-      background-color: rgb(255 255 255 / 0.07);
-      color: var(--color-data-300);
+      background-color: var(--color-white);
+      color: var(--color-data-600);
     }
     .svc-console:has(.svc-row:is(:hover, :focus-visible)) .svc-row[data-svc='1'] .svc-row-arrow {
-      color: var(--color-ink-400);
+      color: var(--color-ink-500);
     }
 
     /* Whichever row is pointed at, its display turns to the front. */
@@ -836,12 +864,12 @@ const tiles = [
       opacity: 1;
     }
     /* ...and the other two carry on round the cylinder. */
-    .svc-console:has(.svc-row[data-svc='1']:is(:hover, :focus-visible)) .svc-panel[data-svc='2'] { --a: 120deg; opacity: 0; }
-    .svc-console:has(.svc-row[data-svc='1']:is(:hover, :focus-visible)) .svc-panel[data-svc='3'] { --a: 240deg; opacity: 0; }
-    .svc-console:has(.svc-row[data-svc='2']:is(:hover, :focus-visible)) .svc-panel[data-svc='1'] { --a: -120deg; opacity: 0; }
-    .svc-console:has(.svc-row[data-svc='2']:is(:hover, :focus-visible)) .svc-panel[data-svc='3'] { --a: 120deg; opacity: 0; }
-    .svc-console:has(.svc-row[data-svc='3']:is(:hover, :focus-visible)) .svc-panel[data-svc='1'] { --a: -240deg; opacity: 0; }
-    .svc-console:has(.svc-row[data-svc='3']:is(:hover, :focus-visible)) .svc-panel[data-svc='2'] { --a: -120deg; opacity: 0; }
+    .svc-console:has(.svc-row[data-svc='1']:is(:hover, :focus-visible)) .svc-panel[data-svc='2'] { --a: calc(var(--svc-arc-pitch) * 1); opacity: 0; }
+    .svc-console:has(.svc-row[data-svc='1']:is(:hover, :focus-visible)) .svc-panel[data-svc='3'] { --a: calc(var(--svc-arc-pitch) * 2); opacity: 0; }
+    .svc-console:has(.svc-row[data-svc='2']:is(:hover, :focus-visible)) .svc-panel[data-svc='1'] { --a: calc(var(--svc-arc-pitch) * -1); opacity: 0; }
+    .svc-console:has(.svc-row[data-svc='2']:is(:hover, :focus-visible)) .svc-panel[data-svc='3'] { --a: calc(var(--svc-arc-pitch) * 1); opacity: 0; }
+    .svc-console:has(.svc-row[data-svc='3']:is(:hover, :focus-visible)) .svc-panel[data-svc='1'] { --a: calc(var(--svc-arc-pitch) * -2); opacity: 0; }
+    .svc-console:has(.svc-row[data-svc='3']:is(:hover, :focus-visible)) .svc-panel[data-svc='2'] { --a: calc(var(--svc-arc-pitch) * -1); opacity: 0; }
 
     /* No cylinder for anyone who asked for less movement: the displays simply
        cross-fade in place. */
@@ -850,24 +878,26 @@ const tiles = [
     }
 
     .svc-row:is(:hover, :focus-visible) {
-      background-color: rgb(255 255 255 / 0.07);
+      background-color: var(--color-white);
+      background-image: none;
+      border-color: var(--color-prime-300);
       transform: translateY(-2px);
       box-shadow:
-        0 0 0 1px rgb(255 112 0 / 0.45),
-        0 18px 34px -16px rgb(8 9 11 / 0.5);
+        0 0 0 1px rgb(255 112 0 / 0.32),
+        0 14px 28px -14px rgb(8 9 11 / 0.28);
     }
     .svc-row:is(:hover, :focus-visible)::before {
       opacity: 1;
       transform: translateY(-50%) scaleY(1);
     }
-    .svc-row:is(:hover, :focus-visible) .svc-row-label { color: var(--color-white); }
-    .svc-row:is(:hover, :focus-visible) .svc-row-index { color: var(--color-prime-400); }
+    .svc-row:is(:hover, :focus-visible) .svc-row-label { color: var(--color-ink-950); }
+    .svc-row:is(:hover, :focus-visible) .svc-row-index { color: var(--color-prime-800); }
     .svc-row:is(:hover, :focus-visible) .svc-row-icon {
-      background-color: rgb(255 112 0 / 0.18);
-      color: var(--color-prime-300);
+      background-color: var(--color-prime-50);
+      color: var(--color-prime-800);
     }
     .svc-row:is(:hover, :focus-visible) .svc-row-arrow {
-      color: var(--color-prime-300);
+      color: var(--color-prime-800);
       transform: translateX(3px);
     }
   }

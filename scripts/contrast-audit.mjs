@@ -81,6 +81,15 @@ const PAIRS = [
   ['data-300', 'ink-700', 4.5, 'resting row icon on the slate rail'],
   ['ink-300', 'ink-800', 4.5, 'rail copy at the dark end of the gradient'],
 
+  ['ink-900', 'ink-100', 4.5, 'resting service label on the grey rail card'],
+  ['ink-600', 'ink-100', 4.5, 'service descriptor on the grey rail card'],
+  ['ink-500', 'ink-100', 4.5, 'row index + arrow on the grey rail card'],
+  ['prime-800', 'ink-100', 4.5, 'active row accent on the grey rail card'],
+  ['data-600', 'white', 3.0, 'resting row icon in its white chip'],
+  ['ink-950', 'white', 4.5, 'active service label on the white rail card'],
+  ['prime-800', 'white', 4.5, 'active row index + arrow on the white rail card'],
+  ['prime-800', 'prime-50', 4.5, 'active row icon in its orange chip'],
+
 
   ['signal-700', 'white', 4.5, 'red text on white'],
   ['signal-500', 'ink-950', 3.0, 'live dot on dark'],

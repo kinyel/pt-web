@@ -48,13 +48,13 @@ export const products: NavItem[] = [
       'GPS-based fleet management to optimise routes, cut fuel consumption and eliminate downtime, with real-time tracking, alerts, reporting and API integration.',
   },
   {
-    label: 'Human Trackers',
-    href: '/employee-monitoring-solutions/',
-    icon: 'watch',
-    descriptor: 'Wearable personnel trackers with panic SOS',
-    title: 'Employee & Personnel GPS Monitoring Solutions | PrimeTrack',
+    label: 'Cargo Trackers',
+    href: '/reliable-container-tracking/',
+    icon: 'container',
+    descriptor: 'Stand-alone rechargeable cargo and container tracking',
+    title: 'STAR Cargo & Container Trackers | Reliable Cargo Tracking | PrimeTrack',
     description:
-      'Wearable GPS trackers in watch, keyring, modem and chip formats, with panic-button SOS, geofencing and real-time personnel tracking.',
+      'Stand-alone rechargeable trackers running for months per charge, with a magnetized weather-proof body for cargo and containers in off-grid areas.',
   },
   {
     label: 'Fuel Monitoring',
@@ -70,28 +70,33 @@ export const products: NavItem[] = [
 /**
  * Products the company no longer offers.
  *
- * Goods Trackers ("STAR" container trackers, inventory §3.4) was withdrawn —
- * client-confirmed, Aug 2026. It is out of `products`, so it no longer appears
- * in the header mega-menu, the homepage product spiral, the contact form's
- * interest list, or the 404 suggestions.
+ * Human Trackers (wearable personnel devices, inventory §3.5) was withdrawn and
+ * replaced in the line-up by Cargo Trackers — client-confirmed, Aug 2026. It is
+ * out of `products`, so it no longer appears in the header mega-menu, the
+ * homepage product spiral, the contact form's interest list, or the 404
+ * suggestions.
+ *
+ * NOTE: the container/cargo product moved the other way in the same change. It
+ * had been retired here as "Goods Trackers"; it is back in `products` as "Cargo
+ * Trackers", pointing at the same /reliable-container-tracking/ route, which is
+ * why that page's copy still stands.
  *
  * The entry survives here rather than being deleted because
- * /reliable-container-tracking/ is still a built route and reads its own title
- * and meta description from this record. That page is now unlinked from the
- * site's navigation but still published and still in the sitemap — see the
- * open question raised with the client about whether to 301 it or remove it.
- * Deleting this array without settling that would 404 an indexed URL and fail
- * the Gate 4 content-preservation check.
+ * /employee-monitoring-solutions/ is still a built route and reads its own
+ * title and meta description from this record. That page is now unlinked from
+ * the site's navigation but still published and still in the sitemap. Deleting
+ * this array without settling that would 404 an indexed URL and fail the
+ * Gate 4 content-preservation check.
  */
 export const retiredProducts: NavItem[] = [
   {
-    label: 'Goods Trackers',
-    href: '/reliable-container-tracking/',
-    icon: 'container',
-    descriptor: 'Stand-alone rechargeable container tracking',
-    title: 'STAR Container & Goods Trackers | Reliable Container Tracking | PrimeTrack',
+    label: 'Human Trackers',
+    href: '/employee-monitoring-solutions/',
+    icon: 'watch',
+    descriptor: 'Wearable personnel trackers with panic SOS',
+    title: 'Employee & Personnel GPS Monitoring Solutions | PrimeTrack',
     description:
-      'Stand-alone rechargeable trackers running for months per charge, with a magnetized weather-proof body for containers and cargo in off-grid areas.',
+      'Wearable GPS trackers in watch, keyring, modem and chip formats, with panic-button SOS, geofencing and real-time personnel tracking.',
   },
 ];
 
@@ -127,7 +132,7 @@ export const services: NavItem[] = [
     // Rwanda property. Never rebuilt as a Nigeria page (inventory §4.4).
     // Open item: client to confirm whether vRAS belongs in the Nigeria nav.
     label: 'vRAS',
-    href: 'https://primetrack.rw/vras',
+    href: 'https://www.primetrack.rw',
     icon: 'globe',
     descriptor: 'Rwanda, opens the PrimeTrack Rwanda site',
     external: true,

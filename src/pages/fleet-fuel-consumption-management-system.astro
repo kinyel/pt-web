@@ -2,6 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import Section from '../components/Section.astro';
+import MediaPlaceholder from '../components/MediaPlaceholder.astro';
+
 import SectionHeader from '../components/SectionHeader.astro';
 import FeatureBlocks from '../components/FeatureBlocks.astro';
 import ContentImage from '../components/ContentImage.astro';
@@ -90,7 +92,9 @@ const related = [
         </p>
       </div>
 
-      <ContentImage asset={media.fuelMonitoring} />
+      <!-- <ContentImage asset={media.fuelMonitoring} /> -->
+      <MediaPlaceholder src="/fuel monitoring.jpeg" slot="fleet-on-road" class="lg:order-last" />
+
     </div>
   </Section>
 
