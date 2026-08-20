@@ -13,8 +13,6 @@ const title = 'Contact PrimeTrack Telematics | Ikeja, Lagos | PrimeTrack';
 const description =
   '4th Floor, L’Monarch Towers, 65C Opebi Road, Ikeja, Lagos. Call +234 803 060 9099 or email admin@primetracknigeria.net.';
 
-/** Set PUBLIC_WEB3FORMS_KEY in the deploy environment to activate the form. */
-const accessKey = import.meta.env.PUBLIC_WEB3FORMS_KEY;
 
 const interests = [...products, ...services.filter((s) => !s.external)].map((item) => item.label);
 
@@ -46,9 +44,13 @@ const mapSrc = `https://www.google.com/maps?q=${lat},${lng}&hl=en&z=16&output=em
           lead="Fill this in and our team will come back to you. For anything urgent, calling is faster."
           class="mb-8"
         />
+        {/* client:load, not client:visible. With deferred hydration there is a
+            window where the form is on screen but its JavaScript has not
+            arrived, and a submit in that window is a native POST that navigates
+            away to Formspree's own page. The whole point of this form is that
+            the visitor stays put, so it hydrates eagerly. */}
         <ContactForm
-          client:visible
-          accessKey={accessKey}
+          client:load
           interests={interests}
           recipientEmail={contact.email}
         />

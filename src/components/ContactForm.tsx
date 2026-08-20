@@ -1,19 +1,40 @@
-import { useId, useState, type FormEvent } from 'react';
+import { useId, useRef, useState, type FormEvent } from 'react';
 
 /**
- * Contact form wired to Web3Forms (build brief §D, option 1).
+ * Contact form, wired to Formspree.
  *
- * Submissions are delivered to the address configured on the Web3Forms account
- * that owns the access key. Until PUBLIC_WEB3FORMS_KEY is set the form renders
- * a visible configuration notice rather than silently failing — a form that
- * looks like it sent and did not is worse than one that says it cannot.
+ * TRANSPORT
+ * Submitted with fetch and `Accept: application/json`, which is what makes
+ * Formspree answer with JSON instead of redirecting to its own thank-you page.
+ * The visitor never leaves the page and never loses what they typed: on any
+ * failure the field state is left exactly as it was, and only on a confirmed
+ * success is it cleared.
+ *
+ * The endpoint is not a secret — it ships in the HTML of every Formspree form
+ * by design — so it is a plain constant rather than an env var. That is
+ * deliberate: the previous Web3Forms wiring read a build-time key and rendered
+ * a "not configured" notice when it was missing, which meant a broken form was
+ * one unset variable away. This cannot fail that way.
+ *
+ * SPAM
+ * `_gotcha` is Formspree's honeypot. It is hidden from people and from the tab
+ * order; if anything fills it, Formspree accepts the request and silently drops
+ * the message, so bots get no signal that they were caught.
+ *
+ * ERRORS
+ * Formspree returns field-level errors as `{ errors: [{ field, message }] }`.
+ * Those are mapped back onto the individual inputs so the correction happens
+ * where the mistake is, rather than in a banner far from the offending field.
  */
 
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mqpznbre';
+
 interface Props {
-  accessKey?: string;
   /** Product and service names, so enquiries arrive pre-labelled. */
   interests: string[];
   recipientEmail: string;
+  /** Overridable so the endpoint can be pointed elsewhere for testing. */
+  endpoint?: string;
 }
 
 interface Fields {
@@ -30,25 +51,30 @@ type Status = 'idle' | 'submitting' | 'success' | 'error';
 const EMPTY: Fields = { name: '', email: '', phone: '', company: '', interest: '', message: '' };
 
 const labelClass = 'text-small font-semibold text-ink-800';
-const inputClass =
-  'min-h-12 w-full rounded-card border border-ink-200 bg-white px-4 py-3 text-body text-ink-900 transition-colors placeholder:text-ink-400 focus:border-prime-500 focus:outline-none';
-const errorClass = 'text-small text-signal-600';
+const baseInput =
+  'min-h-12 w-full rounded-card border bg-white px-4 py-3 text-body text-ink-900 transition-colors placeholder:text-ink-400 focus:outline-none';
+/* The invalid state is carried by the border AND the message, never by colour
+   alone — colour on its own is not an accessible error signal. */
+const inputClass = (invalid: boolean) =>
+  `${baseInput} ${invalid ? 'border-signal-500 focus:border-signal-700' : 'border-ink-200 focus:border-prime-500'}`;
+const errorClass = 'text-small text-signal-700';
 
-export default function ContactForm({ accessKey, interests, recipientEmail }: Props) {
+export default function ContactForm({ interests, recipientEmail, endpoint }: Props) {
   const formId = useId();
+  const formRef = useRef<HTMLFormElement>(null);
   const [fields, setFields] = useState<Fields>(EMPTY);
   const [errors, setErrors] = useState<Partial<Record<keyof Fields, string>>>({});
   const [status, setStatus] = useState<Status>('idle');
   const [serverMessage, setServerMessage] = useState('');
 
-  const update = (key: keyof Fields) => (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
-  ) => {
-    setFields((prev) => ({ ...prev, [key]: event.target.value }));
-    setErrors((prev) => ({ ...prev, [key]: undefined }));
-  };
+  const update =
+    (key: keyof Fields) =>
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      setFields((prev) => ({ ...prev, [key]: event.target.value }));
+      setErrors((prev) => ({ ...prev, [key]: undefined }));
+    };
 
-  const validate = (): boolean => {
+  const validate = (): Partial<Record<keyof Fields, string>> => {
     const next: Partial<Record<keyof Fields, string>> = {};
     if (!fields.name.trim()) next.name = 'Please tell us your name.';
     if (!fields.email.trim()) {
@@ -61,48 +87,77 @@ export default function ContactForm({ accessKey, interests, recipientEmail }: Pr
     } else if (fields.message.trim().length < 10) {
       next.message = 'A little more detail helps us route your enquiry.';
     }
-    setErrors(next);
-    return Object.keys(next).length === 0;
+    return next;
+  };
+
+  /** Moves focus to the first field in error, so a keyboard or screen-reader
+      user is taken to the problem instead of being told one exists. */
+  const focusFirstError = (found: Partial<Record<keyof Fields, string>>) => {
+    const order: (keyof Fields)[] = ['name', 'email', 'phone', 'company', 'interest', 'message'];
+    const first = order.find((key) => found[key]);
+    if (first) formRef.current?.querySelector<HTMLElement>(`#${CSS.escape(`${formId}-${first}`)}`)?.focus();
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!validate()) return;
 
-    if (!accessKey) {
-      setStatus('error');
-      setServerMessage(
-        'This form is not connected yet. Please email or call us using the details on this page.',
-      );
+    const found = validate();
+    setErrors(found);
+    if (Object.keys(found).length > 0) {
+      focusFirstError(found);
       return;
     }
 
     setStatus('submitting');
+    setServerMessage('');
+
     const formData = new FormData(event.currentTarget);
-    formData.append('access_key', accessKey);
-    formData.append('subject', `Website enquiry: ${fields.interest || 'General'}`);
-    formData.append('from_name', 'PrimeTrack website');
+    formData.append('_subject', `Website enquiry: ${fields.interest || 'General'}`);
 
     try {
-      const response = await fetch('https://api.web3forms.com/submit', {
+      const response = await fetch(endpoint ?? FORMSPREE_ENDPOINT, {
         method: 'POST',
         body: formData,
+        /* Without this header Formspree replies with a redirect to its own
+           hosted thank-you page instead of JSON. */
+        headers: { Accept: 'application/json' },
       });
-      const result = await response.json();
 
-      if (response.ok && result.success) {
+      if (response.ok) {
         setStatus('success');
         setFields(EMPTY);
-      } else {
-        setStatus('error');
-        setServerMessage(
-          result?.message ?? 'Something went wrong sending your message. Please try again.',
-        );
+        setErrors({});
+        return;
       }
+
+      /* Map Formspree's field errors back onto the inputs where possible. */
+      const data = await response.json().catch(() => null);
+      const list: { field?: string; message?: string }[] = data?.errors ?? [];
+      const mapped: Partial<Record<keyof Fields, string>> = {};
+      const general: string[] = [];
+
+      for (const item of list) {
+        const key = item.field as keyof Fields | undefined;
+        if (key && key in EMPTY && item.message) mapped[key] = item.message;
+        else if (item.message) general.push(item.message);
+      }
+
+      setStatus('error');
+      setErrors(mapped);
+      if (Object.keys(mapped).length > 0) focusFirstError(mapped);
+
+      setServerMessage(
+        general.join(' ') ||
+          (Object.keys(mapped).length > 0
+            ? 'Please check the highlighted fields and try again.'
+            : `We could not send your message. Please try again, or email us at ${recipientEmail}.`),
+      );
     } catch {
+      /* Network-level failure: offline, DNS, blocked request. Nothing typed is
+         lost, so the visitor can simply retry. */
       setStatus('error');
       setServerMessage(
-        'We could not reach the server. Check your connection, or call us directly.',
+        'We could not reach the server. Check your connection and try again, or call us directly.',
       );
     }
   };
@@ -114,15 +169,25 @@ export default function ContactForm({ accessKey, interests, recipientEmail }: Pr
         role="status"
         aria-live="polite"
       >
-        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-prime-50 text-prime-600">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-prime-50 text-prime-700">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
             <path d="M20 6 9 17l-5-5" />
           </svg>
         </span>
         <h2 className="mt-4 font-display text-h3 text-ink-950">Message sent</h2>
         <p className="mt-2 text-body text-ink-600">
-          Thank you. Our team will be in touch. For anything urgent, call us directly on the
-          numbers listed on this page.
+          Thank you. Our team will be in touch. For anything urgent, call us directly on the numbers
+          listed on this page.
         </p>
         <button
           type="button"
@@ -137,32 +202,29 @@ export default function ContactForm({ accessKey, interests, recipientEmail }: Pr
 
   return (
     <form
+      ref={formRef}
       onSubmit={handleSubmit}
+      action={endpoint ?? FORMSPREE_ENDPOINT}
+      method="POST"
       noValidate
+      aria-busy={status === 'submitting'}
       className="flex flex-col gap-5 rounded-panel border border-ink-200 bg-white p-6 md:p-8"
     >
-      {!accessKey && (
-        <p className="rounded-card border border-prime-200 bg-prime-50 px-4 py-3 text-small text-prime-900">
-          <strong className="font-semibold">Setup required:</strong> set{' '}
-          <code className="font-mono">PUBLIC_WEB3FORMS_KEY</code> so submissions reach{' '}
-          {recipientEmail}. Until then this form cannot send.
-        </p>
-      )}
-
-      {/* Honeypot — hidden from people, tempting to bots. */}
+      {/* Formspree's honeypot. Hidden from people and from the tab order; if a
+          bot fills it the submission is accepted and quietly discarded. */}
       <input
-        type="checkbox"
-        name="botcheck"
+        type="text"
+        name="_gotcha"
         tabIndex={-1}
         autoComplete="off"
-        className="hidden"
         aria-hidden="true"
+        style={{ display: 'none' }}
       />
 
       <div className="grid gap-5 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <label htmlFor={`${formId}-name`} className={labelClass}>
-            Name <span className="text-signal-600">*</span>
+            Name <span className="text-signal-700">*</span>
           </label>
           <input
             id={`${formId}-name`}
@@ -173,7 +235,7 @@ export default function ContactForm({ accessKey, interests, recipientEmail }: Pr
             required
             aria-invalid={Boolean(errors.name)}
             aria-describedby={errors.name ? `${formId}-name-error` : undefined}
-            className={inputClass}
+            className={inputClass(Boolean(errors.name))}
           />
           {errors.name && (
             <p id={`${formId}-name-error`} className={errorClass}>
@@ -192,13 +254,13 @@ export default function ContactForm({ accessKey, interests, recipientEmail }: Pr
             value={fields.company}
             onChange={update('company')}
             autoComplete="organization"
-            className={inputClass}
+            className={inputClass(false)}
           />
         </div>
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor={`${formId}-email`} className={labelClass}>
-            Email <span className="text-signal-600">*</span>
+            Email <span className="text-signal-700">*</span>
           </label>
           <input
             id={`${formId}-email`}
@@ -211,7 +273,7 @@ export default function ContactForm({ accessKey, interests, recipientEmail }: Pr
             required
             aria-invalid={Boolean(errors.email)}
             aria-describedby={errors.email ? `${formId}-email-error` : undefined}
-            className={inputClass}
+            className={inputClass(Boolean(errors.email))}
           />
           {errors.email && (
             <p id={`${formId}-email-error`} className={errorClass}>
@@ -232,8 +294,15 @@ export default function ContactForm({ accessKey, interests, recipientEmail }: Pr
             value={fields.phone}
             onChange={update('phone')}
             autoComplete="tel"
-            className={inputClass}
+            aria-invalid={Boolean(errors.phone)}
+            aria-describedby={errors.phone ? `${formId}-phone-error` : undefined}
+            className={inputClass(Boolean(errors.phone))}
           />
+          {errors.phone && (
+            <p id={`${formId}-phone-error`} className={errorClass}>
+              {errors.phone}
+            </p>
+          )}
         </div>
       </div>
 
@@ -246,7 +315,7 @@ export default function ContactForm({ accessKey, interests, recipientEmail }: Pr
           name="interest"
           value={fields.interest}
           onChange={update('interest')}
-          className={inputClass}
+          className={inputClass(false)}
         >
           <option value="">Select an option</option>
           {interests.map((interest) => (
@@ -260,7 +329,7 @@ export default function ContactForm({ accessKey, interests, recipientEmail }: Pr
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor={`${formId}-message`} className={labelClass}>
-          Message <span className="text-signal-600">*</span>
+          Message <span className="text-signal-700">*</span>
         </label>
         <textarea
           id={`${formId}-message`}
@@ -272,7 +341,7 @@ export default function ContactForm({ accessKey, interests, recipientEmail }: Pr
           placeholder="Tell us about your fleet, cargo or team: size, locations, and what you need to track."
           aria-invalid={Boolean(errors.message)}
           aria-describedby={errors.message ? `${formId}-message-error` : undefined}
-          className={`${inputClass} min-h-32 resize-y`}
+          className={`${inputClass(Boolean(errors.message))} min-h-32 resize-y`}
         />
         {errors.message && (
           <p id={`${formId}-message-error`} className={errorClass}>
@@ -281,19 +350,29 @@ export default function ContactForm({ accessKey, interests, recipientEmail }: Pr
         )}
       </div>
 
-      {status === 'error' && (
-        <p className="rounded-card border border-signal-500/30 bg-signal-100 px-4 py-3 text-small text-signal-700" role="alert">
+      {status === 'error' && serverMessage && (
+        <p
+          className="rounded-card border border-signal-500/30 bg-signal-100 px-4 py-3 text-small text-signal-700"
+          role="alert"
+        >
           {serverMessage}
         </p>
       )}
 
+      {/* Black on brand orange, matching Button.astro's primary variant. White
+          on prime-600 is 3.7:1 and fails AA; ink-950 on prime-500 is 7.2:1. */}
       <button
         type="submit"
         disabled={status === 'submitting'}
-        className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-prime-600 px-7 py-3 font-semibold text-white transition-colors hover:bg-prime-700 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-prime-500 px-7 py-3 font-semibold text-ink-950 transition duration-[var(--duration-base)] ease-[var(--ease-prime)] hover:-translate-y-0.5 hover:bg-prime-400 hover:shadow-lift active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none"
       >
         {status === 'submitting' ? 'Sending…' : 'Send message'}
       </button>
+
+      {/* Announces the in-flight state to assistive tech without stealing focus. */}
+      <span className="sr-only" role="status" aria-live="polite">
+        {status === 'submitting' ? 'Sending your message' : ''}
+      </span>
 
       <p className="text-small text-ink-500">
         Prefer to talk? Call us on the numbers beside this form. They go straight to our Lagos

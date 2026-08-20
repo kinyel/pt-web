@@ -9,10 +9,10 @@
  * `note` records anything a future editor should know about the asset's
  * quality or provenance before reusing it.
  */
-import primesolarTracker from '../assets/products/primesolar-solar-tracker.jpg';
+import primesolarTracker from '../assets/products/solar-tracking-company.png';
 import fuelMonitoring from '../assets/products/fuel-monitoring.jpg';
 import videoTrackingDashcam from '../assets/products/vehicle-video-tracking-dashcam.jpg';
-import mdvrCameraKit from '../assets/products/mdvr-camera-kit.jpg';
+import mdvrCameraKit from '../assets/products/video-tracker.jpeg';
 import primetrackLogo from '../assets/brand/primetrack-logo.png';
 import accreditations from '../assets/brand/accreditations.png';
 

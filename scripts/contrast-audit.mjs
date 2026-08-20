@@ -94,6 +94,10 @@ const PAIRS = [
   ['signal-700', 'white', 4.5, 'red text on white'],
   ['signal-500', 'ink-950', 3.0, 'live dot on dark'],
   ['signal-400', 'ink-950', 4.5, 'alert text on dark'],
+
+  ['signal-700', 'white', 4.5, 'contact form inline error + required asterisk'],
+  ['signal-500', 'white', 3.0, 'contact form invalid input border'],
+  ['signal-700', 'signal-100', 4.5, 'contact form error banner on its tint'],
 ];
 
 let failures = 0;
