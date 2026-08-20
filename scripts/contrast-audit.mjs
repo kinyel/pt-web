@@ -65,6 +65,21 @@ const PAIRS = [
   ['data-500', 'white', 3.0, 'chart stroke on white'],
   ['data-600', 'data-50', 3.0, 'blue icon in blue chip'],
   ['data-500', 'ink-950', 3.0, 'blue UI on dark'],
+  ['data-400', 'ink-950', 4.5, 'blue data marks on the dark console'],
+  ['data-300', 'ink-950', 4.5, 'blue labels on the dark console'],
+  ['data-200', 'ink-950', 4.5, 'endpoint labels on the dark console'],
+  ['data-400', 'ink-900', 4.5, 'blue data marks on the console gradient'],
+  ['data-200', 'ink-900', 4.5, 'endpoint labels on the console gradient'],
+  ['prime-300', 'ink-950', 4.5, 'source-node label on the dark console'],
+
+  ['white', 'ink-700', 4.5, 'active service label on the slate rail'],
+  ['ink-200', 'ink-700', 4.5, 'resting service label on the slate rail'],
+  ['ink-300', 'ink-700', 4.5, 'service descriptor on the slate rail'],
+  ['ink-400', 'ink-700', 3.0, 'row index + arrow on the slate rail'],
+  ['prime-400', 'ink-700', 4.5, 'active row index on the slate rail'],
+  ['prime-300', 'ink-700', 4.5, 'active row icon on the slate rail'],
+  ['data-300', 'ink-700', 4.5, 'resting row icon on the slate rail'],
+  ['ink-300', 'ink-800', 4.5, 'rail copy at the dark end of the gradient'],
 
 
   ['signal-700', 'white', 4.5, 'red text on white'],

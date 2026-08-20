@@ -15,6 +15,17 @@ These are real problems on the current site. Handle them exactly as described; d
 2. **"Brands We Serve" has no actual brands.**
    The homepage has a *"Some Brands We Serve"* section, but it contains **no real client names or logos** — just repeated slogan text. → **Do not invent client names or logos.** Either omit a logo wall, or build the component and leave it clearly `[PLACEHOLDER — client to supply client logos]`.
 
+   > **CORRECTION (verified against the live site).** This is wrong. The
+   > carousel *does* carry 19 real client logos; they are CSS
+   > `background-image` URLs on empty divs under
+   > `/wp-content/uploads/2023/06/` and `/2023/07/`, so an `<img>`-based scrape
+   > sees an empty section. Each file was fetched and opened to identify it.
+   > 13 are now self-hosted in `src/assets/clients/`. The standing rule is
+   > unchanged and still applies: **never invent or redraw a client logo** —
+   > only re-host files the client actually publishes. The *slogan* text above
+   > the carousel ("Lifetime Warranty / 24-Hour Service") remains off-limits:
+   > the warranty is 3 years.
+
 3. **Speed limiters / "Arrive Alive"** are mentioned on the homepage (PrimeTrack is described as an *FRSC-licensed Speed Limiter vendor*) but there is **no dedicated page** for it. It's a real offering — surface it as a trust/credential point, but don't build out a full product page with invented specs.
 
 4. **Stats that ARE real and usable** (they appear on the live homepage): see §5. Everything else numeric must not be invented.

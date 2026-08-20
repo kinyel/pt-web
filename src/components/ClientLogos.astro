@@ -1,0 +1,265 @@
+---
+/**
+ * "Some brands we serve" — the client logo wall.
+ *
+ * PROVENANCE
+ * Every logo here is the real file from the client's own live site, fetched
+ * from primetracknigeria.com/wp-content/uploads/ and re-hosted locally. Nothing
+ * is redrawn, traced or approximated. The only processing applied is a crop of
+ * the grey frame and white padding the uploader baked into some files, plus a
+ * resize and a WebP conversion — no logo pixel is altered.
+ *
+ * NOTE ON THE CONTENT INVENTORY
+ * §0.2 of primetrack-content-inventory.md records that this section "has no
+ * actual brands... just repeated slogan text". That was read off the rendered
+ * markup, where the logos are CSS `background-image` URLs on empty divs rather
+ * than <img> tags — so an <img>-based scrape sees nothing. The logos are real
+ * and were verified one by one by opening each file. See the correction note
+ * added to the inventory.
+ *
+ * DELIBERATELY ABSENT
+ * On the live site this carousel sits beneath a slogan promising an unlimited
+ * warranty term alongside 24-hour service. That slogan is not reproduced here:
+ * the real warranty is 3 years, so the live wording is a claim the site cannot
+ * make. check-content.mjs blocks the phrase outright — including, as it turns
+ * out, inside this comment, which is the guard behaving exactly as intended.
+ */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+
+/* Slug -> the name as it is written on the logo itself. The alt text is the
+   company name and nothing else, which is what a logo wall should announce. */
+const clients = [
+  { slug: 'maersk', name: 'Maersk' },
+  { slug: 'greenville-lng', name: 'Greenville LNG' },
+  { slug: 'cadbury', name: 'Cadbury' },
+  { slug: 'nipco', name: 'NIPCO' },
+  { slug: 'wact', name: 'WACT (West Africa Container Terminal)' },
+  { slug: 'beloxxi', name: 'Beloxxi' },
+  { slug: 'efina', name: 'EFInA' },
+  { slug: 'apm-terminals', name: 'APM Terminals' },
+  { slug: 'shalina-healthcare', name: 'Shalina Healthcare' },
+  { slug: 'oando', name: 'Oando' },
+  { slug: 'nestle', name: 'Nestlé' },
+  { slug: 'ecogas', name: 'ECOGAS' },
+  { slug: 'royal-exchange', name: 'Royal Exchange General Insurance' },
+  { slug: 'enyo', name: 'ENYO Retail and Supply' },
+  { slug: 'vanguard', name: 'Vanguard Media Group' },
+  { slug: 'emel', name: 'EmEL' },
+  { slug: 'russelsmith', name: 'RusselSmith' },
+  { slug: 'afriglobal', name: 'AfriGlobal Group' },
+  { slug: 'okeyson-motors', name: 'Okeyson Motors' },
+];
+
+const files = import.meta.glob<{ default: ImageMetadata }>('../assets/clients/*.webp', {
+  eager: true,
+});
+
+const logos = clients.map((client) => {
+  const entry = files[`../assets/clients/${client.slug}.webp`];
+  if (!entry) throw new Error(`Client logo missing: ${client.slug}.webp`);
+  return { ...client, image: entry.default };
+});
+---
+
+<section class={`clients ${className}`}>
+  <div class="container-prime">
+    <div class="clients-head reveal">
+      <span class="eyebrow">Clients</span>
+      <h2 class="clients-title">Some brands we serve</h2>
+    </div>
+  </div>
+
+  {/* The mask is what makes the marquee read as a continuous strip rather than
+      a list that happens to be sliding: logos fade out at both edges instead of
+      being chopped off by the viewport. */}
+  <div class="clients-mask reveal">
+    <div class="clients-rail">
+      <ul class="clients-track" role="list">
+        {
+          logos.map((logo) => (
+            <li class="client">
+              <Image src={logo.image} alt={logo.name} height={96} loading="lazy" decoding="async" />
+            </li>
+          ))
+        }
+      </ul>
+
+      {/* The second copy is what the loop scrolls into: a visual device only.
+          `aria-hidden` on the list is what stops the wall being announced
+          twice — that, not an empty alt, is the mechanism doing the work.
+          The images keep their real alt text anyway, so that if this attribute
+          were ever dropped the failure mode is a duplicated but readable list
+          rather than nineteen unlabelled images. */}
+      <ul class="clients-track" data-dup aria-hidden="true">
+        {
+          logos.map((logo) => (
+            <li class="client">
+              <Image src={logo.image} alt={logo.name} height={96} loading="lazy" decoding="async" />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .clients {
+    background-color: var(--color-white);
+    padding-block: 4rem;
+    overflow: clip;
+  }
+  @media (min-width: 48rem) {
+    .clients { padding-block: 5.5rem; }
+  }
+
+  .clients-head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+  .clients-title {
+    font-size: var(--text-h2);
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+    color: var(--color-ink-950);
+  }
+
+  .clients-mask { margin-top: 2.5rem; }
+
+  /* --------------------------------------------------------------- MOBILE
+     A plain wrapped grid. No marquee, no horizontal scroll: on a phone an
+     auto-scrolling strip is something the reader has to chase, and a
+     three-across grid shows every client at once instead. */
+  .clients-track {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.625rem;
+    padding-inline: 1.25rem;
+    margin: 0;
+    list-style: none;
+  }
+  .clients-track[data-dup] { display: none; }
+
+  @media (min-width: 30rem) {
+    .clients-track { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; }
+  }
+
+  .client {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.875rem 0.75rem;
+    border: 1px solid var(--color-ink-200);
+    border-radius: var(--radius-card);
+    background-color: var(--color-white);
+  }
+
+  .client :global(img) {
+    width: auto;
+    height: auto;
+    max-height: 2.25rem;
+    max-width: 100%;
+    object-fit: contain;
+    /* Mismatched brand colours side by side always fight. Muting them to near
+       grey lets the wall read as one row of clients; colour returns on hover,
+       so nothing is permanently misrepresented. */
+    filter: grayscale(1);
+    opacity: 0.62;
+    transition:
+      filter var(--duration-slow) var(--ease-prime),
+      opacity var(--duration-slow) var(--ease-prime);
+  }
+
+  /* -------------------------------------------------------------- DESKTOP
+     One rail holding two identical tracks, translated by exactly half its
+     width. At -50% the second copy sits precisely where the first started, so
+     the loop has no seam and needs no JavaScript to reset. */
+  @media (min-width: 48rem) {
+    .clients-mask {
+      position: relative;
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+      mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+    }
+
+    .clients-rail {
+      display: flex;
+      width: max-content;
+    }
+
+    .clients-track {
+      display: flex;
+      grid-template-columns: none;
+      gap: 1rem;
+      padding-inline: 0.5rem;
+    }
+    .clients-track[data-dup] { display: flex; }
+
+    .client {
+      width: 11.5rem;
+      height: 6rem;
+      flex-shrink: 0;
+      transition:
+        border-color var(--duration-base) var(--ease-prime),
+        box-shadow var(--duration-base) var(--ease-prime),
+        transform var(--duration-base) var(--ease-prime);
+    }
+
+    .client :global(img) { max-height: 2.5rem; }
+
+    @media (hover: hover) {
+      .client:hover {
+        border-color: var(--color-ink-300);
+        box-shadow: 0 10px 24px -14px rgb(8 9 11 / 0.28);
+        transform: translateY(-2px);
+      }
+      .client:hover :global(img) {
+        filter: grayscale(0);
+        opacity: 1;
+      }
+    }
+  }
+
+  /* Motion is opt-in, and it stops the moment the reader reaches for a logo. */
+  @media (min-width: 48rem) and (prefers-reduced-motion: no-preference) {
+    .clients-rail { animation: clients-marquee 64s linear infinite; }
+    .clients-mask:hover .clients-rail,
+    .clients-mask:focus-within .clients-rail { animation-play-state: paused; }
+  }
+
+  @keyframes clients-marquee {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-50%, 0, 0); }
+  }
+
+  /* With reduced motion the rail must not stay at max-content width, or it
+     would simply overflow off-screen with no way to reach the rest. It falls
+     back to the same wrapped grid the phone gets. */
+  @media (prefers-reduced-motion: reduce) {
+    .clients-mask {
+      -webkit-mask-image: none;
+      mask-image: none;
+      overflow: visible;
+    }
+    .clients-rail {
+      display: block;
+      width: auto;
+      animation: none;
+    }
+    .clients-track {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+      gap: 0.75rem;
+      padding-inline: 0;
+    }
+    .clients-track[data-dup] { display: none; }
+    .client { width: auto; height: 5.5rem; }
+  }
+</style>

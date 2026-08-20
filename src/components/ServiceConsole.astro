@@ -109,10 +109,26 @@ const tiles = [
     </div>
 
     <div class="svc-console reveal">
+      {/* The rail needs to announce itself. Without this the first service
+          reads as the only one and the other two look like decoration. */}
+      <div class="svc-rail-head">
+        <span class="svc-rail-title">Choose a service</span>
+        <span class="svc-rail-hint">
+          <Icon name="mouse-pointer-click" size={13} />
+          Hover to preview, click to open
+        </span>
+      </div>
+
+      {/* The axis the displays turn around. Opaque panels cover it at rest, so
+          what you see is the glow overhanging above and below — until a panel
+          rotates away and reveals the whole core. */}
+      <div class="svc-spine" aria-hidden="true"></div>
+
       {
         items.map((item, i) => (
           <>
             <a class="svc-row" data-svc={i + 1} href={item.href}>
+              <span class="svc-row-index">{String(i + 1).padStart(2, '0')}</span>
               <span class="svc-row-icon">
                 <Icon name={item.icon!} size={19} />
               </span>
@@ -212,7 +228,7 @@ const tiles = [
                   <svg class="svc-viz" viewBox="0 0 340 232" role="presentation" focusable="false">
                     <defs>
                       <linearGradient id="svc-area" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="#3b6fe8" stop-opacity="0.22" />
+                        <stop offset="0%" stop-color="#3b6fe8" stop-opacity="0.20" />
                         <stop offset="100%" stop-color="#3b6fe8" stop-opacity="0" />
                       </linearGradient>
                     </defs>
@@ -257,14 +273,16 @@ const tiles = [
 </section>
 
 <style>
-  /* ------------------------------------------------------------------ shell */
+  /* ------------------------------------------------------------------ shell
+     A light, quiet ground. The blue is a whisper now — it tints the top-right
+     corner and nothing more. Any stronger and it competes with the dark rail
+     and the white display, which are the two things that should be carrying
+     this section. */
   .svc {
-    /* Opens on the exact tone the spiral above closes on, then lifts to white.
-       The blue wash is the only thing announcing the change of register. */
-    background-color: var(--color-ink-50);
+    background-color: var(--color-white);
     background-image:
-      radial-gradient(52% 44% at 82% 8%, rgb(59 111 232 / 0.09) 0%, transparent 70%),
-      linear-gradient(to bottom, transparent 30%, var(--color-white) 100%);
+      radial-gradient(44% 36% at 88% 2%, rgb(59 111 232 / 0.05) 0%, transparent 72%),
+      linear-gradient(to bottom, var(--color-ink-50) 0%, var(--color-white) 52%);
     padding-block: 4rem;
   }
   @media (min-width: 48rem) {
@@ -294,24 +312,77 @@ const tiles = [
   .svc-console {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 0;
     margin-top: 2.5rem;
+  }
+
+  /* ------------------------------------------------------------- rail head
+     Slate, not black. ink-800 is the darkest step where ink-400 still clears
+     4.5:1, and the gradient's light end (ink-700) is why the row copy sits at
+     ink-300 rather than ink-400. */
+  .svc-rail-head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0 0.25rem 0.875rem;
+    margin-bottom: 0;
+  }
+  .svc-rail-title {
+    font-size: var(--text-label);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-ink-950);
+  }
+  .svc-rail-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: var(--text-small);
+    color: var(--color-ink-500);
   }
 
   /* ------------------------------------------------------------------- row */
   .svc-row {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 0.875rem;
-    padding: 1rem 1.125rem;
-    border: 1px solid var(--color-ink-200);
+    padding: 1.0625rem 1.25rem;
     border-radius: var(--radius-card) var(--radius-card) 0 0;
-    background-color: var(--color-white);
+    background-image: linear-gradient(180deg, var(--color-ink-700), var(--color-ink-800));
     text-decoration: none;
     transition:
       background-color var(--duration-base) var(--ease-prime),
-      border-color var(--duration-base) var(--ease-prime),
+      box-shadow var(--duration-base) var(--ease-prime),
+      transform var(--duration-base) var(--ease-prime),
       color var(--duration-base) var(--ease-prime);
+  }
+
+  /* The active marker. A 3px orange bar that grows into place — the clearest
+     signal available that one row of a set is the selected one. */
+  .svc-row::before {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    top: 50%;
+    height: 54%;
+    width: 3px;
+    border-radius: 999px;
+    background-color: var(--color-prime-500);
+    opacity: 0;
+    transform: translateY(-50%) scaleY(0.3);
+    transition:
+      opacity var(--duration-base) var(--ease-prime),
+      transform var(--duration-base) var(--ease-prime);
+  }
+
+  .svc-row-index {
+    flex-shrink: 0;
+    font-size: var(--text-label);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--color-ink-400);
+    transition: color var(--duration-base) var(--ease-prime);
   }
 
   .svc-row-icon {
@@ -322,8 +393,8 @@ const tiles = [
     align-items: center;
     justify-content: center;
     border-radius: 999px;
-    background-color: var(--color-data-50);
-    color: var(--color-data-600);
+    background-color: rgb(255 255 255 / 0.07);
+    color: var(--color-data-300);
     transition:
       background-color var(--duration-base) var(--ease-prime),
       color var(--duration-base) var(--ease-prime);
@@ -338,12 +409,13 @@ const tiles = [
   .svc-row-label {
     font-size: var(--text-h4);
     font-weight: 700;
-    color: var(--color-ink-950);
+    color: var(--color-ink-200);
+    transition: color var(--duration-base) var(--ease-prime);
   }
   .svc-row-desc {
     font-size: var(--text-small);
     line-height: 1.45;
-    color: var(--color-ink-600);
+    color: var(--color-ink-300);
   }
 
   .svc-row-arrow {
@@ -356,11 +428,14 @@ const tiles = [
       transform var(--duration-base) var(--ease-prime);
   }
 
+  .svc-spine { display: none; }
+
   /* ----------------------------------------------------------------- panel */
   .svc-panel {
     margin-bottom: 1rem;
   }
 
+  /* The display is light again: a white instrument panel, read at a glance. */
   .svc-screen {
     overflow: hidden;
     border: 1px solid var(--color-ink-200);
@@ -384,7 +459,6 @@ const tiles = [
     text-transform: uppercase;
     color: var(--color-ink-500);
   }
-  /* The one orange mark in the panel chrome. */
   .svc-live {
     height: 0.4375rem;
     width: 0.4375rem;
@@ -398,9 +472,8 @@ const tiles = [
     width: 100%;
     height: auto;
     padding: 0.5rem;
+    max-height: 26rem;
   }
-  /* Backstop so the drawing can never balloon on a very wide column. */
-  .svc-viz { max-height: 26rem; }
 
   /* --------------------------------------------------------- viz: shared */
   .svc-bar-label,
@@ -431,12 +504,12 @@ const tiles = [
   }
   .svc-gauge-sweep {
     fill: none;
-    stroke: var(--color-data-100);
+    stroke: var(--color-white);
     stroke-width: 5;
     stroke-linecap: round;
     stroke-dasharray: 20 calc(var(--arc) - 20);
     stroke-dashoffset: 0;
-    opacity: 0.9;
+    opacity: 0.55;
   }
   .svc-gauge-dot {
     fill: var(--color-prime-500);
@@ -508,7 +581,7 @@ const tiles = [
     stroke-linecap: round;
     stroke-dasharray: 16 999;
     stroke-dashoffset: -60;
-    opacity: 0.85;
+    opacity: 0.8;
   }
   .svc-spark-dot {
     fill: var(--color-prime-500);
@@ -529,26 +602,20 @@ const tiles = [
   .svc-tile-bar { fill: var(--color-data-200); }
   .svc-tile-bar-key { fill: var(--color-data-500); }
 
-  /* ---------------------------------------------------------------- motion
-     Four looping animations in the whole section, all of them a small dash or
-     a single circle, all on properties the compositor can take. Slow on
-     purpose: this section is the calm one.                                 */
+  /* ---------------------------------------------------------------- motion */
   @media (prefers-reduced-motion: no-preference) {
-    .svc-gauge-sweep {
-      animation: svc-arc-sweep 7s linear infinite;
-    }
+    .svc-gauge-sweep { animation: svc-arc-sweep 7s linear infinite; }
     .svc-flow-packet {
       animation: svc-packet 3.4s cubic-bezier(0.5, 0, 0.5, 1) infinite;
       animation-delay: var(--delay);
     }
-    .svc-spark-run {
-      animation: svc-spark-run 6s linear infinite;
-    }
+    .svc-spark-run { animation: svc-spark-run 6s linear infinite; }
     .svc-spark-halo {
       transform-box: fill-box;
       transform-origin: center;
       animation: svc-halo 3.2s ease-out infinite;
     }
+    .svc-spine::before { animation: svc-core 6.5s ease-in-out infinite; }
   }
 
   @keyframes svc-arc-sweep {
@@ -565,119 +632,248 @@ const tiles = [
     from { stroke-dashoffset: 0; }
     to { stroke-dashoffset: -420; }
   }
+  @keyframes svc-core {
+    0%, 100% { opacity: 0.75; }
+    50% { opacity: 1; }
+  }
   @keyframes svc-halo {
     0% { transform: scale(0.7); opacity: 0.45; }
     70% { opacity: 0; }
     100% { transform: scale(2.1); opacity: 0; }
   }
 
-  /* ============================================================== DESKTOP
-     One grid becomes two layouts. Rows go to column 1, and all three panels
-     land in the same cell of column 2, stacked on top of each other.       */
+  /* ============================================================== DESKTOP */
   @media (min-width: 64rem) {
     .svc-console {
-      /* Held well inside the container. Left to fill 80rem the preview would
-         render around 560px tall, which would tower over three 90px rows. */
-      max-width: 58rem;
-      grid-template-columns: minmax(0, 19rem) minmax(0, 1fr);
-      /* The fourth track is the trick that keeps the rows compact: the panel
-         spans every row, so without somewhere for the surplus height to go it
-         would stretch the three row tracks to a third of its height each. */
-      grid-template-rows: auto auto auto 1fr;
+      /* One step of the staircase. Each card shifts right by this much and
+         loses the same amount off its right margin, so all three keep an
+         identical width and the run reads as an even diagonal rather than
+         three cards of different sizes.
+
+         The rail column carries 2 steps of slack on top of the card width, so
+         widening the step widens the column rather than squeezing the cards:
+         card width = 29rem - 2 x 4.5rem = 20rem, unchanged since the steps
+         first appeared. The console's max-width absorbs the extra so the
+         display keeps its 35rem and the drawings are not shrunk to pay for the
+         run. At 4.5rem the first and last card still share 55% of their width,
+         which is what keeps the run reading as one group. */
+      --svc-step: 4.5rem;
+
+      /* The cylinder the displays are arranged on. */
+      --svc-persp: 1400px;
+      --svc-radius: 220px;
+      --svc-turn: 620ms;
+      --svc-spin: cubic-bezier(0.33, 0.02, 0.2, 1);
+
+      max-width: 67rem;
+      grid-template-columns: minmax(0, 29rem) minmax(0, 1fr);
+      /* head + three cards, then a filler track to absorb the display's
+         surplus height so the cards stay compact at the top. */
+      grid-template-rows: auto auto auto auto 1fr;
       column-gap: 3rem;
+      row-gap: 1rem;
       align-items: start;
       margin-top: 3.5rem;
     }
 
-    .svc-row[data-svc='1'] { grid-area: 1 / 1; }
-    .svc-row[data-svc='2'] { grid-area: 2 / 1; }
-    .svc-row[data-svc='3'] { grid-area: 3 / 1; }
-
-    .svc-row {
-      border: 0;
-      border-left: 2px solid var(--color-ink-200);
-      border-radius: 0;
-      background-color: transparent;
-      padding: 1.125rem 1rem;
+    .svc-rail-head {
+      grid-area: 1 / 1;
+      padding: 0 0.25rem 0.25rem;
     }
 
+    /* Three separate objects on a staircase, not one panel cut into thirds.
+       The offset is margin rather than transform so it costs no compositing
+       and cannot overflow the column. */
+    .svc-row[data-svc='1'] { grid-area: 2 / 1; margin-left: 0; margin-right: calc(var(--svc-step) * 2); }
+    .svc-row[data-svc='2'] { grid-area: 3 / 1; margin-left: var(--svc-step); margin-right: var(--svc-step); }
+    .svc-row[data-svc='3'] { grid-area: 4 / 1; margin-left: calc(var(--svc-step) * 2); margin-right: 0; }
+
+    .svc-row {
+      border-radius: var(--radius-card);
+      cursor: pointer;
+      /* Resting elevation. Enough to sit off the page, not enough to shout. */
+      box-shadow: 0 8px 20px -12px rgb(8 9 11 / 0.4);
+    }
+
+    /* The three displays sit on a cylinder, 120 degrees apart, turning about
+       the vertical axis marked by the spine.
+
+       `perspective()` is used as a transform FUNCTION rather than as a property
+       on the container. Every panel shares the same grid cell, so they share a
+       transform-origin, so they share a vanishing point — which is the whole
+       illusion — and the rail is left out of the 3D context entirely.
+
+       The angles are deliberately NOT normalised to +/-180. Shortest-path
+       angles would send one panel back through the front on some transitions;
+       running 0/120/240 unnormalised means every panel turns by the same delta
+       and the three move as one body. */
     .svc-panel {
       grid-column: 2;
       grid-row: 1 / -1;
       margin-bottom: 0;
+      position: relative;
+      z-index: 1;
+      /* Decorative, and a turning panel sweeps wide — it must never intercept
+         a hover meant for the rail. */
+      pointer-events: none;
+      backface-visibility: hidden;
       opacity: 0;
-      visibility: hidden;
-      transform: translate3d(0, 6px, 0);
+      --a: 120deg;
+      transform:
+        perspective(var(--svc-persp))
+        translateZ(calc(var(--svc-radius) * -1))
+        rotateY(var(--a))
+        translateZ(var(--svc-radius));
       transition:
-        opacity var(--duration-base) var(--ease-prime),
-        transform var(--duration-base) var(--ease-prime),
-        visibility 0s linear var(--duration-base);
+        transform var(--svc-turn) var(--svc-spin),
+        opacity var(--svc-turn) var(--svc-spin);
     }
 
     .svc-screen {
       border: 1px solid var(--color-ink-200);
       border-radius: var(--radius-panel);
-      box-shadow: 0 18px 44px -26px rgb(8 9 11 / 0.28);
+      box-shadow: 0 20px 48px -28px rgb(8 9 11 / 0.3);
     }
 
-    /* Resting state: the first service is the one on show. */
-    .svc-panel[data-svc='1'] {
-      opacity: 1;
-      visibility: visible;
-      transform: none;
-      transition-delay: 0s;
+    /* --- the axis ---
+       Sits in the same cell as the displays, centred, one layer below them.
+       The negative block margin is what makes it read as a core running
+       THROUGH the stack rather than a line tucked behind it: the panels are
+       opaque, so the only part visible at rest is the overhang above and
+       below. When a panel turns away, the whole rod is revealed. */
+    .svc-spine {
+      display: block;
+      grid-column: 2;
+      grid-row: 1 / -1;
+      position: relative;
+      z-index: 0;
+      justify-self: center;
+      align-self: stretch;
+      width: 2px;
+      margin-block: -2.25rem;
+      border-radius: 999px;
+      pointer-events: none;
+      background-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgb(255 112 0 / 0.45) 15%,
+        rgb(255 143 56 / 0.85) 50%,
+        rgb(255 112 0 / 0.45) 85%,
+        transparent 100%
+      );
     }
+
+    /* The bloom. A horizontal wash masked back at both ends, which is cheaper
+       and far crisper than a blur filter on a full-height element. */
+    .svc-spine::before {
+      content: '';
+      position: absolute;
+      inset-block: 0;
+      left: 50%;
+      width: 15rem;
+      transform: translateX(-50%);
+      background-image: linear-gradient(
+        to right,
+        transparent,
+        rgb(255 112 0 / 0.16) 42%,
+        rgb(255 138 40 / 0.2) 50%,
+        rgb(255 112 0 / 0.16) 58%,
+        transparent
+      );
+      -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent);
+      mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent);
+    }
+
+    /* --- resting state: service one faces the front --- */
+    .svc-panel[data-svc='1'] { --a: 0deg; opacity: 1; }
+    .svc-panel[data-svc='2'] { --a: 120deg; }
+    .svc-panel[data-svc='3'] { --a: 240deg; }
     .svc-row[data-svc='1'] {
-      border-left-color: var(--color-prime-500);
-      background-color: var(--color-white);
+      background-color: rgb(255 255 255 / 0.07);
+      transform: translateY(-2px);
+      box-shadow:
+        0 0 0 1px rgb(255 112 0 / 0.45),
+        0 18px 34px -16px rgb(8 9 11 / 0.5);
     }
+    .svc-row[data-svc='1']::before { opacity: 1; transform: translateY(-50%) scaleY(1); }
+    .svc-row[data-svc='1'] .svc-row-label { color: var(--color-white); }
+    .svc-row[data-svc='1'] .svc-row-index { color: var(--color-prime-400); }
     .svc-row[data-svc='1'] .svc-row-icon {
-      background-color: var(--color-prime-50);
-      color: var(--color-prime-700);
+      background-color: rgb(255 112 0 / 0.18);
+      color: var(--color-prime-300);
     }
+    .svc-row[data-svc='1'] .svc-row-arrow { color: var(--color-prime-300); }
 
-    /* Pointing at any row hands control to that row. `:has()` is what makes
-       this work in both directions — a plain sibling combinator could not
-       reach back to switch the first panel off. */
-    .svc-console:has(.svc-row:is(:hover, :focus-visible)) .svc-panel {
-      opacity: 0;
-      visibility: hidden;
-      transform: translate3d(0, 6px, 0);
-    }
+    /* --- pointing at any row hands control to that row --- */
     .svc-console:has(.svc-row:is(:hover, :focus-visible)) .svc-row[data-svc='1'] {
-      border-left-color: var(--color-ink-200);
       background-color: transparent;
+      transform: none;
+      box-shadow: 0 8px 20px -12px rgb(8 9 11 / 0.4);
+    }
+    .svc-console:has(.svc-row:is(:hover, :focus-visible)) .svc-row[data-svc='1']::before {
+      opacity: 0;
+      transform: translateY(-50%) scaleY(0.3);
+    }
+    .svc-console:has(.svc-row:is(:hover, :focus-visible)) .svc-row[data-svc='1'] .svc-row-label {
+      color: var(--color-ink-200);
+    }
+    .svc-console:has(.svc-row:is(:hover, :focus-visible)) .svc-row[data-svc='1'] .svc-row-index {
+      color: var(--color-ink-400);
     }
     .svc-console:has(.svc-row:is(:hover, :focus-visible)) .svc-row[data-svc='1'] .svc-row-icon {
-      background-color: var(--color-data-50);
-      color: var(--color-data-600);
+      background-color: rgb(255 255 255 / 0.07);
+      color: var(--color-data-300);
+    }
+    .svc-console:has(.svc-row:is(:hover, :focus-visible)) .svc-row[data-svc='1'] .svc-row-arrow {
+      color: var(--color-ink-400);
     }
 
+    /* Whichever row is pointed at, its display turns to the front. */
     .svc-console:has(.svc-row[data-svc='1']:is(:hover, :focus-visible)) .svc-panel[data-svc='1'],
     .svc-console:has(.svc-row[data-svc='2']:is(:hover, :focus-visible)) .svc-panel[data-svc='2'],
     .svc-console:has(.svc-row[data-svc='3']:is(:hover, :focus-visible)) .svc-panel[data-svc='3'] {
+      --a: 0deg;
       opacity: 1;
-      visibility: visible;
-      transform: none;
-      transition-delay: 0s;
+    }
+    /* ...and the other two carry on round the cylinder. */
+    .svc-console:has(.svc-row[data-svc='1']:is(:hover, :focus-visible)) .svc-panel[data-svc='2'] { --a: 120deg; opacity: 0; }
+    .svc-console:has(.svc-row[data-svc='1']:is(:hover, :focus-visible)) .svc-panel[data-svc='3'] { --a: 240deg; opacity: 0; }
+    .svc-console:has(.svc-row[data-svc='2']:is(:hover, :focus-visible)) .svc-panel[data-svc='1'] { --a: -120deg; opacity: 0; }
+    .svc-console:has(.svc-row[data-svc='2']:is(:hover, :focus-visible)) .svc-panel[data-svc='3'] { --a: 120deg; opacity: 0; }
+    .svc-console:has(.svc-row[data-svc='3']:is(:hover, :focus-visible)) .svc-panel[data-svc='1'] { --a: -240deg; opacity: 0; }
+    .svc-console:has(.svc-row[data-svc='3']:is(:hover, :focus-visible)) .svc-panel[data-svc='2'] { --a: -120deg; opacity: 0; }
+
+    /* No cylinder for anyone who asked for less movement: the displays simply
+       cross-fade in place. */
+    @media (prefers-reduced-motion: reduce) {
+      .svc-panel { transform: none; }
     }
 
     .svc-row:is(:hover, :focus-visible) {
-      border-left-color: var(--color-prime-500);
-      background-color: var(--color-white);
+      background-color: rgb(255 255 255 / 0.07);
+      transform: translateY(-2px);
+      box-shadow:
+        0 0 0 1px rgb(255 112 0 / 0.45),
+        0 18px 34px -16px rgb(8 9 11 / 0.5);
     }
+    .svc-row:is(:hover, :focus-visible)::before {
+      opacity: 1;
+      transform: translateY(-50%) scaleY(1);
+    }
+    .svc-row:is(:hover, :focus-visible) .svc-row-label { color: var(--color-white); }
+    .svc-row:is(:hover, :focus-visible) .svc-row-index { color: var(--color-prime-400); }
     .svc-row:is(:hover, :focus-visible) .svc-row-icon {
-      background-color: var(--color-prime-50);
-      color: var(--color-prime-700);
+      background-color: rgb(255 112 0 / 0.18);
+      color: var(--color-prime-300);
     }
     .svc-row:is(:hover, :focus-visible) .svc-row-arrow {
-      color: var(--color-prime-700);
+      color: var(--color-prime-300);
       transform: translateX(3px);
     }
   }
 
-  /* Touch and small screens have no hover, so every panel is simply open. */
-  @media (hover: hover) and (min-width: 64rem) {
-    .svc-row { cursor: pointer; }
+  /* The hint is about hovering, so it only belongs where hovering exists. */
+  @media (max-width: 63.999rem) {
+    .svc-rail-hint { display: none; }
   }
 </style>
