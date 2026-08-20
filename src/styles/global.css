@@ -61,6 +61,27 @@
   --color-amber-400: #ffab2e;
   --color-amber-300: #ffc46b;
 
+  /* --- Data blue: the analytics/telematics register ----------------------
+     NEW to the palette. Everything else here carries the brand (orange) or
+     does structural work (ink). Blue exists for one job: the software and
+     data surfaces, where charts, flows and readouts need a hue that reads as
+     instrumentation rather than as branding. It never competes with orange —
+     orange stays the anchor accent and marks what is selected or live.
+
+     CONTRAST: 700 is the only step safe as small text on light (8.9:1 on
+     white). 500 is the chart/stroke colour, 600 the UI/large-text step.       */
+  --color-data-950: #101d3d;
+  --color-data-900: #182f63;
+  --color-data-800: #1a3a80;
+  --color-data-700: #1d449e;   /* 8.9:1 on white — blue text and links */
+  --color-data-600: #2456c9;   /* 6.5:1 on white — large text / UI */
+  --color-data-500: #3b6fe8;   /* chart strokes, data marks */
+  --color-data-400: #6390fb;
+  --color-data-300: #93b4ff;
+  --color-data-200: #bcd2ff;
+  --color-data-100: #dbe7ff;
+  --color-data-50: #eef4ff;
+
   /* --- Signal red: live indicators and genuine alerts ONLY ---------------
      500 is the live stylesheet's red. Non-text on light surfaces.          */
   --color-signal-700: #b82a0e;   /* 5.9:1 on white — the only red safe as text */

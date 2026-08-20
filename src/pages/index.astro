@@ -2,8 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Section from '../components/Section.astro';
 import SectionHeader from '../components/SectionHeader.astro';
-import ProductCard from '../components/ProductCard.astro';
 import ProductSpiral from '../components/ProductSpiral.astro';
+import ServiceConsole from '../components/ServiceConsole.astro';
 import StatBand from '../components/StatBand.astro';
 import Button from '../components/Button.astro';
 import Icon from '../components/Icon.astro';
@@ -12,7 +12,6 @@ import HeroMap from '../components/HeroMap.astro';
 import MediaPlaceholder from '../components/MediaPlaceholder.astro';
 import { Image } from 'astro:assets';
 import { media } from '../data/media.ts';
-import { products, services } from '../data/navigation.ts';
 import { company, descriptors, credentials, certificatesPdf } from '../data/company.ts';
 
 /**
@@ -187,36 +186,13 @@ const description =
        there when they get there. Motion starts below the fold. -->
   <ProductSpiral id="products" />
 
-  <!-- ================= SERVICES ================= -->
-  <Section tone="tinted" id="services">
-    <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-      <SectionHeader
-        class="reveal"
-        eyebrow="Services"
-        title="The intelligence layer on top of the hardware"
-        lead="Trackers collect the data. These services turn it into decisions your operation can act on."
-      />
-      <Button href="/fleet-analytics/" variant="secondary" class="reveal shrink-0">
-        Explore fleet analytics
-        <Icon name="arrow-right" size={16} />
-      </Button>
-    </div>
-
-    <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4" data-reveal-stagger="70">
-      {
-        services.map((service) => (
-          <ProductCard
-            href={service.href}
-            label={service.label}
-            descriptor={service.descriptor}
-            icon={service.icon!}
-            external={service.external}
-            class="reveal"
-          />
-        ))
-      }
-    </div>
-  </Section>
+  <!-- ================= SERVICES =================
+       The three software services, as an interactive console. Runs cooler and
+       flatter than the spiral above on purpose; see the note in the component.
+       The standalone "Explore fleet analytics" button that used to sit beside
+       the heading is gone: Fleet Analytics is now one of the three rows, so the
+       button was a second link to the same page. -->
+  <ServiceConsole id="services" />
 
   <!-- ================= WHY PRIMETRACK ================= -->
   <Section tone="dark">

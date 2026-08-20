@@ -1,0 +1,683 @@
+---
+/**
+ * Homepage services section — an interactive console for the three software
+ * services that sit on top of the tracking hardware.
+ *
+ * REGISTER
+ * This section deliberately runs cooler and flatter than the product spiral
+ * above it. The spiral is warm, dimensional and scroll-driven; this is cool,
+ * flat and pointer-driven. Nothing here rotates, nothing is scroll-linked, and
+ * the only colour carrying the "data" idea is the new blue scale. Orange stays
+ * the anchor: it marks the selected row and the single live point in each
+ * visual, and nothing else.
+ *
+ * INTERACTION (desktop)
+ * Three rows on the left, one preview stage on the right. Hovering or
+ * keyboard-focusing a row swaps the preview. This is done with `:has()` on the
+ * container, so there is no JavaScript at all. If a browser lacks `:has()` the
+ * first preview simply stays put and every row is still a working link — the
+ * failure mode is "less interactive", never "broken".
+ *
+ * LAYOUT
+ * Rows and panels are FLAT SIBLINGS of one grid, not row/panel pairs inside
+ * wrappers. That is what lets one CSS grid produce both layouts: on mobile the
+ * natural DOM order (row, its panel, next row…) stacks into cards, and on
+ * desktop explicit grid placement puts every row in column 1 and stacks all
+ * three panels in the same cell of column 2. Same markup, same previews, two
+ * genuinely different layouts — the mobile version is not the desktop one
+ * shrunk.
+ *
+ * THE PREVIEWS ARE ILLUSTRATIVE
+ * They are mock interface, not customer data, and not a claim about PrimeTrack's
+ * numbers. The labels are all real capability names taken from the content
+ * inventory (harsh braking, overspeed, cornering, ERP…), but the gauge value
+ * and chart shapes are drawn, not measured. Every panel is aria-hidden so a
+ * screen reader is never read a figure the company has not published, and the
+ * meaning of each service lives in the row text instead.
+ */
+import Icon from './Icon.astro';
+import { services } from '../data/navigation.ts';
+
+interface Props {
+  id?: string;
+}
+const { id } = Astro.props;
+
+/* The three internal services. vRAS is a Rwanda property and an open question
+   for the client (see navigation.ts) — it stays in the header menu, but it is
+   not one of the three services this section is about. */
+const items = services.filter((service) => !service.external);
+
+/* Gauge geometry, computed once so the arc and its overlay cannot drift.
+   220° sweep, opening at the bottom. */
+const CX = 170;
+const CY = 138;
+const R = 78;
+const SWEEP = 220;
+const START = 160;
+const pt = (deg: number) => [
+  (CX + R * Math.cos((deg * Math.PI) / 180)).toFixed(1),
+  (CY + R * Math.sin((deg * Math.PI) / 180)).toFixed(1),
+];
+const [x1, y1] = pt(START);
+const [x2, y2] = pt(START + SWEEP);
+const ARC = `M ${x1} ${y1} A ${R} ${R} 0 1 1 ${x2} ${y2}`;
+const ARC_LEN = (2 * Math.PI * R * SWEEP) / 360;
+/* Where the gauge needle sits. A drawn value, not a measured one. */
+const SCORE = 86;
+const ARC_FILLED = ARC_LEN * (1 - SCORE / 100);
+const [dotX, dotY] = pt(START + SWEEP * (SCORE / 100));
+
+/* Driver-monitoring sub-metrics. The names are real capabilities; the bar
+   lengths are illustrative. */
+const behaviours = [
+  { label: 'Harsh braking', width: 34 },
+  { label: 'Overspeed', width: 21 },
+  { label: 'Cornering', width: 47 },
+];
+
+/* API endpoints — generic system categories, not named products. */
+const endpoints = [
+  { label: 'ERP', y: 40 },
+  { label: 'Fleet ops', y: 101 },
+  { label: 'Billing', y: 162 },
+];
+
+const flows = endpoints.map(
+  (endpoint, i) => `M 122 101 C 168 101, 180 ${endpoint.y}, 226 ${endpoint.y}`,
+);
+
+/* Analytics sparkline. Drawn shape, not plotted data. */
+const SPARK =
+  'M 22 94 C 52 90, 66 64, 96 68 S 136 42, 164 54 S 202 32, 232 40 S 280 24, 312 30';
+
+const tiles = [
+  { label: 'Utilisation', bars: [10, 16, 13, 22] },
+  { label: 'Idle time', bars: [20, 14, 17, 9] },
+  { label: 'Distance', bars: [12, 18, 15, 23] },
+];
+---
+
+<section id={id} class="svc">
+  <div class="container-prime">
+    <div class="svc-head reveal">
+      <span class="eyebrow">Services</span>
+      <h2 class="svc-title">The intelligence layer on top of the hardware</h2>
+      <p class="svc-lead">
+        Trackers collect the data. These services turn it into decisions your operation can act on.
+      </p>
+    </div>
+
+    <div class="svc-console reveal">
+      {
+        items.map((item, i) => (
+          <>
+            <a class="svc-row" data-svc={i + 1} href={item.href}>
+              <span class="svc-row-icon">
+                <Icon name={item.icon!} size={19} />
+              </span>
+              <span class="svc-row-text">
+                <span class="svc-row-label">{item.label}</span>
+                <span class="svc-row-desc">{item.descriptor}</span>
+              </span>
+              <span class="svc-row-arrow">
+                <Icon name="arrow-right" size={16} />
+              </span>
+            </a>
+
+            <div class="svc-panel" data-svc={i + 1} aria-hidden="true">
+              <div class="svc-screen">
+                <div class="svc-screen-bar">
+                  <span class="svc-live" />
+                  <span class="svc-screen-title">{item.label}</span>
+                </div>
+
+                {/* ---------- 1. Driver Monitoring: score gauge ---------- */}
+                {i === 0 && (
+                  <svg class="svc-viz" viewBox="0 0 340 232" role="presentation" focusable="false">
+                    <path d={ARC} class="svc-gauge-track" />
+                    <path
+                      d={ARC}
+                      class="svc-gauge-value"
+                      style={`--arc:${ARC_LEN.toFixed(1)}; --arc-offset:${ARC_FILLED.toFixed(1)}`}
+                    />
+                    {/* Radar-style sweep: a short bright dash running the arc.
+                        It moves without implying the reading changed. */}
+                    <path
+                      d={ARC}
+                      class="svc-gauge-sweep"
+                      style={`--arc:${ARC_LEN.toFixed(1)}`}
+                    />
+                    <circle cx={dotX} cy={dotY} r="6.5" class="svc-gauge-dot" />
+
+                    <text x={CX} y={CY - 4} class="svc-gauge-score">{SCORE}</text>
+                    <text x={CX} y={CY + 20} class="svc-gauge-cap">Driver score</text>
+
+                    {behaviours.map((behaviour, b) => (
+                      <>
+                        <text x="22" y={186 + b * 20} class="svc-bar-label">
+                          {behaviour.label}
+                        </text>
+                        <rect x="150" y={178 + b * 20} width="168" height="6" rx="3" class="svc-bar-track" />
+                        <rect
+                          x="150"
+                          y={178 + b * 20}
+                          width={behaviour.width * 1.68}
+                          height="6"
+                          rx="3"
+                          class="svc-bar-fill"
+                        />
+                      </>
+                    ))}
+                  </svg>
+                )}
+
+                {/* ---------- 2. API Integration: data-flow diagram ---------- */}
+                {i === 1 && (
+                  <svg class="svc-viz" viewBox="0 0 340 232" role="presentation" focusable="false">
+                    {flows.map((d, f) => (
+                      <>
+                        <path d={d} class="svc-flow-track" />
+                        <path d={d} class="svc-flow-packet" style={`--delay:${-f * 1.6}s`} />
+                      </>
+                    ))}
+
+                    <rect x="14" y="79" width="108" height="44" rx="12" class="svc-node-source" />
+                    <text x="68" y="106" class="svc-node-label svc-node-label-source">
+                      PrimeTrack
+                    </text>
+
+                    {endpoints.map((endpoint) => (
+                      <>
+                        <rect
+                          x="226"
+                          y={endpoint.y - 21}
+                          width="100"
+                          height="42"
+                          rx="12"
+                          class="svc-node-target"
+                        />
+                        <text x="276" y={endpoint.y + 5} class="svc-node-label">
+                          {endpoint.label}
+                        </text>
+                      </>
+                    ))}
+
+                    <text x="14" y="212" class="svc-bar-label">REST API · webhooks</text>
+                  </svg>
+                )}
+
+                {/* ---------- 3. Fleet Analytics: chart + metric tiles ---------- */}
+                {i === 2 && (
+                  <svg class="svc-viz" viewBox="0 0 340 232" role="presentation" focusable="false">
+                    <defs>
+                      <linearGradient id="svc-area" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#3b6fe8" stop-opacity="0.22" />
+                        <stop offset="100%" stop-color="#3b6fe8" stop-opacity="0" />
+                      </linearGradient>
+                    </defs>
+
+                    {[38, 66, 94].map((y) => (
+                      <line x1="22" y1={y} x2="318" y2={y} class="svc-grid-line" />
+                    ))}
+
+                    <path d={`${SPARK} L 312 108 L 22 108 Z`} fill="url(#svc-area)" />
+                    <path d={SPARK} class="svc-spark" />
+                    <path d={SPARK} class="svc-spark-run" />
+                    <circle cx="312" cy="30" r="10" class="svc-spark-halo" />
+                    <circle cx="312" cy="30" r="5" class="svc-spark-dot" />
+
+                    {tiles.map((tile, t) => (
+                      <>
+                        <rect x={22 + t * 101} y="134" width="94" height="76" rx="12" class="svc-tile" />
+                        <text x={34 + t * 101} y="154" class="svc-tile-label">
+                          {tile.label}
+                        </text>
+                        {tile.bars.map((h, b) => (
+                          <rect
+                            x={34 + t * 101 + b * 18}
+                            y={196 - h}
+                            width="10"
+                            height={h}
+                            rx="3"
+                            class={b === tile.bars.length - 1 ? 'svc-tile-bar-key' : 'svc-tile-bar'}
+                          />
+                        ))}
+                      </>
+                    ))}
+                  </svg>
+                )}
+              </div>
+            </div>
+          </>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ------------------------------------------------------------------ shell */
+  .svc {
+    /* Opens on the exact tone the spiral above closes on, then lifts to white.
+       The blue wash is the only thing announcing the change of register. */
+    background-color: var(--color-ink-50);
+    background-image:
+      radial-gradient(52% 44% at 82% 8%, rgb(59 111 232 / 0.09) 0%, transparent 70%),
+      linear-gradient(to bottom, transparent 30%, var(--color-white) 100%);
+    padding-block: 4rem;
+  }
+  @media (min-width: 48rem) {
+    .svc { padding-block: 6rem; }
+  }
+
+  .svc-head {
+    display: flex;
+    max-width: 46rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .svc-title {
+    font-size: var(--text-h2);
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+    color: var(--color-ink-950);
+  }
+  .svc-lead {
+    font-size: var(--text-lead);
+    line-height: 1.6;
+    color: var(--color-ink-600);
+    text-wrap: pretty;
+  }
+
+  /* ------------------------------------------------------------------ grid */
+  .svc-console {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    margin-top: 2.5rem;
+  }
+
+  /* ------------------------------------------------------------------- row */
+  .svc-row {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 1rem 1.125rem;
+    border: 1px solid var(--color-ink-200);
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+    background-color: var(--color-white);
+    text-decoration: none;
+    transition:
+      background-color var(--duration-base) var(--ease-prime),
+      border-color var(--duration-base) var(--ease-prime),
+      color var(--duration-base) var(--ease-prime);
+  }
+
+  .svc-row-icon {
+    display: flex;
+    height: 2.375rem;
+    width: 2.375rem;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background-color: var(--color-data-50);
+    color: var(--color-data-600);
+    transition:
+      background-color var(--duration-base) var(--ease-prime),
+      color var(--duration-base) var(--ease-prime);
+  }
+
+  .svc-row-text {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+  .svc-row-label {
+    font-size: var(--text-h4);
+    font-weight: 700;
+    color: var(--color-ink-950);
+  }
+  .svc-row-desc {
+    font-size: var(--text-small);
+    line-height: 1.45;
+    color: var(--color-ink-600);
+  }
+
+  .svc-row-arrow {
+    margin-left: auto;
+    display: flex;
+    flex-shrink: 0;
+    color: var(--color-ink-400);
+    transition:
+      color var(--duration-base) var(--ease-prime),
+      transform var(--duration-base) var(--ease-prime);
+  }
+
+  /* ----------------------------------------------------------------- panel */
+  .svc-panel {
+    margin-bottom: 1rem;
+  }
+
+  .svc-screen {
+    overflow: hidden;
+    border: 1px solid var(--color-ink-200);
+    border-top: 0;
+    border-radius: 0 0 var(--radius-card) var(--radius-card);
+    background-color: var(--color-white);
+  }
+
+  .svc-screen-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--color-ink-100);
+    background-color: var(--color-ink-50);
+    padding: 0.625rem 1rem;
+  }
+  .svc-screen-title {
+    font-size: var(--text-label);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-ink-500);
+  }
+  /* The one orange mark in the panel chrome. */
+  .svc-live {
+    height: 0.4375rem;
+    width: 0.4375rem;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background-color: var(--color-prime-500);
+  }
+
+  .svc-viz {
+    display: block;
+    width: 100%;
+    height: auto;
+    padding: 0.5rem;
+  }
+  /* Backstop so the drawing can never balloon on a very wide column. */
+  .svc-viz { max-height: 26rem; }
+
+  /* --------------------------------------------------------- viz: shared */
+  .svc-bar-label,
+  .svc-tile-label,
+  .svc-node-label,
+  .svc-gauge-cap {
+    font-family: var(--font-sans);
+    fill: var(--color-ink-500);
+    font-size: 11px;
+  }
+  .svc-bar-track { fill: var(--color-ink-100); }
+  .svc-bar-fill { fill: var(--color-data-500); }
+
+  /* ---------------------------------------------------------- viz: gauge */
+  .svc-gauge-track {
+    fill: none;
+    stroke: var(--color-ink-100);
+    stroke-width: 13;
+    stroke-linecap: round;
+  }
+  .svc-gauge-value {
+    fill: none;
+    stroke: var(--color-data-500);
+    stroke-width: 13;
+    stroke-linecap: round;
+    stroke-dasharray: var(--arc);
+    stroke-dashoffset: var(--arc-offset);
+  }
+  .svc-gauge-sweep {
+    fill: none;
+    stroke: var(--color-data-100);
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-dasharray: 20 calc(var(--arc) - 20);
+    stroke-dashoffset: 0;
+    opacity: 0.9;
+  }
+  .svc-gauge-dot {
+    fill: var(--color-prime-500);
+    stroke: var(--color-white);
+    stroke-width: 3;
+  }
+  .svc-gauge-score {
+    font-family: var(--font-display);
+    font-size: 40px;
+    font-weight: 700;
+    fill: var(--color-ink-950);
+    text-anchor: middle;
+  }
+  .svc-gauge-cap {
+    text-anchor: middle;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-size: 10px;
+  }
+
+  /* ----------------------------------------------------------- viz: flow */
+  .svc-flow-track {
+    fill: none;
+    stroke: var(--color-data-200);
+    stroke-width: 1.5;
+  }
+  .svc-flow-packet {
+    fill: none;
+    stroke: var(--color-data-500);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 5 999;
+    stroke-dashoffset: -40;
+  }
+  .svc-node-source {
+    fill: var(--color-prime-50);
+    stroke: var(--color-prime-500);
+    stroke-width: 1.5;
+  }
+  .svc-node-target {
+    fill: var(--color-data-50);
+    stroke: var(--color-data-300);
+    stroke-width: 1.5;
+  }
+  .svc-node-label {
+    text-anchor: middle;
+    font-weight: 700;
+    fill: var(--color-data-700);
+  }
+  .svc-node-label-source { fill: var(--color-prime-700); }
+
+  /* ------------------------------------------------------ viz: analytics */
+  .svc-grid-line {
+    stroke: var(--color-ink-100);
+    stroke-width: 1;
+    stroke-dasharray: 3 5;
+  }
+  .svc-spark {
+    fill: none;
+    stroke: var(--color-data-500);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .svc-spark-run {
+    fill: none;
+    stroke: var(--color-white);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 16 999;
+    stroke-dashoffset: -60;
+    opacity: 0.85;
+  }
+  .svc-spark-dot {
+    fill: var(--color-prime-500);
+    stroke: var(--color-white);
+    stroke-width: 2.5;
+  }
+  .svc-spark-halo {
+    fill: none;
+    stroke: var(--color-prime-500);
+    stroke-width: 1.5;
+    opacity: 0.28;
+  }
+  .svc-tile {
+    fill: var(--color-ink-50);
+    stroke: var(--color-ink-100);
+    stroke-width: 1;
+  }
+  .svc-tile-bar { fill: var(--color-data-200); }
+  .svc-tile-bar-key { fill: var(--color-data-500); }
+
+  /* ---------------------------------------------------------------- motion
+     Four looping animations in the whole section, all of them a small dash or
+     a single circle, all on properties the compositor can take. Slow on
+     purpose: this section is the calm one.                                 */
+  @media (prefers-reduced-motion: no-preference) {
+    .svc-gauge-sweep {
+      animation: svc-arc-sweep 7s linear infinite;
+    }
+    .svc-flow-packet {
+      animation: svc-packet 3.4s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+      animation-delay: var(--delay);
+    }
+    .svc-spark-run {
+      animation: svc-spark-run 6s linear infinite;
+    }
+    .svc-spark-halo {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: svc-halo 3.2s ease-out infinite;
+    }
+  }
+
+  @keyframes svc-arc-sweep {
+    from { stroke-dashoffset: 0; }
+    to { stroke-dashoffset: calc(var(--arc) * -1); }
+  }
+  @keyframes svc-packet {
+    from { stroke-dashoffset: 0; opacity: 0; }
+    12% { opacity: 1; }
+    88% { opacity: 1; }
+    to { stroke-dashoffset: -175; opacity: 0; }
+  }
+  @keyframes svc-spark-run {
+    from { stroke-dashoffset: 0; }
+    to { stroke-dashoffset: -420; }
+  }
+  @keyframes svc-halo {
+    0% { transform: scale(0.7); opacity: 0.45; }
+    70% { opacity: 0; }
+    100% { transform: scale(2.1); opacity: 0; }
+  }
+
+  /* ============================================================== DESKTOP
+     One grid becomes two layouts. Rows go to column 1, and all three panels
+     land in the same cell of column 2, stacked on top of each other.       */
+  @media (min-width: 64rem) {
+    .svc-console {
+      /* Held well inside the container. Left to fill 80rem the preview would
+         render around 560px tall, which would tower over three 90px rows. */
+      max-width: 58rem;
+      grid-template-columns: minmax(0, 19rem) minmax(0, 1fr);
+      /* The fourth track is the trick that keeps the rows compact: the panel
+         spans every row, so without somewhere for the surplus height to go it
+         would stretch the three row tracks to a third of its height each. */
+      grid-template-rows: auto auto auto 1fr;
+      column-gap: 3rem;
+      align-items: start;
+      margin-top: 3.5rem;
+    }
+
+    .svc-row[data-svc='1'] { grid-area: 1 / 1; }
+    .svc-row[data-svc='2'] { grid-area: 2 / 1; }
+    .svc-row[data-svc='3'] { grid-area: 3 / 1; }
+
+    .svc-row {
+      border: 0;
+      border-left: 2px solid var(--color-ink-200);
+      border-radius: 0;
+      background-color: transparent;
+      padding: 1.125rem 1rem;
+    }
+
+    .svc-panel {
+      grid-column: 2;
+      grid-row: 1 / -1;
+      margin-bottom: 0;
+      opacity: 0;
+      visibility: hidden;
+      transform: translate3d(0, 6px, 0);
+      transition:
+        opacity var(--duration-base) var(--ease-prime),
+        transform var(--duration-base) var(--ease-prime),
+        visibility 0s linear var(--duration-base);
+    }
+
+    .svc-screen {
+      border: 1px solid var(--color-ink-200);
+      border-radius: var(--radius-panel);
+      box-shadow: 0 18px 44px -26px rgb(8 9 11 / 0.28);
+    }
+
+    /* Resting state: the first service is the one on show. */
+    .svc-panel[data-svc='1'] {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      transition-delay: 0s;
+    }
+    .svc-row[data-svc='1'] {
+      border-left-color: var(--color-prime-500);
+      background-color: var(--color-white);
+    }
+    .svc-row[data-svc='1'] .svc-row-icon {
+      background-color: var(--color-prime-50);
+      color: var(--color-prime-700);
+    }
+
+    /* Pointing at any row hands control to that row. `:has()` is what makes
+       this work in both directions — a plain sibling combinator could not
+       reach back to switch the first panel off. */
+    .svc-console:has(.svc-row:is(:hover, :focus-visible)) .svc-panel {
+      opacity: 0;
+      visibility: hidden;
+      transform: translate3d(0, 6px, 0);
+    }
+    .svc-console:has(.svc-row:is(:hover, :focus-visible)) .svc-row[data-svc='1'] {
+      border-left-color: var(--color-ink-200);
+      background-color: transparent;
+    }
+    .svc-console:has(.svc-row:is(:hover, :focus-visible)) .svc-row[data-svc='1'] .svc-row-icon {
+      background-color: var(--color-data-50);
+      color: var(--color-data-600);
+    }
+
+    .svc-console:has(.svc-row[data-svc='1']:is(:hover, :focus-visible)) .svc-panel[data-svc='1'],
+    .svc-console:has(.svc-row[data-svc='2']:is(:hover, :focus-visible)) .svc-panel[data-svc='2'],
+    .svc-console:has(.svc-row[data-svc='3']:is(:hover, :focus-visible)) .svc-panel[data-svc='3'] {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      transition-delay: 0s;
+    }
+
+    .svc-row:is(:hover, :focus-visible) {
+      border-left-color: var(--color-prime-500);
+      background-color: var(--color-white);
+    }
+    .svc-row:is(:hover, :focus-visible) .svc-row-icon {
+      background-color: var(--color-prime-50);
+      color: var(--color-prime-700);
+    }
+    .svc-row:is(:hover, :focus-visible) .svc-row-arrow {
+      color: var(--color-prime-700);
+      transform: translateX(3px);
+    }
+  }
+
+  /* Touch and small screens have no hover, so every panel is simply open. */
+  @media (hover: hover) and (min-width: 64rem) {
+    .svc-row { cursor: pointer; }
+  }
+</style>

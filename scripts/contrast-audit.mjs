@@ -59,6 +59,13 @@ const PAIRS = [
   ['prime-300', 'ink-900', 4.5, 'placeholder label on dark'],
   ['prime-600', 'ink-50', 3.0, 'orange icon on tinted'],
 
+  ['data-700', 'white', 4.5, 'blue text/link on white'],
+  ['data-700', 'ink-50', 4.5, 'blue text on tinted'],
+  ['data-600', 'white', 3.0, 'blue large text / UI on white'],
+  ['data-500', 'white', 3.0, 'chart stroke on white'],
+  ['data-600', 'data-50', 3.0, 'blue icon in blue chip'],
+  ['data-500', 'ink-950', 3.0, 'blue UI on dark'],
+
 
   ['signal-700', 'white', 4.5, 'red text on white'],
   ['signal-500', 'ink-950', 3.0, 'live dot on dark'],
