@@ -78,7 +78,7 @@ const endpoints = [
 ];
 
 const flows = endpoints.map(
-  (endpoint, i) => `M 122 101 C 168 101, 180 ${endpoint.y}, 226 ${endpoint.y}`,
+  (endpoint) => `M 122 101 C 168 101, 180 ${endpoint.y}, 226 ${endpoint.y}`,
 );
 
 /* Analytics sparkline. Drawn shape, not plotted data. */
@@ -290,7 +290,12 @@ const tiles = [
   /* ------------------------------------------------------------------ shell */
   .svc {
     --svc-arc-pitch: 50deg;   /* angular pitch between adjacent displays */
-    --svc-radius: 620px;      /* chord-matched to the 33rem display: 524px */
+    /* Stage width drives the radius, so the panels stay chords of the cylinder
+       at every breakpoint instead of only at the one it was tuned on:
+           R = W / (2 sin(pitch/2)) = W / 0.8452 = W x 1.1832  (at 50deg)
+       Widen --svc-stage-w and the geometry follows on its own. */
+    --svc-stage-w: 33rem;
+    --svc-radius: calc(var(--svc-stage-w) * 1.1832);
     --svc-persp: 1200px;      /* short lens on purpose — the turn must read */
     --svc-scroll-per-item: 78vh;
 
@@ -715,7 +720,7 @@ const tiles = [
       display: grid;
       /* Rail and stage pushed well apart: the brief asked for the two halves
          to breathe, so the gutter is 5rem rather than the 3rem it was. */
-      grid-template-columns: minmax(0, 26rem) minmax(0, 33rem);
+      grid-template-columns: minmax(0, 26rem) minmax(0, var(--svc-stage-w));
       column-gap: 7rem;
       justify-content: center;
       align-items: center;
@@ -725,7 +730,13 @@ const tiles = [
       .svc-layout { column-gap: 8rem; }
     }
     @media (min-width: 90rem) {
-      .svc-layout { column-gap: 9rem; }
+      .svc {
+        --svc-stage-w: 38rem;   /* radius follows automatically */
+      }
+      .svc-layout {
+        grid-template-columns: minmax(0, 29rem) minmax(0, var(--svc-stage-w));
+        column-gap: 10rem;
+      }
     }
 
     .svc-stage {

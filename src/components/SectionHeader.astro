@@ -17,7 +17,7 @@ const {
   tone = 'light',
   class: className = '',
   as: Tag = 'h2',
-} = Astro.props;
+}: Props = Astro.props;
 
 const alignment = align === 'center' ? 'text-center mx-auto items-center' : 'items-start';
 const titleTone = tone === 'dark' ? 'text-white' : 'text-ink-950';

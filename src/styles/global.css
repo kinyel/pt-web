@@ -224,13 +224,32 @@
    Only patterns repeated across many pages live here. Anything used once
    stays in its component file.                                             */
 @layer components {
+  /* --- Page gutter -------------------------------------------------------
+     80rem left a 1920px monitor with 320px of dead margin on each side, which
+     read as a site pinned in a column rather than a site. 96rem fills a large
+     screen properly while the gutter keeps growing with it, so the content
+     never runs to the bezel.
+
+     This widens the SHELL only. Line length is governed separately, by the
+     measure caps on the text blocks themselves (SectionHeader, .prose-prime,
+     .measure) — a wider shell must not become a wider paragraph. */
   .container-prime {
     width: 100%;
     margin-inline: auto;
     padding-inline: 1.25rem;
-    max-width: 80rem;
+    max-width: var(--container-max, 96rem);
   }
   @media (min-width: 768px) { .container-prime { padding-inline: 2rem; } }
+  @media (min-width: 1280px) { .container-prime { padding-inline: 3rem; } }
+  @media (min-width: 1600px) { .container-prime { padding-inline: 4rem; } }
+
+  /* Opt-in wider shell for the big visual sections, so the hero spreads across
+     the screen instead of sitting in the same column as body content. */
+  .container-wide { --container-max: 112rem; }
+
+  /* Reading measure. Roughly 68 characters at body size — the cap that stops a
+     paragraph stretching just because its container can. */
+  .measure { max-width: 42rem; }
 
   /* Eyebrow label above section headings */
   .eyebrow {

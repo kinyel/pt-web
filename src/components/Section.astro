@@ -11,7 +11,16 @@ interface Props {
   as?: 'section' | 'div';
 }
 
-const { tone = 'white', id, class: className = '', size = 'md', as: Tag = 'section' } = Astro.props;
+/* Annotated explicitly rather than relying on Astro's implicit Props
+   inference: without it `tone` and `size` come through as `any`, and indexing
+   the lookup tables below with an `any` key trips noImplicitAny (ts7053). */
+const {
+  tone = 'white',
+  id,
+  class: className = '',
+  size = 'md',
+  as: Tag = 'section',
+}: Props = Astro.props;
 
 const tones = {
   white: 'bg-white text-ink-800',
